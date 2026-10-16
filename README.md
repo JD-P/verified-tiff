@@ -6,10 +6,10 @@ Use at your own risk.**
 
 This is an attempt at a formally verified replacement library for
 [libtiff](https://en.wikipedia.org/wiki/LibTIFF) written in
-[Rust](https://rust-lang.org/) and [Versus](https://www.cs.cmu.edu/~csd-phd-blog/2023/rust-verification-with-verus/).
+[Rust](https://rust-lang.org/) and [Verus](https://www.cs.cmu.edu/~csd-phd-blog/2023/rust-verification-with-verus/).
 It is currently about 5x slower than the C libtiff, but can presumably be brought
-up to parity with further optimization of either the library itself or Versus.
-I have minimal experience with Rust and zero experience with Versus, so I'm left
+up to parity with further optimization of either the library itself or Verus.
+I have minimal experience with Rust and zero experience with Verus, so I'm left
 in the strange position of having this artifact but not really knowing if it's any
 good or not. I guess I'll find out.
 
