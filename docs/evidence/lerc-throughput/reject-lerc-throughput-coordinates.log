@@ -1,0 +1,66 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module lerc_block (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/lerc_block.rs:116:1
+    |
+116 | fn target_xy(h:Header,t:Tile,row:usize,col:usize) -> (r:(usize,usize))
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/lerc_block.rs:118:48
+    |
+118 |     ensures r.0==t.pixel(h,row as int*t.w+col),r.1==t.target(h,row as int*t.w+col),r.0<h.width*h.height,r.1<h.width*h.height*h.depth,
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+127 |     (p,(p*h.depth+t.depth)^1usize)
+    |     ------------------------------ at the end of the function body
+
+error: postcondition not satisfied
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-coordinates/lerc_block.rs:118:105
+    |
+118 |     ensures r.0==t.pixel(h,row as int*t.w+col),r.1==t.target(h,row as int*t.w+col),r.0<h.width*h.height,r.1<h.width*h.height*h.depth,
+    |                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+127 |     (p,(p*h.depth+t.depth)^1usize)
+    |     ------------------------------ at the end of the function body
+
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

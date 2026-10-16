@@ -1,0 +1,16 @@
+test_ccitt_rle (__main__.Consumers.test_ccitt_rle) ... ok
+test_cmyk_and_lab (__main__.Consumers.test_cmyk_and_lab) ... ok
+test_environment_limits (__main__.Consumers.test_environment_limits) ... ok
+test_logluv_float (__main__.Consumers.test_logluv_float) ... ok
+test_predictor3 (__main__.Consumers.test_predictor3) ... ok
+test_read_side_sample_format (__main__.Consumers.test_read_side_sample_format) ... ok
+test_registered_anonymous_and_nonimage_directories (__main__.Consumers.test_registered_anonymous_and_nonimage_directories) ... ok
+test_temporary_compressed_contexts (__main__.Consumers.test_temporary_compressed_contexts) ... ok
+test_temporary_decoder_context (__main__.Consumers.test_temporary_decoder_context) ... ok
+test_transfer_function (__main__.Consumers.test_transfer_function) ... ok
+test_ycbcr (__main__.Consumers.test_ycbcr) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 2.636s
+
+OK

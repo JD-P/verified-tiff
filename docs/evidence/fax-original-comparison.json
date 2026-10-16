@@ -1,0 +1,77 @@
+[
+  {
+    "file": "testfax3_bug54_1dnoEOL.tif",
+    "pixels": 4008960,
+    "exact": true,
+    "metadata": {
+      "width": 1728,
+      "height": 2320,
+      "channels": 1,
+      "bits_per_sample": 1,
+      "compression": 3,
+      "predictor": 1,
+      "sample_format": "unsigned_integer",
+      "color_model": "gray",
+      "output_byte_order": "not_applicable",
+      "source_alpha": "none",
+      "output_alpha": "none",
+      "output_bits_per_sample": 8,
+      "planar_configuration": 1,
+      "scratch_bytes": 63936,
+      "output_bytes": 4008960,
+      "decode_work": 18673279,
+      "work_used": 37505396
+    },
+    "oracle_warning": "Fax3Decode1D: Warning, Try to decode (read) fax Group 3 data without EOL at line 0 of strip 0 (x 0). Please check result."
+  },
+  {
+    "file": "testfax3_bug_513.tiff",
+    "pixels": 64,
+    "exact": true,
+    "metadata": {
+      "width": 32,
+      "height": 2,
+      "channels": 1,
+      "bits_per_sample": 1,
+      "compression": 3,
+      "predictor": 1,
+      "sample_format": "unsigned_integer",
+      "color_model": "gray",
+      "output_byte_order": "not_applicable",
+      "source_alpha": "none",
+      "output_alpha": "none",
+      "output_bits_per_sample": 8,
+      "planar_configuration": 1,
+      "scratch_bytes": 64,
+      "output_bytes": 64,
+      "decode_work": 2945,
+      "work_used": 7030
+    },
+    "oracle_warning": ""
+  },
+  {
+    "file": "testfax4.tiff",
+    "pixels": 8264157,
+    "exact": true,
+    "metadata": {
+      "width": 2453,
+      "height": 3369,
+      "channels": 1,
+      "bits_per_sample": 1,
+      "compression": 4,
+      "predictor": 1,
+      "sample_format": "unsigned_integer",
+      "color_model": "gray",
+      "output_byte_order": "not_applicable",
+      "source_alpha": "none",
+      "output_alpha": "none",
+      "output_bits_per_sample": 8,
+      "planar_configuration": 1,
+      "scratch_bytes": 8264157,
+      "output_bytes": 8264157,
+      "decode_work": 35786485,
+      "work_used": 71731906
+    },
+    "oracle_warning": ""
+  }
+]

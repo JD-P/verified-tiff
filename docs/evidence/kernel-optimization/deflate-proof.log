@@ -1,0 +1,83 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> src/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> src/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> src/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module deflate
+
+note: verifying module native_stream
+
+verification results:: 31 verified, 0 errors
+warning: 3 warnings emitted
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> src/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> src/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> src/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 3 warnings emitted
+

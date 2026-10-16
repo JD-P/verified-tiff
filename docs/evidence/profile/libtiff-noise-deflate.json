@@ -1,0 +1,109 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 756 dropped 0 interval_us 1000",
+  "samples": 756,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/benchmark/libtiff",
+    "target/benchmark/inputs/noise-deflate.tif",
+    "total",
+    "3000"
+  ],
+  "binary_sha256": "baa77bde849ef286bf6640fed716294b6acf9677466ae52069c03988a6df4904",
+  "input_sha256": "03f7f3ecd33fa602722fd33301ad59c532d7147328438855e44bb190abe06676",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "mode": "total",
+    "iterations": 7700,
+    "seconds": 3.02461276,
+    "ns_per_image": 392806.852,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 1048576,
+    "hash": "ba3744a0368fc2c6"
+  },
+  "functions": [
+    {
+      "function": "libz.so.1::adler32_z@@ZLIB_1.2.9",
+      "samples": 620,
+      "percent": 82.01058201058201
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 114,
+      "percent": 15.079365079365079
+    },
+    {
+      "function": "libtiff::TIFFFindField",
+      "samples": 5,
+      "percent": 0.6613756613756614
+    },
+    {
+      "function": "libz.so.1::inflate",
+      "samples": 3,
+      "percent": 0.3968253968253968
+    },
+    {
+      "function": "libtiff::tagCompare",
+      "samples": 3,
+      "percent": 0.3968253968253968
+    },
+    {
+      "function": "libtiff::TIFFCleanup",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::_TIFFVSetField",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::TIFFSetCompressionScheme",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::TIFFFetchNormalTag",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::ZIPDecode",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::TIFFReadDirectory",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::TIFFInitZIP",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libc.so.6::qsort_r@@GLIBC_2.8",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::TIFFScanlineSize64",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libtiff::_TIFFmallocExt",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    },
+    {
+      "function": "libc.so.6::munmap@@GLIBC_2.2.5",
+      "samples": 1,
+      "percent": 0.13227513227513227
+    }
+  ]
+}

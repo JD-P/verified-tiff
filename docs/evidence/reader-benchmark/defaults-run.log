@@ -1,0 +1,6 @@
+large-strip-none firstrow {'verified': 0.0026, 'libtiff': 0.008}
+large-strip-none crop {'verified': 0.1952, 'libtiff': 0.026}
+large-strip-lzw firstrow {'verified': 100.8136, 'libtiff': 0.1954}
+large-strip-lzw crop {'verified': 148.892, 'libtiff': 10.4719}
+large-strip-deflate firstrow {'verified': 302.6025, 'libtiff': 0.0196}
+large-strip-deflate crop {'verified': 433.1602, 'libtiff': 3.5782}

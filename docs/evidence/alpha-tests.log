@@ -1,0 +1,14 @@
+test_all_color_alpha_pairs (__main__.Alpha.test_all_color_alpha_pairs) ... ok
+test_alpha_matrix (__main__.Alpha.test_alpha_matrix) ... ok
+test_explicit_alpha_semantics (__main__.Alpha.test_explicit_alpha_semantics) ... ok
+test_independent_libtiff_encoder (__main__.Alpha.test_independent_libtiff_encoder) ... ok
+test_invalid_alpha_metadata (__main__.Alpha.test_invalid_alpha_metadata) ... ok
+test_pages_formats_and_limits (__main__.Alpha.test_pages_formats_and_limits) ... ok
+test_truncated_alpha_storage (__main__.Alpha.test_truncated_alpha_storage) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 6.499s
+
+OK
+alpha exhaustive conversion: 6 images, 65536 color/alpha pairs per color channel
+alpha matrix: 576 cases; native libtiff oracle=True

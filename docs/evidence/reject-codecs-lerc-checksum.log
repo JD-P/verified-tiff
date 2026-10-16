@@ -1,0 +1,72 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/native_stream.rs:14:5
+   |
+14 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/native_stream.rs:15:5
+   |
+15 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module lerc_header (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/lerc_header.rs:59:1
+   |
+59 | pub(super) fn inspect(s:&[u8]) -> (r:Result<Header,Error>)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/lerc_header.rs:60:13
+   |
+60 |       ensures r.is_ok()==inspected(s@).is_some(),r.is_ok() ==> r.unwrap()==inspected(s@).unwrap() && r.unwrap().invariant() && r.unw...
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+61 | / {
+62 | |     reveal(inspected);let h=read_record(s)?;
+63 | |     let (blob,_)=s.split_at(h.length);let sum=check::compute(blob,14);
+64 | |     if false{return Err(Error::Invalid);}
+65 | |     Ok(h)
+66 | | }
+   | |_- at the end of the function body
+
+error: postcondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/lerc_header.rs:60:48
+   |
+60 |       ensures r.is_ok()==inspected(s@).is_some(),r.is_ok() ==> r.unwrap()==inspected(s@).unwrap() && r.unwrap().invariant() && r.unwrap().length<=s.len(),
+   |                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+61 | / {
+62 | |     reveal(inspected);let h=read_record(s)?;
+63 | |     let (blob,_)=s.split_at(h.length);let sum=check::compute(blob,14);
+64 | |     if false{return Err(Error::Invalid);}
+65 | |     Ok(h)
+66 | | }
+   | |_- at the end of the function body
+
+note: recommendation not met
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-lerc-checksum/lerc_header.rs:60:74
+   |
+60 |     ensures r.is_ok()==inspected(s@).is_some(),r.is_ok() ==> r.unwrap()==inspected(s@).unwrap() && r.unwrap().invariant() && r.unwra...
+   |                                                                          ^^^^^^^^^^^^^^^^^^^^^^
+   |
+  --> std_specs/option.rs:154:8
+   |
+   = note: recommendation not met
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 2 warnings emitted
+

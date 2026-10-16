@@ -1,0 +1,85 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 2003 dropped 0 interval_us 1000",
+  "samples": 2003,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/017cea9a2f6e/verified-tiff/target/reader-benchmark/verified",
+    "target/reader-benchmark/inputs/rgb-deflate.tif",
+    "native",
+    "4000",
+    "memory"
+  ],
+  "binary_sha256": "0d830657f019133d13247bf2af67408f00d9acda949806e38417abe265797f7b",
+  "input_sha256": "b632fc15ac1a2f0e11879be2ada455cb358f097c2948163f3ad32aca5cd21403",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "width": 1024,
+    "height": 1024,
+    "bytes": 3145728,
+    "iterations": 72,
+    "seconds": 7.89894186,
+    "ns_per_operation": 109707526,
+    "peak_rss_kib": 5284,
+    "hash": "cf57ce8ffd4c3325"
+  },
+  "functions": [
+    {
+      "function": "libtiff.so.6::<verified_tiff::native_stream::Inflater>::step",
+      "samples": 1002,
+      "percent": 50.024962556165754
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::stream::Stream>::pull",
+      "samples": 872,
+      "percent": 43.53469795307039
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::stream::Input>::ensure",
+      "samples": 101,
+      "percent": 5.042436345481778
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 15,
+      "percent": 0.7488766849725412
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff::deflate_bits::Huff>::build",
+      "samples": 4,
+      "percent": 0.19970044932601097
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::deflate_header::dynamic",
+      "samples": 3,
+      "percent": 0.14977533699450823
+    },
+    {
+      "function": "libc.so.6::brk@@GLIBC_2.2.5",
+      "samples": 2,
+      "percent": 0.09985022466300549
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::stream::Stream>::range",
+      "samples": 1,
+      "percent": 0.04992511233150274
+    },
+    {
+      "function": "libc.so.6::malloc@@GLIBC_2.2.5",
+      "samples": 1,
+      "percent": 0.04992511233150274
+    },
+    {
+      "function": "libtiff.so.6::[unresolved]",
+      "samples": 1,
+      "percent": 0.04992511233150274
+    },
+    {
+      "function": "verified::main",
+      "samples": 1,
+      "percent": 0.04992511233150274
+    }
+  ]
+}

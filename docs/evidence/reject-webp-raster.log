@@ -1,0 +1,44 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> target/reject-webp-raster/native_stream.rs:14:5
+   |
+14 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> target/reject-webp-raster/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> target/reject-webp-raster/native_stream.rs:15:5
+   |
+15 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> target/reject-webp-raster/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module reader (selected functions)
+
+error: postcondition not satisfied
+   --> target/reject-webp-raster/reader.rs:92:9
+    |
+ 92 |           supported_raster_profile(s@,page,*limits) && old(budget).remaining as int>=raster_inspection_work_bound(page,*limits) ==> r.is_ok(),
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+ 95 | / {
+ 96 | |     // Bound the first attempt and charge its actual work even when it fails.
+ 97 | |     // The second inspector validates independently; no failed-probe state is reused.
+ 98 | |     let quota=match inspection_work_limit(page,limits) {
+...   |
+161 | | }
+    | |_- at the end of the function body
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error; 2 warnings emitted
+

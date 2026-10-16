@@ -1,0 +1,54 @@
+[
+  {
+    "file": "test_float64_predictor2_be_lzw.tif",
+    "input_sha256": "92b52def55d4fad284fe74b447b1a4a008c4ae0c2eeb80044e18b8f5a192f670",
+    "accepted": true,
+    "metadata": {
+      "width": 20,
+      "height": 20,
+      "channels": 1,
+      "bits_per_sample": 64,
+      "compression": 5,
+      "predictor": 2,
+      "sample_format": "ieee_float",
+      "color_model": "gray",
+      "output_byte_order": "little",
+      "source_alpha": "none",
+      "output_alpha": "none",
+      "output_bits_per_sample": 64,
+      "planar_configuration": 1,
+      "scratch_bytes": 3200,
+      "output_bytes": 3200,
+      "decode_work": 10314,
+      "work_used": 11270
+    },
+    "pixels_match": true,
+    "pixel_sha256": "0c584ffb2f50f568c2f97313e38a16c7b9274300b3b846d9faf2d0a09ba1881f"
+  },
+  {
+    "file": "test_float64_predictor2_le_lzw.tif",
+    "input_sha256": "0aa2ac5e2513e9a9f76ac70eaab47002f255ddd3648c4335b30a1fdd337ed821",
+    "accepted": true,
+    "metadata": {
+      "width": 20,
+      "height": 20,
+      "channels": 1,
+      "bits_per_sample": 64,
+      "compression": 5,
+      "predictor": 2,
+      "sample_format": "ieee_float",
+      "color_model": "gray",
+      "output_byte_order": "little",
+      "source_alpha": "none",
+      "output_alpha": "none",
+      "output_bits_per_sample": 64,
+      "planar_configuration": 1,
+      "scratch_bytes": 3200,
+      "output_bytes": 3200,
+      "decode_work": 10329,
+      "work_used": 11300
+    },
+    "pixels_match": true,
+    "pixel_sha256": "0c584ffb2f50f568c2f97313e38a16c7b9274300b3b846d9faf2d0a09ba1881f"
+  }
+]

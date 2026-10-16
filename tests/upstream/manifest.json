@@ -1,0 +1,539 @@
+{
+  "source": "libtiff 4.7.1 test/images",
+  "fixtures": [
+    {
+      "file": "minisblack-1c-8b.tiff",
+      "sha256": "7993664077ea8898704d15128e563d9ddd9c85376b3e8b42b0865a2ba71ee175",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "6f2d6e8e78698950bfced4d1049ff79e13b54d751db08364c43de4a721b72d16",
+      "expected": "decode page 0; bounded traversal on cyclic fixtures"
+    },
+    {
+      "file": "rgb-3c-8b.tiff",
+      "sha256": "21a751d4d6cad3903e4833db726c1b645fc88a1161efffcabaf9ce9c8c8f7084",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "ff53739e3609939a902677367b759b4dd0c32e0605dae9173657e32f56de0ff4",
+      "expected": "decode page 0; bounded traversal on cyclic fixtures"
+    },
+    {
+      "file": "test_ifd_loop_subifd.tif",
+      "sha256": "9f7b0b1ef6fe925f2b4913e2e108ecfb1f9547346de17e53c61068888b7345aa",
+      "shape": [
+        1,
+        1,
+        3
+      ],
+      "pixel_sha256": "4234f1064f32788dc9487507f9eeecd0cdf7df6bd010fd1dad8026226e222813",
+      "expected": "decode page 0; bounded traversal on cyclic fixtures"
+    },
+    {
+      "file": "test_ifd_loop_to_first.tif",
+      "sha256": "516a304cc30116b6f3a123544ad287d7fbe93aae1bf741a883b1d0b92f7dec9d",
+      "shape": [
+        1,
+        1,
+        1
+      ],
+      "pixel_sha256": "8254c329a92850f6d539dd376f4816ee2764517da5e0235514af433164480d7a",
+      "expected": "decode page 0; bounded traversal on cyclic fixtures"
+    },
+    {
+      "file": "test_ifd_loop_to_self.tif",
+      "sha256": "38b3093d53a1a80fdb949992ee51d6cb184894cc82ddec7a7f71ea5817e49868",
+      "shape": [
+        20,
+        20,
+        1
+      ],
+      "pixel_sha256": "b55a841b7b95be907f6bb0d358b8d10c9dce6e485381eb9accb71e653597d9a1",
+      "expected": "decode page 0; bounded traversal on cyclic fixtures"
+    },
+    {
+      "file": "test_two_ifds.tif",
+      "sha256": "e8167ea8ec1d9e145798ac7fc19a3fd79c6eee55ed0923b17a305f4fca0d6810",
+      "shape": [
+        1,
+        1,
+        1
+      ],
+      "pixel_sha256": "8254c329a92850f6d539dd376f4816ee2764517da5e0235514af433164480d7a",
+      "expected": "decode page 0; bounded traversal on cyclic fixtures"
+    },
+    {
+      "file": "miniswhite-1c-1b.tiff",
+      "sha256": "9b303ec8e0dc83e9099af6a8c0d837772caad953d72995ad34e2f842fb66e83f",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "8d374877da14092727fac4662dea3113b6b934c48307bb8bcb54ee4b5837a2ad",
+      "expected": "decode uncompressed 1-bit WhiteIsZero, byte-padded rows to Gray8"
+    },
+    {
+      "file": "packbits-miniswhite-1c-1b.tiff",
+      "sha256": "993fc5b0dd55fda0a53aa9cff25b4f906615a834a4cf09002f508e01df08115c",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "8d374877da14092727fac4662dea3113b6b934c48307bb8bcb54ee4b5837a2ad",
+      "expected": "decode libtiff-encoded PackBits; normalized pixel hash matches uncompressed source",
+      "source": "miniswhite-1c-1b.tiff",
+      "transform": [
+        "tiffcp",
+        "-c",
+        "packbits",
+        "-r",
+        "17",
+        "miniswhite-1c-1b.tiff",
+        "packbits-miniswhite-1c-1b.tiff"
+      ]
+    },
+    {
+      "file": "packbits-minisblack-1c-8b.tiff",
+      "sha256": "fd6c053eb1c6226054c084cc9a93d4ee372b76d0e4a66c63b1859c96d6ed41a0",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "6f2d6e8e78698950bfced4d1049ff79e13b54d751db08364c43de4a721b72d16",
+      "expected": "decode libtiff-encoded PackBits; normalized pixel hash matches uncompressed source",
+      "source": "minisblack-1c-8b.tiff",
+      "transform": [
+        "tiffcp",
+        "-c",
+        "packbits",
+        "-t",
+        "-w",
+        "32",
+        "-l",
+        "32",
+        "minisblack-1c-8b.tiff",
+        "packbits-minisblack-1c-8b.tiff"
+      ]
+    },
+    {
+      "file": "packbits-rgb-3c-8b.tiff",
+      "sha256": "2316f774db50ddb2272f5e8acba6d1520bdf2325f15677092fa6761c8b4919c7",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "ff53739e3609939a902677367b759b4dd0c32e0605dae9173657e32f56de0ff4",
+      "expected": "decode libtiff-encoded PackBits; normalized pixel hash matches uncompressed source",
+      "source": "rgb-3c-8b.tiff",
+      "transform": [
+        "tiffcp",
+        "-c",
+        "packbits",
+        "-r",
+        "13",
+        "rgb-3c-8b.tiff",
+        "packbits-rgb-3c-8b.tiff"
+      ]
+    },
+    {
+      "file": "lzw-miniswhite-1c-1b.tiff",
+      "sha256": "82461f603d295cc7a4ce04086659b64727a781b7cb64a901b31df6e31dadcca3",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "8d374877da14092727fac4662dea3113b6b934c48307bb8bcb54ee4b5837a2ad",
+      "expected": "decode libtiff-encoded LZW, Predictor 1; normalized pixel hash matches uncompressed source",
+      "source": "miniswhite-1c-1b.tiff",
+      "transform": [
+        "tiffcp",
+        "-c",
+        "lzw:1",
+        "-r",
+        "17",
+        "miniswhite-1c-1b.tiff",
+        "lzw-miniswhite-1c-1b.tiff"
+      ]
+    },
+    {
+      "file": "lzw-minisblack-1c-8b.tiff",
+      "sha256": "efe0e1479f734128f6a055b28545019bf26eee5c2b728f9e08beedbc98f9d05e",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "6f2d6e8e78698950bfced4d1049ff79e13b54d751db08364c43de4a721b72d16",
+      "expected": "decode libtiff-encoded LZW, Predictor 1; normalized pixel hash matches uncompressed source",
+      "source": "minisblack-1c-8b.tiff",
+      "transform": [
+        "tiffcp",
+        "-c",
+        "lzw:1",
+        "-t",
+        "-w",
+        "32",
+        "-l",
+        "32",
+        "minisblack-1c-8b.tiff",
+        "lzw-minisblack-1c-8b.tiff"
+      ]
+    },
+    {
+      "file": "lzw-rgb-3c-8b.tiff",
+      "sha256": "d306be217a8cb096ccd8333e56d668c7b0045b90a193ff462bea57fada3eb27a",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "ff53739e3609939a902677367b759b4dd0c32e0605dae9173657e32f56de0ff4",
+      "expected": "decode libtiff-encoded LZW, Predictor 1; normalized pixel hash matches uncompressed source",
+      "source": "rgb-3c-8b.tiff",
+      "transform": [
+        "tiffcp",
+        "-c",
+        "lzw:1",
+        "-r",
+        "13",
+        "rgb-3c-8b.tiff",
+        "lzw-rgb-3c-8b.tiff"
+      ]
+    },
+    {
+      "file": "none-minisblack-2c-8b-alpha.tiff",
+      "sha256": "f7b629d6dd297731f71e0fd79699e6f2349c1b286eee02c3577b7adae09153f4",
+      "shape": [
+        64,
+        64,
+        2
+      ],
+      "pixel_sha256": "aab6f33e429b1c72ec64ccaf8687edd90c6fbea274da334937af4e3ad54bb945",
+      "alpha": 1,
+      "white": false,
+      "source": "minisblack-2c-8b-alpha.tiff",
+      "source_sha256": "6fcb5238fb9bd583cd78b27c51b16492d17d4768032f9ee1ed10f2d2f45730c9",
+      "transform": [
+        [
+          "tiffcp",
+          "-c",
+          "none",
+          "minisblack-2c-8b-alpha.tiff",
+          "alpha-planar-plain.tiff"
+        ],
+        [
+          "tiffcp",
+          "-p",
+          "contig",
+          "-c",
+          "none",
+          "-r",
+          "17",
+          "alpha-planar-plain.tiff",
+          "none-minisblack-2c-8b-alpha.tiff"
+        ]
+      ],
+      "expected": "contiguous associated Gray+A; native samples decoded by libtiff and normalized by independent rational reference"
+    },
+    {
+      "file": "packbits-minisblack-2c-8b-alpha.tiff",
+      "sha256": "e3b42010c181ed5def6220aa5cd7e206f6d4b87bc412915192485a3346322ec8",
+      "shape": [
+        64,
+        64,
+        2
+      ],
+      "pixel_sha256": "aab6f33e429b1c72ec64ccaf8687edd90c6fbea274da334937af4e3ad54bb945",
+      "alpha": 1,
+      "white": false,
+      "source": "minisblack-2c-8b-alpha.tiff",
+      "source_sha256": "6fcb5238fb9bd583cd78b27c51b16492d17d4768032f9ee1ed10f2d2f45730c9",
+      "transform": [
+        [
+          "tiffcp",
+          "-c",
+          "none",
+          "minisblack-2c-8b-alpha.tiff",
+          "alpha-planar-plain.tiff"
+        ],
+        [
+          "tiffcp",
+          "-p",
+          "contig",
+          "-c",
+          "packbits",
+          "-r",
+          "17",
+          "alpha-planar-plain.tiff",
+          "packbits-minisblack-2c-8b-alpha.tiff"
+        ]
+      ],
+      "expected": "contiguous associated Gray+A; native samples decoded by libtiff and normalized by independent rational reference"
+    },
+    {
+      "file": "lzw-minisblack-2c-8b-alpha.tiff",
+      "sha256": "d53816640f51a491b6561694a284644d507b4d812bd13012ebdbf806efe792ff",
+      "shape": [
+        64,
+        64,
+        2
+      ],
+      "pixel_sha256": "aab6f33e429b1c72ec64ccaf8687edd90c6fbea274da334937af4e3ad54bb945",
+      "alpha": 1,
+      "white": false,
+      "source": "minisblack-2c-8b-alpha.tiff",
+      "source_sha256": "6fcb5238fb9bd583cd78b27c51b16492d17d4768032f9ee1ed10f2d2f45730c9",
+      "transform": [
+        [
+          "tiffcp",
+          "-c",
+          "none",
+          "minisblack-2c-8b-alpha.tiff",
+          "alpha-planar-plain.tiff"
+        ],
+        [
+          "tiffcp",
+          "-p",
+          "contig",
+          "-c",
+          "lzw:1",
+          "-r",
+          "17",
+          "alpha-planar-plain.tiff",
+          "lzw-minisblack-2c-8b-alpha.tiff"
+        ]
+      ],
+      "expected": "contiguous associated Gray+A; native samples decoded by libtiff and normalized by independent rational reference"
+    },
+    {
+      "file": "minisblack-1c-16b.tiff",
+      "sha256": "4b158802cb0926445ca0e61a43e9aad16290c63950457466992d53f3e2843a02",
+      "shape": [
+        157,
+        151,
+        1
+      ],
+      "pixel_sha256": "732c4554c7271229e4d9d8d5fcb0ea6415fa2840d00dc9a12869969fb8d9179b",
+      "bits": 16,
+      "output_bits": 16,
+      "alpha": 0,
+      "white": false,
+      "native_oracle": true,
+      "expected": "unchanged upstream original; first main image; full-precision native sample comparison"
+    },
+    {
+      "file": "minisblack-2c-8b-alpha.tiff",
+      "sha256": "6fcb5238fb9bd583cd78b27c51b16492d17d4768032f9ee1ed10f2d2f45730c9",
+      "shape": [
+        64,
+        64,
+        2
+      ],
+      "pixel_sha256": "aab6f33e429b1c72ec64ccaf8687edd90c6fbea274da334937af4e3ad54bb945",
+      "bits": 8,
+      "output_bits": 8,
+      "alpha": 1,
+      "white": false,
+      "native_oracle": true,
+      "expected": "unchanged upstream original; first main image; full-precision native sample comparison"
+    },
+    {
+      "file": "palette-1c-1b.tiff",
+      "sha256": "a5793c7369c07eda42c81b492661ec15511b7082df7b4eb728130ac6baec4fe4",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "9e35d83f16404cbe72e2edb108e3dc64f1a89ba5d210610f18c4562cdba9fbf1",
+      "bits": 1,
+      "output_bits": 8,
+      "alpha": 0,
+      "white": false,
+      "native_oracle": true,
+      "expected": "unchanged upstream original; first main image; full-precision native sample comparison"
+    },
+    {
+      "file": "palette-1c-4b.tiff",
+      "sha256": "148fc93d0effb9287aa93552efabe913a6c60093940a129d9c96b48ebe6a933f",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "8cfacd8173e6d8c5f53d05c86da6fdeac1b3557564232749f3b34b176625810d",
+      "bits": 4,
+      "output_bits": 8,
+      "alpha": 0,
+      "white": false,
+      "native_oracle": true,
+      "expected": "unchanged upstream original; first main image; full-precision native sample comparison"
+    },
+    {
+      "file": "palette-1c-8b.tiff",
+      "sha256": "9ef8051e9aa19f7439fdec77c7e5bdffef442572937287a83b5938bd02464286",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "1944b9bf417cd0aa3ae515425609126f80431c02e1b5103df15b29f26d2dc6a1",
+      "bits": 8,
+      "output_bits": 8,
+      "alpha": 0,
+      "white": false,
+      "native_oracle": true,
+      "expected": "unchanged upstream original; first main image; full-precision native sample comparison"
+    },
+    {
+      "file": "rgb-3c-16b.tiff",
+      "sha256": "31ff3a1f416cb7281acfbcbb4b56ee8bb94e9f91489602ff2806e5a49abc03c0",
+      "shape": [
+        157,
+        151,
+        3
+      ],
+      "pixel_sha256": "80aca8bc4e69ebded102f69f792515f7d1d853d248912631e701fcafed00bbe2",
+      "bits": 16,
+      "output_bits": 16,
+      "alpha": 0,
+      "white": false,
+      "native_oracle": true,
+      "expected": "unchanged upstream original; first main image; full-precision native sample comparison"
+    },
+    {
+      "file": "deflate-last-strip-extra-data.tiff",
+      "sha256": "031aa7e15c2dfb21fe2fdd89eff88c4505c306f641be8b98f3666707d698b5ae",
+      "shape": [
+        500,
+        500,
+        1
+      ],
+      "pixel_sha256": "6b4a4efbcbbb242fd172773ed16b77e032747f6eee21b8e71b6da19793c18f80",
+      "expected": "Original Deflate regression: 8000 decoded bytes in final strip, 2000 logical bytes; full stream/checksum validated",
+      "native_oracle": true,
+      "white": false
+    },
+    {
+      "file": "quad-tile.jpg.tiff",
+      "sha256": "657062ada721390508c93606e2d7a33295722a171be65f55aa578f4aeeb96db4",
+      "shape": [
+        512,
+        384,
+        3
+      ],
+      "pixel_sha256": "fbc3b8d22125cc63dc231a1bab4abcab5e252833dd43972f08fc39f618c0e3f6",
+      "reference_pixel_sha256": "f5ede8c8d319d4b104f14f2b9dcea27a086fbaef6892e672da9d673f6b3bdfe1",
+      "jpeg_oracle": true,
+      "max_channel_error": 3,
+      "expected": "page 0; nearest chroma; bounded integer-IDCT difference",
+      "observed_mean_absolute_error": 0.010694715711805556
+    },
+    {
+      "file": "ojpeg_chewey_subsamp21_multi_strip.tiff",
+      "sha256": "fa829625035ed42a71d3baf0c4148903808b7c16c5e3a5a97a86909a969a57cb",
+      "shape": [
+        392,
+        575,
+        3
+      ],
+      "pixel_sha256": "8a454d1d071b1d9a475bb98b6483c09ea1a4686ebd2997a41ed1eeb3575db4e9",
+      "reference_pixel_sha256": "1e03a2f3d93e3f034ca28f1cb950e6bd23aef4ba8c21650cc6ecbebe3da7ab22",
+      "jpeg_oracle": true,
+      "max_channel_error": 3,
+      "expected": "page 0; nearest chroma; bounded integer-IDCT difference",
+      "observed_mean_absolute_error": 0.06549985211475895
+    },
+    {
+      "file": "ojpeg_zackthecat_subsamp22_single_strip.tiff",
+      "sha256": "0d31f2acb25bfbde4d79975572369c3e4bea8e978fc1935075a545e3f8321b6e",
+      "shape": [
+        234,
+        213,
+        3
+      ],
+      "pixel_sha256": "40a0ef7f583017b04c2865221d3a56538f4efad7248ae3bb656836afb1961d6b",
+      "reference_pixel_sha256": "78a655fa8c37d87848897cfd9149a11bc1568318ed1c1558ecd666ab1b36b9d6",
+      "jpeg_oracle": true,
+      "max_channel_error": 3,
+      "expected": "page 0; nearest chroma; bounded integer-IDCT difference",
+      "observed_mean_absolute_error": 0.0260088546473523
+    },
+    {
+      "file": "ojpeg_single_strip_no_rowsperstrip.tiff",
+      "sha256": "bb4e0c9436da88030de5bb4f1042326fb15593d81650cfb6c51be800059ca032",
+      "shape": [
+        234,
+        213,
+        3
+      ],
+      "pixel_sha256": "40a0ef7f583017b04c2865221d3a56538f4efad7248ae3bb656836afb1961d6b",
+      "reference_pixel_sha256": "78a655fa8c37d87848897cfd9149a11bc1568318ed1c1558ecd666ab1b36b9d6",
+      "jpeg_oracle": true,
+      "max_channel_error": 3,
+      "expected": "page 0; nearest chroma; bounded integer-IDCT difference",
+      "observed_mean_absolute_error": 0.0260088546473523
+    },
+    {
+      "file": "webp_lossless_rgba_alpha_fully_opaque.tif",
+      "sha256": "ca79569f94dad826998157d1415dadc4ea2930d79e772f8e0be79e09c3984b97",
+      "shape": [
+        20,
+        20,
+        4
+      ],
+      "pixel_sha256": "3f08979d8b3a4700e4e34b057a9197287f98a5a3d7d37cc958f34843e25257ca",
+      "alpha": 2,
+      "white": false,
+      "native_oracle": true,
+      "expected": "Unchanged WebP lossless opaque-alpha regression; native RGBA exact despite has_alpha=0 in VP8L header"
+    },
+    {
+      "file": "lzw-single-strip.tiff",
+      "sha256": "9cbff8fbe7a487da5d56e7e7566c0f3984e7092a3b1ccfe6bc1461449d008e4e",
+      "shape": [
+        7795,
+        3122,
+        1
+      ],
+      "pixel_sha256": "1758deaebe0f5ac2a42b241e9538e71e25586e2e21a865490302d01d8c2730f5",
+      "expected": "Unchanged original; exact LZW expansion with five residual bits of a truncated EOI; independent Python and libtiff Gray8 comparisons"
+    },
+    {
+      "file": "quad-lzw-compat.tiff",
+      "sha256": "081118d951224d9909b105bb75f9667fd817e7b95122d141e91b43604dacd78b",
+      "shape": [
+        512,
+        384,
+        3
+      ],
+      "pixel_sha256": "cd515a3f3a51ac88da3df62a657d892e97942992b091cd7f16900721ae41cb9b",
+      "native_oracle": true,
+      "white": false,
+      "expected": "Unchanged original; 77 old-style LSB LZW strips, late-change widths and frozen full dictionary; independent Python and libtiff RGB exact"
+    },
+    {
+      "file": "logluv-3c-16b.tiff",
+      "sha256": "a042e969b1f6ee47703e5187bdac782510023906cd99fdb81ad41e510f4c457d",
+      "shape": [
+        1,
+        1,
+        3
+      ],
+      "pixel_sha256": "8262676937f21d3b6034030a5cbb1c632929cc7aedb7275a8c280944e44f26bb",
+      "native_oracle": true,
+      "white": false,
+      "expected": "Unchanged original SGILog32; exact native LogLuv16 components in little-endian NPY, compared with independent rational conversion and libtiff SGILOGDATAFMT_16BIT"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "compat-tests",
+    "exit_code": 0,
+    "seconds": 80.99766299099974
+  },
+  {
+    "name": "sanitizer-tests",
+    "exit_code": 0,
+    "seconds": 58.39849999699982
+  },
+  {
+    "name": "fuzz-tests",
+    "exit_code": 0,
+    "seconds": 0.267698267999549
+  },
+  {
+    "name": "upstream",
+    "exit_code": 0,
+    "seconds": 17.605339895000725
+  }
+]

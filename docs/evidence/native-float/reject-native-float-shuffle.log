@@ -1,0 +1,48 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module native_fp (selected functions)
+
+error: invariant not satisfied at end of loop body
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-float-shuffle/native_fp.rs:63:13
+   |
+63 |             forall|j:int| 0<=j<k ==> out@[j]==decoded(raw@,row,ch,bytes,out_le,j),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error; 3 warnings emitted
+

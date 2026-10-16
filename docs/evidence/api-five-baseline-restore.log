@@ -1,0 +1,25 @@
+patching file compat/api.json
+patching file compat/bridge.h
+patching file compat/fields.inc
+patching file compat/generate_stubs.py
+patching file compat/src/decoder.rs
+patching file compat/src/directory.rs
+patching file compat/src/lib.rs
+patching file compat/src/storage.rs
+patching file compat/tests/api.c
+patching file compat/tests/coverage.c
+patching file compat/tests/coverage.py
+patching file compat/tests/pillow_smoke.py
+patching file compat/tests/test.py
+patching file compat/tiff_compat.c
+patching file scripts/reject-native-check.py
+patching file scripts/test-compat.sh
+patching file scripts/verify-parallel.py
+patching file scripts/verify.sh
+patching file src/container.rs
+patching file src/lib.rs
+patching file src/native.rs
+patching file src/native_samples.rs
+patching file tests/native_api.rs
+Restored all 51 original core files and archived adapter in /workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/api-five-v20-final-restore
+This is a benchmark build tree, not a separate deliverable or a fresh verification run.

@@ -1,0 +1,1419 @@
+{
+  "target": "libtiff 4.7.1 public Linux tiffio.h",
+  "functions": [
+    {
+      "name": "LogL10fromY",
+      "result": "int",
+      "arguments": "double, int",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "LogL10toY",
+      "result": "double",
+      "arguments": "int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "LogL16fromY",
+      "result": "int",
+      "arguments": "double, int",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "LogL16toY",
+      "result": "double",
+      "arguments": "int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "LogLuv24fromXYZ",
+      "result": "uint32_t",
+      "arguments": "float *, int",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "LogLuv24toXYZ",
+      "result": "void",
+      "arguments": "uint32_t, float *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "LogLuv32fromXYZ",
+      "result": "uint32_t",
+      "arguments": "float *, int",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "LogLuv32toXYZ",
+      "result": "void",
+      "arguments": "uint32_t, float *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFAccessTagMethods",
+      "result": "TIFFTagMethods *",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCIELabToRGBInit",
+      "result": "int",
+      "arguments": "TIFFCIELabToRGB *, const TIFFDisplay *, float *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCIELabToXYZ",
+      "result": "void",
+      "arguments": "TIFFCIELabToRGB *, uint32_t, int32_t, int32_t, float *, float *, float *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCheckTile",
+      "result": "int",
+      "arguments": "TIFF *tif, uint32_t x, uint32_t y, uint32_t z, uint16_t s",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCheckpointDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFCleanup",
+      "result": "void",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFClientOpen",
+      "result": "TIFF *",
+      "arguments": "const char *, const char *, thandle_t, TIFFReadWriteProc, TIFFReadWriteProc, TIFFSeekProc, TIFFCloseProc, TIFFSizeProc, TIFFMapFileProc, TIFFUnmapFileProc",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFClientOpenExt",
+      "result": "TIFF *",
+      "arguments": "const char *, const char *, thandle_t, TIFFReadWriteProc, TIFFReadWriteProc, TIFFSeekProc, TIFFCloseProc, TIFFSizeProc, TIFFMapFileProc, TIFFUnmapFileProc, TIFFOpenOptions *opts",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFClientdata",
+      "result": "thandle_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFClose",
+      "result": "void",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFComputeStrip",
+      "result": "uint32_t",
+      "arguments": "TIFF *, uint32_t, uint16_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFComputeTile",
+      "result": "uint32_t",
+      "arguments": "TIFF *tif, uint32_t x, uint32_t y, uint32_t z, uint16_t s",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCreateCustomDirectory",
+      "result": "int",
+      "arguments": "TIFF *, const TIFFFieldArray *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFCreateDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFCreateEXIFDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFCreateGPSDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFCurrentDirOffset",
+      "result": "uint64_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCurrentDirectory",
+      "result": "tdir_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCurrentRow",
+      "result": "uint32_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCurrentStrip",
+      "result": "uint32_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFCurrentTile",
+      "result": "uint32_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFDataWidth",
+      "result": "int",
+      "arguments": "TIFFDataType",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFDefaultStripSize",
+      "result": "uint32_t",
+      "arguments": "TIFF *tif, uint32_t request",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFDefaultTileSize",
+      "result": "void",
+      "arguments": "TIFF *, uint32_t *, uint32_t *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "void (diagnostic only)"
+    },
+    {
+      "name": "TIFFDeferStrileArrayWriting",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFError",
+      "result": "void",
+      "arguments": "const char *, const char *, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFErrorExt",
+      "result": "void",
+      "arguments": "thandle_t, const char *, const char *, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFErrorExtR",
+      "result": "void",
+      "arguments": "TIFF *, const char *, const char *, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFdOpen",
+      "result": "TIFF *",
+      "arguments": "int, const char *, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFdOpenExt",
+      "result": "TIFF *",
+      "arguments": "int, const char *, const char *, TIFFOpenOptions *opts",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldDataType",
+      "result": "TIFFDataType",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldIsAnonymous",
+      "result": "int",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldName",
+      "result": "const char *",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldPassCount",
+      "result": "int",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldReadCount",
+      "result": "int",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldSetGetCountSize",
+      "result": "int",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldSetGetSize",
+      "result": "int",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldTag",
+      "result": "uint32_t",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldWithName",
+      "result": "const TIFFField *",
+      "arguments": "TIFF *, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldWithTag",
+      "result": "const TIFFField *",
+      "arguments": "TIFF *, uint32_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFieldWriteCount",
+      "result": "int",
+      "arguments": "const TIFFField *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFileName",
+      "result": "const char *",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFileno",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFindCODEC",
+      "result": "const TIFFCodec *",
+      "arguments": "uint16_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFindField",
+      "result": "const TIFFField *",
+      "arguments": "TIFF *, uint32_t, TIFFDataType",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFlush",
+      "result": "int",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFFlushData",
+      "result": "int",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFForceStrileArrayWriting",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFFreeDirectory",
+      "result": "void",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetBitRevTable",
+      "result": "const unsigned char *",
+      "arguments": "int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetClientInfo",
+      "result": "void *",
+      "arguments": "TIFF *, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetCloseProc",
+      "result": "TIFFCloseProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetConfiguredCODECs",
+      "result": "TIFFCodec *",
+      "arguments": "void",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetField",
+      "result": "int",
+      "arguments": "TIFF *tif, uint32_t tag, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetFieldDefaulted",
+      "result": "int",
+      "arguments": "TIFF *tif, uint32_t tag, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetMapFileProc",
+      "result": "TIFFMapFileProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetMode",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetReadProc",
+      "result": "TIFFReadWriteProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetSeekProc",
+      "result": "TIFFSeekProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetSizeProc",
+      "result": "TIFFSizeProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetStrileByteCount",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t strile",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetStrileByteCountWithErr",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t strile, int *pbErr",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetStrileOffset",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t strile",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetStrileOffsetWithErr",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t strile, int *pbErr",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetTagListCount",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetTagListEntry",
+      "result": "uint32_t",
+      "arguments": "TIFF *, int tag_index",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetUnmapFileProc",
+      "result": "TIFFUnmapFileProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetVersion",
+      "result": "const char *",
+      "arguments": "void",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFGetWriteProc",
+      "result": "TIFFReadWriteProc",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsBigEndian",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsBigTIFF",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsByteSwapped",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsCODECConfigured",
+      "result": "int",
+      "arguments": "uint16_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsMSB2LSB",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsTiled",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFIsUpSampled",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFLastDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFMergeFieldInfo",
+      "result": "int",
+      "arguments": "TIFF *, const TIFFFieldInfo[], uint32_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFNumberOfDirectories",
+      "result": "tdir_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFNumberOfStrips",
+      "result": "uint32_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFNumberOfTiles",
+      "result": "uint32_t",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpen",
+      "result": "TIFF *",
+      "arguments": "const char *, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenExt",
+      "result": "TIFF *",
+      "arguments": "const char *, const char *, TIFFOpenOptions *opts",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsAlloc",
+      "result": "TIFFOpenOptions *",
+      "arguments": "void",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsFree",
+      "result": "void",
+      "arguments": "TIFFOpenOptions *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsSetErrorHandlerExtR",
+      "result": "void",
+      "arguments": "TIFFOpenOptions *opts, TIFFErrorHandlerExtR handler, void *errorhandler_user_data",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsSetMaxCumulatedMemAlloc",
+      "result": "void",
+      "arguments": "TIFFOpenOptions *opts, tmsize_t max_cumulated_mem_alloc",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsSetMaxSingleMemAlloc",
+      "result": "void",
+      "arguments": "TIFFOpenOptions *opts, tmsize_t max_single_mem_alloc",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsSetWarnAboutUnknownTags",
+      "result": "void",
+      "arguments": "TIFFOpenOptions *opts, int warn_about_unknown_tags",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFOpenOptionsSetWarningHandlerExtR",
+      "result": "void",
+      "arguments": "TIFFOpenOptions *opts, TIFFErrorHandlerExtR handler, void *warnhandler_user_data",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFPrintDirectory",
+      "result": "void",
+      "arguments": "TIFF *, FILE *, long",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRGBAImageBegin",
+      "result": "int",
+      "arguments": "TIFFRGBAImage *, TIFF *, int, char[1024]",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRGBAImageEnd",
+      "result": "void",
+      "arguments": "TIFFRGBAImage *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRGBAImageGet",
+      "result": "int",
+      "arguments": "TIFFRGBAImage *, uint32_t *, uint32_t, uint32_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRGBAImageOK",
+      "result": "int",
+      "arguments": "TIFF *, char[1024]",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRasterScanlineSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRasterScanlineSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRawStripSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t strip",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRawStripSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t strip",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadBufferSetup",
+      "result": "int",
+      "arguments": "TIFF *tif, void *bp, tmsize_t size",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadCustomDirectory",
+      "result": "int",
+      "arguments": "TIFF *tif, toff_t diroff, const TIFFFieldArray *infoarray",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadDirectory",
+      "result": "int",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadEXIFDirectory",
+      "result": "int",
+      "arguments": "TIFF *tif, toff_t diroff",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadEncodedStrip",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t strip, void *buf, tmsize_t size",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadEncodedTile",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t tile, void *buf, tmsize_t size",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadFromUserBuffer",
+      "result": "int",
+      "arguments": "TIFF *tif, uint32_t strile, void *inbuf, tmsize_t insize, void *outbuf, tmsize_t outsize",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadGPSDirectory",
+      "result": "int",
+      "arguments": "TIFF *tif, toff_t diroff",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRGBAImage",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, uint32_t, uint32_t *, int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRGBAImageOriented",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, uint32_t, uint32_t *, int, int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRGBAStrip",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, uint32_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRGBAStripExt",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, uint32_t *, int stop_on_error",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRGBATile",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, uint32_t, uint32_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRGBATileExt",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, uint32_t, uint32_t *, int stop_on_error",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRawStrip",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t strip, void *buf, tmsize_t size",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadRawTile",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t tile, void *buf, tmsize_t size",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadScanline",
+      "result": "int",
+      "arguments": "TIFF *tif, void *buf, uint32_t row, uint16_t sample",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFReadTile",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, void *buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRegisterCODEC",
+      "result": "TIFFCodec *",
+      "arguments": "uint16_t, const char *, TIFFInitMethod",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "NULL"
+    },
+    {
+      "name": "TIFFReverseBits",
+      "result": "void",
+      "arguments": "uint8_t *cp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFRewriteDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFScanlineSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFScanlineSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetClientInfo",
+      "result": "void",
+      "arguments": "TIFF *, void *, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetClientdata",
+      "result": "thandle_t",
+      "arguments": "TIFF *, thandle_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetDirectory",
+      "result": "int",
+      "arguments": "TIFF *, tdir_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetErrorHandler",
+      "result": "TIFFErrorHandler",
+      "arguments": "TIFFErrorHandler",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetErrorHandlerExt",
+      "result": "TIFFErrorHandlerExt",
+      "arguments": "TIFFErrorHandlerExt",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetField",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetFileName",
+      "result": "const char *",
+      "arguments": "TIFF *, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetFileno",
+      "result": "int",
+      "arguments": "TIFF *, int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetMode",
+      "result": "int",
+      "arguments": "TIFF *, int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetSubDirectory",
+      "result": "int",
+      "arguments": "TIFF *, uint64_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetTagExtender",
+      "result": "TIFFExtendProc",
+      "arguments": "TIFFExtendProc",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetWarningHandler",
+      "result": "TIFFErrorHandler",
+      "arguments": "TIFFErrorHandler",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetWarningHandlerExt",
+      "result": "TIFFErrorHandlerExt",
+      "arguments": "TIFFErrorHandlerExt",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSetWriteOffset",
+      "result": "void",
+      "arguments": "TIFF *tif, toff_t off",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "void (diagnostic only)"
+    },
+    {
+      "name": "TIFFSetupStrips",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFStripSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFStripSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabArrayOfDouble",
+      "result": "void",
+      "arguments": "double *dp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabArrayOfFloat",
+      "result": "void",
+      "arguments": "float *fp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabArrayOfLong",
+      "result": "void",
+      "arguments": "uint32_t *lp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabArrayOfLong8",
+      "result": "void",
+      "arguments": "uint64_t *lp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabArrayOfShort",
+      "result": "void",
+      "arguments": "uint16_t *wp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabArrayOfTriples",
+      "result": "void",
+      "arguments": "uint8_t *tp, tmsize_t n",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabDouble",
+      "result": "void",
+      "arguments": "double *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabFloat",
+      "result": "void",
+      "arguments": "float *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabLong",
+      "result": "void",
+      "arguments": "uint32_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabLong8",
+      "result": "void",
+      "arguments": "uint64_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFSwabShort",
+      "result": "void",
+      "arguments": "uint16_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFTileRowSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFTileRowSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFTileSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFTileSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFUnRegisterCODEC",
+      "result": "void",
+      "arguments": "TIFFCodec *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "void (diagnostic only)"
+    },
+    {
+      "name": "TIFFUnlinkDirectory",
+      "result": "int",
+      "arguments": "TIFF *, tdir_t",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFUnsetField",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVGetField",
+      "result": "int",
+      "arguments": "TIFF *tif, uint32_t tag, va_list ap",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVGetFieldDefaulted",
+      "result": "int",
+      "arguments": "TIFF *tif, uint32_t tag, va_list ap",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVSetField",
+      "result": "int",
+      "arguments": "TIFF *, uint32_t, va_list",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVStripSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t nrows",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVStripSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t nrows",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVTileSize",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t nrows",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFVTileSize64",
+      "result": "uint64_t",
+      "arguments": "TIFF *tif, uint32_t nrows",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFWarning",
+      "result": "void",
+      "arguments": "const char *, const char *, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFWarningExt",
+      "result": "void",
+      "arguments": "thandle_t, const char *, const char *, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFWarningExtR",
+      "result": "void",
+      "arguments": "TIFF *, const char *, const char *, ...",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFWriteBufferSetup",
+      "result": "int",
+      "arguments": "TIFF *tif, void *bp, tmsize_t size",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFWriteCheck",
+      "result": "int",
+      "arguments": "TIFF *, int, const char *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFWriteCustomDirectory",
+      "result": "int",
+      "arguments": "TIFF *, uint64_t *",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "0"
+    },
+    {
+      "name": "TIFFWriteDirectory",
+      "result": "int",
+      "arguments": "TIFF *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFWriteEncodedStrip",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t strip, void *data, tmsize_t cc",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "TIFFWriteEncodedTile",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t tile, void *data, tmsize_t cc",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "TIFFWriteRawStrip",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t strip, void *data, tmsize_t cc",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "TIFFWriteRawTile",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, uint32_t tile, void *data, tmsize_t cc",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "TIFFWriteScanline",
+      "result": "int",
+      "arguments": "TIFF *tif, void *buf, uint32_t row, uint16_t sample",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "TIFFWriteTile",
+      "result": "tmsize_t",
+      "arguments": "TIFF *tif, void *buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    },
+    {
+      "name": "TIFFXYZToRGB",
+      "result": "void",
+      "arguments": "TIFFCIELabToRGB *, float, float, float, uint32_t *, uint32_t *, uint32_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFYCbCrToRGBInit",
+      "result": "int",
+      "arguments": "TIFFYCbCrToRGB *, float *, float *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "TIFFYCbCrtoRGB",
+      "result": "void",
+      "arguments": "TIFFYCbCrToRGB *, uint32_t, int32_t, int32_t, uint32_t *, uint32_t *, uint32_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "XYZtoRGB24",
+      "result": "void",
+      "arguments": "float *, uint8_t *",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFcalloc",
+      "result": "void *",
+      "arguments": "tmsize_t nmemb, tmsize_t siz",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFfree",
+      "result": "void",
+      "arguments": "void *p",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFmalloc",
+      "result": "void *",
+      "arguments": "tmsize_t s",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFmemcmp",
+      "result": "int",
+      "arguments": "const void *p1, const void *p2, tmsize_t c",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFmemcpy",
+      "result": "void",
+      "arguments": "void *d, const void *s, tmsize_t c",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFmemset",
+      "result": "void",
+      "arguments": "void *p, int v, tmsize_t c",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "_TIFFrealloc",
+      "result": "void *",
+      "arguments": "void *p, tmsize_t s",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "uv_decode",
+      "result": "int",
+      "arguments": "double *, double *, int",
+      "status": "implemented_or_explicitly_restricted",
+      "implementation": "manual"
+    },
+    {
+      "name": "uv_encode",
+      "result": "int",
+      "arguments": "double, double, int",
+      "status": "not_implemented",
+      "implementation": "generated_stub",
+      "failure_return": "-1"
+    }
+  ]
+}

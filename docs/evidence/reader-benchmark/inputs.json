@@ -1,0 +1,600 @@
+[
+  {
+    "name": "gray-none",
+    "label": "Gray8 none",
+    "file": "target/reader-benchmark/inputs/gray-none.tif",
+    "modes": [
+      "native",
+      "scan",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 1048850,
+    "sha256": "5a0264bfbdb64f1a6a38b0a2d76dc0e31e4c93fbea1ab1bc24fd4ba9f6a7685c",
+    "codec": 1,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "rgb-none",
+    "label": "RGB8 none",
+    "file": "target/reader-benchmark/inputs/rgb-none.tif",
+    "modes": [
+      "native",
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 3146014,
+    "sha256": "dc43c4aa87f60dfae63d942e91403324a146ea80f69504d5a6917c54b6b6e9be",
+    "codec": 1,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "gray-packbits",
+    "label": "Gray8 packbits",
+    "file": "target/reader-benchmark/inputs/gray-packbits.tif",
+    "modes": [
+      "native",
+      "scan",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 262418,
+    "sha256": "ed8dd468721b0a0b58ceaa835a2994dd7443a29741d6abf2c4666fd6e115b59b",
+    "codec": 32773,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "gray-lzw",
+    "label": "Gray8 lzw",
+    "file": "target/reader-benchmark/inputs/gray-lzw.tif",
+    "modes": [
+      "native",
+      "scan",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 245570,
+    "sha256": "c838090e164ba39092d1ac2cabc06a5bc58b651fc5ee6f79ae6d08021d872e89",
+    "codec": 5,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "rgb-lzw",
+    "label": "RGB8 lzw",
+    "file": "target/reader-benchmark/inputs/rgb-lzw.tif",
+    "modes": [
+      "native",
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 889006,
+    "sha256": "8102e856e48f58a655ceb9e36c4f36e3198aebfe63ed6403d30139ba1759b0f8",
+    "codec": 5,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "gray-deflate",
+    "label": "Gray8 deflate",
+    "file": "target/reader-benchmark/inputs/gray-deflate.tif",
+    "modes": [
+      "native",
+      "scan",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 9790,
+    "sha256": "c5da261c9cb6a0dcc4e4a9be772e2e2292431435a339771b5ac48118f868c2f6",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "rgb-deflate",
+    "label": "RGB8 deflate",
+    "file": "target/reader-benchmark/inputs/rgb-deflate.tif",
+    "modes": [
+      "native",
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 29048,
+    "sha256": "b632fc15ac1a2f0e11879be2ada455cb358f097c2948163f3ad32aca5cd21403",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "gray-zstd",
+    "label": "Gray8 zstd",
+    "file": "target/reader-benchmark/inputs/gray-zstd.tif",
+    "modes": [
+      "native",
+      "scan",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 4210,
+    "sha256": "62bca5848b57bbe1dcb3ebbe204d88769658f392a8e00b731b7dcac7c6cf29db",
+    "codec": 50000,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "rgb-zstd",
+    "label": "RGB8 zstd",
+    "file": "target/reader-benchmark/inputs/rgb-zstd.tif",
+    "modes": [
+      "native",
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 8878,
+    "sha256": "6cd7aca931849b5ad30b5a02ab5512be994746e07a92d66f01e6070e6a2dba9d",
+    "codec": 50000,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "noise-lzw",
+    "label": "Random Gray8 lzw",
+    "file": "target/reader-benchmark/inputs/noise-lzw.tif",
+    "modes": [
+      "native"
+    ],
+    "origin": "generated",
+    "bytes": 1434698,
+    "sha256": "f289894e4e541e527288290703e3254c758d821f2261fd615dceb6d0c3e5994d",
+    "codec": 5,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "noise-deflate",
+    "label": "Random Gray8 deflate",
+    "file": "target/reader-benchmark/inputs/noise-deflate.tif",
+    "modes": [
+      "native"
+    ],
+    "origin": "generated",
+    "bytes": 1049266,
+    "sha256": "03f7f3ecd33fa602722fd33301ad59c532d7147328438855e44bb190abe06676",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "noise-zstd",
+    "label": "Random Gray8 zstd",
+    "file": "target/reader-benchmark/inputs/noise-zstd.tif",
+    "modes": [
+      "native"
+    ],
+    "origin": "generated",
+    "bytes": 1048994,
+    "sha256": "7e04153ebc1652c6fe74a39b900ec36f2bdb1607ec5c2f5b5f476cd0fa44ee12",
+    "codec": 50000,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "jpeg-smooth",
+    "label": "RGB8 JPEG smooth",
+    "file": "target/reader-benchmark/inputs/jpeg-smooth.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 54727,
+    "sha256": "e89c015f0a20e86a91e1030e72f488c7131bbc8d724234a07273e0a84975026a",
+    "codec": 7,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": true
+  },
+  {
+    "name": "jpeg-texture",
+    "label": "RGB8 JPEG texture",
+    "file": "target/reader-benchmark/inputs/jpeg-texture.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 2119873,
+    "sha256": "93fcfeee5276a3381c7a2c4e748a3f9dc8fd5b709328b396d05e7922094931eb",
+    "codec": 7,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": true
+  },
+  {
+    "name": "rgb-tiled-lzw",
+    "label": "RGB8 tiled LZW",
+    "file": "target/reader-benchmark/inputs/rgb-tiled-lzw.tif",
+    "modes": [
+      "native",
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 357738,
+    "sha256": "62bd26059ef2e41d66eb1043ef8f291bc6a306005b33ad3c6868938d5751cc91",
+    "codec": 5,
+    "tiled": true,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "gray16-deflate-p2",
+    "label": "Gray16 Deflate Predictor 2",
+    "file": "target/reader-benchmark/inputs/gray16-deflate-p2.tif",
+    "modes": [
+      "native",
+      "scan"
+    ],
+    "origin": "generated",
+    "bytes": 6672,
+    "sha256": "0f04131ce28f35544c7423da8e6fece8992e3c1b5f28293ea4f4c35a93fc4ac0",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "float32-deflate-p3",
+    "label": "Float32 Deflate Predictor 3",
+    "file": "target/reader-benchmark/inputs/float32-deflate-p3.tif",
+    "modes": [
+      "native",
+      "scan"
+    ],
+    "origin": "generated",
+    "bytes": 79008,
+    "sha256": "c1997c47ac06e15eeb59213eb73fe1b6781fb983a94ebaa4a80c57362e508968",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "float16-deflate-p3",
+    "label": "Float16 Deflate Predictor 3",
+    "file": "target/reader-benchmark/inputs/float16-deflate-p3.tif",
+    "modes": [
+      "native",
+      "scan"
+    ],
+    "origin": "generated",
+    "bytes": 16664,
+    "sha256": "18daa5632a1ecbc2a850a6730e5944eb8d0e38bf4c16f1a0f1dc8ed05b181153",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "complex64-lzw",
+    "label": "Complex float32 pairs LZW",
+    "file": "target/reader-benchmark/inputs/complex64-lzw.tif",
+    "modes": [
+      "native",
+      "scan"
+    ],
+    "origin": "generated",
+    "bytes": 3058272,
+    "sha256": "2014b0c8e25f793f45101c6cabe35a18e818cec02691bcbcfd8975a98a27c15b",
+    "codec": 5,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "fax-rle",
+    "label": "Bilevel CCITT rle",
+    "file": "target/reader-benchmark/inputs/fax-rle.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 47028,
+    "sha256": "0ecb3feda39db4d24862b91f62938c4a736d7e561e4bc873bbc895111a991b1f",
+    "codec": 2,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "fax-g3",
+    "label": "Bilevel CCITT g3",
+    "file": "target/reader-benchmark/inputs/fax-g3.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 48024,
+    "sha256": "c3d82c12b895049334ecdb22c5fb33444fa2b11f28f838411ec4593b2c2a43d3",
+    "codec": 3,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "fax-g4",
+    "label": "Bilevel CCITT g4",
+    "file": "target/reader-benchmark/inputs/fax-g4.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 16804,
+    "sha256": "08805714e6c03d6ec3f25e3adcbfcea8ebe0d022827436d106b2509a36404120",
+    "codec": 4,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "webp-lossless",
+    "label": "RGBA8 WebP lossless",
+    "file": "target/reader-benchmark/inputs/webp-lossless.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 2120,
+    "sha256": "b70dbb7e2ccfeb136490443629d411e307da53f7f0fa9b29de31cc3eac520e42",
+    "codec": 50001,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "webp-lossy",
+    "label": "RGBA8 WebP lossy",
+    "file": "target/reader-benchmark/inputs/webp-lossy.tif",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "generated",
+    "bytes": 9670,
+    "sha256": "1c2693e17904e1e68cabb18b0f5a44802bf06177be8a6736fd2f4e72b86cddd4",
+    "codec": 50001,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "lerc-float-plain",
+    "label": "Float32 LERC plain",
+    "file": "target/reader-benchmark/inputs/lerc-float-plain.tif",
+    "modes": [
+      "native"
+    ],
+    "origin": "generated",
+    "bytes": 1168584,
+    "sha256": "1636d0d5ad42a49d0adf0997fc256499f078b1414776b810d2ce670ce37862b5",
+    "codec": 34887,
+    "tiled": true,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "lerc-float-deflate",
+    "label": "Float32 LERC deflate",
+    "file": "target/reader-benchmark/inputs/lerc-float-deflate.tif",
+    "modes": [
+      "native"
+    ],
+    "origin": "generated",
+    "bytes": 96664,
+    "sha256": "fe3de66cd8ee5fab4a50ee63b825aefd8a87b7edec2deb551c609426bd3fd029",
+    "codec": 34887,
+    "tiled": true,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "lerc-float-zstd",
+    "label": "Float32 LERC zstd",
+    "file": "target/reader-benchmark/inputs/lerc-float-zstd.tif",
+    "modes": [
+      "native"
+    ],
+    "origin": "generated",
+    "bytes": 82162,
+    "sha256": "1dcbbbd48cb14c47a4d59b7de6d81f8e66463f2243d565f5db683c5d6ae0cf3d",
+    "codec": 34887,
+    "tiled": true,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "cmyk-deflate",
+    "label": "CMYK8 Deflate",
+    "file": "target/reader-benchmark/inputs/cmyk-deflate.tif",
+    "modes": [
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 36308,
+    "sha256": "48ef47afb0659cd48efc9dab8bdfb6ddcc2567cbd005dcaaee06d03964b47f62",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "lab-deflate",
+    "label": "LAB8 Deflate",
+    "file": "target/reader-benchmark/inputs/lab-deflate.tif",
+    "modes": [
+      "rgba",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 29048,
+    "sha256": "287ea9a12ef8879e4f2fa07a7071d1a578ddc265f2bb74e6ca09816ad8fd7e01",
+    "codec": 8,
+    "tiled": false,
+    "w": 1024,
+    "h": 1024,
+    "jpeg": false
+  },
+  {
+    "name": "large-strip-none",
+    "label": "16 MP Gray8 single strip none",
+    "file": "target/reader-benchmark/inputs/large-strip-none.tif",
+    "modes": [
+      "firstrow",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 16777362,
+    "sha256": "fc4f5196143187f00b8faf7c5b10b3403bb75b5148a93b51f837ee267d0114a5",
+    "codec": 1,
+    "tiled": false,
+    "w": 4096,
+    "h": 4096,
+    "jpeg": false
+  },
+  {
+    "name": "large-strip-lzw",
+    "label": "16 MP Gray8 single strip lzw",
+    "file": "target/reader-benchmark/inputs/large-strip-lzw.tif",
+    "modes": [
+      "firstrow",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 5544946,
+    "sha256": "b696a4ba4ce1a669791f5418659100fad347fd1993c1c6588db1fda25d5d836b",
+    "codec": 5,
+    "tiled": false,
+    "w": 4096,
+    "h": 4096,
+    "jpeg": false
+  },
+  {
+    "name": "large-strip-deflate",
+    "label": "16 MP Gray8 single strip deflate",
+    "file": "target/reader-benchmark/inputs/large-strip-deflate.tif",
+    "modes": [
+      "firstrow",
+      "crop"
+    ],
+    "origin": "generated",
+    "bytes": 91614,
+    "sha256": "c9b7bbf7265de0959afc1baeaea0f09d984f2e0cb89eb9b67c4c973bb6913b64",
+    "codec": 8,
+    "tiled": false,
+    "w": 4096,
+    "h": 4096,
+    "jpeg": false
+  },
+  {
+    "name": "many-strips",
+    "label": "200,000 strip entries",
+    "file": "target/reader-benchmark/inputs/many-strips.tif",
+    "modes": [
+      "open",
+      "lookup",
+      "open-lazy",
+      "lookup-lazy"
+    ],
+    "origin": "generated",
+    "bytes": 1600123,
+    "sha256": "9b30d92e55b83d32a7e11f1635e049c61cf5cfb754180cf74aff403324bff2f2"
+  },
+  {
+    "name": "original-lzw-single-strip.tiff",
+    "label": "Original 24.3 MP LZW scan",
+    "file": ".tools/tiff-4.7.1/test/images/lzw-single-strip.tiff",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "libtiff 4.7.1 original corpus",
+    "bytes": 76264,
+    "sha256": "9cbff8fbe7a487da5d56e7e7566c0f3984e7092a3b1ccfe6bc1461449d008e4e"
+  },
+  {
+    "name": "original-testfax4.tiff",
+    "label": "Original 8.3 MP fax scan",
+    "file": ".tools/tiff-4.7.1/test/images/testfax4.tiff",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "libtiff 4.7.1 original corpus",
+    "bytes": 39637,
+    "sha256": "42df253cef26450582d4810ff237cb1a1725cce9a27afb50ea89aa42b3e172b9"
+  },
+  {
+    "name": "original-quad-lzw-compat.tiff",
+    "label": "Original legacy LZW",
+    "file": ".tools/tiff-4.7.1/test/images/quad-lzw-compat.tiff",
+    "modes": [
+      "native",
+      "rgba"
+    ],
+    "origin": "libtiff 4.7.1 original corpus",
+    "bytes": 214342,
+    "sha256": "081118d951224d9909b105bb75f9667fd817e7b95122d141e91b43604dacd78b"
+  }
+]

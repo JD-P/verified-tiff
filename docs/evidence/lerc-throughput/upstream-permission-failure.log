@@ -1,0 +1,175 @@
+=================================================
+   LibTIFF Software 4.7.1: test/test-suite.log
+=================================================
+
+# TOTAL: 108
+# PASS:  90
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  18
+# XPASS: 0
+# ERROR: 0
+
+.. contents:: :depth: 2
+
+FAIL: tiffcp-g3.sh
+==================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g3 /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-g3.tiff
+./tiffcp-g3.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-g3.tiff".
+FAIL tiffcp-g3.sh (exit status: 126)
+
+FAIL: tiffcp-g3-1d.sh
+=====================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g3:1d /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-g3-1d.tiff
+./tiffcp-g3-1d.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-g3-1d.tiff".
+FAIL tiffcp-g3-1d.sh (exit status: 126)
+
+FAIL: tiffcp-g3-1d-fill.sh
+==========================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g3:1d:fill /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-g3-1d-fill.tiff
+./tiffcp-g3-1d-fill.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-g3-1d-fill.tiff".
+FAIL tiffcp-g3-1d-fill.sh (exit status: 126)
+
+FAIL: tiffcp-g3-2d.sh
+=====================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g3:2d /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-g3-2d.tiff
+./tiffcp-g3-2d.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-g3-2d.tiff".
+FAIL tiffcp-g3-2d.sh (exit status: 126)
+
+FAIL: tiffcp-g3-2d-fill.sh
+==========================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g3:2d:fill /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-g3-2d-fill.tiff
+./tiffcp-g3-2d-fill.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-g3-2d-fill.tiff".
+FAIL tiffcp-g3-2d-fill.sh (exit status: 126)
+
+FAIL: tiffcp-g4.sh
+==================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g4 /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-g4.tiff
+./tiffcp-g4.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-g4.tiff".
+FAIL tiffcp-g4.sh (exit status: 126)
+
+FAIL: tiffcp-logluv.sh
+======================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c none ./images/logluv-3c-16b.tiff o-tiffcp-logluv-raw.tiff
+./tiffcp-logluv.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-logluv-raw.tiff".
+FAIL tiffcp-logluv.sh (exit status: 126)
+
+FAIL: tiffcp-thumbnail.sh
+=========================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c g3:1d /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff o-tiffcp-thumbnail-in.tif
+./tiffcp-thumbnail.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-thumbnail-in.tif".
+FAIL tiffcp-thumbnail.sh (exit status: 126)
+
+FAIL: tiffcp-lzw-compat.sh
+==========================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c none /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/quad-lzw-compat.tiff o-tiffcp-lzw-compat.tiff
+./tiffcp-lzw-compat.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-lzw-compat.tiff".
+FAIL tiffcp-lzw-compat.sh (exit status: 126)
+
+FAIL: tiffcp-lzw-scanline-decode.sh
+===================================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c none -r 1 /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/lzw-single-strip.tiff o-tiffcp-lzw-scanline-decode.tiff
+./tiffcp-lzw-scanline-decode.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-lzw-scanline-decode.tiff".
+FAIL tiffcp-lzw-scanline-decode.sh (exit status: 126)
+
+FAIL: tiffdump.sh
+=================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffdump /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff
+./tiffdump.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffdump: Permission denied
+Returned failed status 126!
+FAIL tiffdump.sh (exit status: 126)
+
+FAIL: tiffcp-split.sh
+=====================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/minisblack-1c-16b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/minisblack-1c-8b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-1b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-4b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-4b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-8b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/rgb-3c-8b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/rgb-3c-16b.tiff o-tiffcp-split-conjoined.tif
+./tiffcp-split.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-split-conjoined.tif".
+FAIL tiffcp-split.sh (exit status: 126)
+
+FAIL: tiffcp-split-join.sh
+==========================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/minisblack-1c-16b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/minisblack-1c-8b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/miniswhite-1c-1b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-1b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-4b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-4b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/palette-1c-8b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/rgb-3c-8b.tiff /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/rgb-3c-16b.tiff o-tiffcp-split-join-conjoined.tif
+./tiffcp-split-join.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-split-join-conjoined.tif".
+FAIL tiffcp-split-join.sh (exit status: 126)
+
+FAIL: testfax4.sh
+=================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c lzw /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/testfax4.tiff o-testfax4.tiff
+./testfax4.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-testfax4.tiff".
+FAIL testfax4.sh (exit status: 126)
+
+FAIL: testfax3_bug_513.sh
+=========================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c none /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/testfax3_bug_513.tiff o-testfax3_bug_513.tiff
+./testfax3_bug_513.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-testfax3_bug_513.tiff".
+FAIL testfax3_bug_513.sh (exit status: 126)
+
+FAIL: testfax3_bug54_1dnoEOL.sh
+===============================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c none /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/testfax3_bug54_1dnoEOL.tif o-testfax3_bug54_1dnoEOL.tiff
+./testfax3_bug54_1dnoEOL.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-testfax3_bug54_1dnoEOL.tiff".
+FAIL testfax3_bug54_1dnoEOL.sh (exit status: 126)
+
+FAIL: testdeflatelaststripextradata.sh
+======================================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c zip /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/test/images/deflate-last-strip-extra-data.tiff o-deflate-last-strip-extra-data.tiff
+./testdeflatelaststripextradata.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-deflate-last-strip-extra-data.tiff".
+FAIL testdeflatelaststripextradata.sh (exit status: 126)
+
+FAIL: tiffcp-32bpp-None-jpeg.sh
+===============================
+
+ /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp -c jpeg ./images/32bpp-None-jpeg.tiff o-tiffcp-32bpp-None-jpeg-YCbCr.tiff
+./tiffcp-32bpp-None-jpeg.sh: 1: eval: /workspace/scratch/017cea9a2f6e/verified-tiff/.tools/tiff-4.7.1/tools/tiffcp: Permission denied
+Returned failed status 126!
+Output (if any) is in "o-tiffcp-32bpp-None-jpeg-YCbCr.tiff".
+FAIL tiffcp-32bpp-None-jpeg.sh (exit status: 126)
+

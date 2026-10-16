@@ -1,0 +1,42 @@
+native_add:
+	.cfi_startproc
+	movq	%rdi, %xmm0
+	movq	%rsi, %xmm1
+	addsd	%xmm0, %xmm1
+	movq	%xmm1, %rax
+	retq
+
+native_scale:
+	.cfi_startproc
+	movl	%esi, %eax
+	addq	%rax, %rax
+	cvtsi2sd	%rax, %xmm0
+	movq	%rdi, %xmm1
+	mulsd	%xmm1, %xmm0
+	movq	%xmm0, %rax
+	retq
+
+native_narrow:
+	.cfi_startproc
+	movq	%rdi, %xmm0
+	cvtsd2ss	%xmm0, %xmm0
+	movd	%xmm0, %eax
+	retq
+
+native_widen:
+	.cfi_startproc
+	movd	%edi, %xmm0
+	cvtss2sd	%xmm0, %xmm0
+	movq	%xmm0, %rax
+	retq
+
+native_integer:
+	.cfi_startproc
+	movl	%edi, %eax
+	cvtsi2sd	%rax, %xmm0
+	testl	%esi, %esi
+	je	.LBB6_2
+	orpd	.LCPI6_0(%rip), %xmm0
+.LBB6_2:
+	movq	%xmm0, %rax
+	retq

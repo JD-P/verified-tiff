@@ -1,0 +1,78 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 844 dropped 0 interval_us 1000",
+  "samples": 844,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/release/examples/benchmark",
+    "target/benchmark/inputs/gray16-deflate.tif",
+    "total",
+    "3000"
+  ],
+  "binary_sha256": "21bd2abd70654679e1546fd78516ff71c7ad8bb11a1c94441aae4f4715d1f086",
+  "input_sha256": "ec0cd6e8f333f716d4a42f2fd4b2c327dd00363de3d86204e1d3fc40f21366a8",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "engine": "rust",
+    "mode": "total",
+    "iterations": 33,
+    "seconds": 3.135145798,
+    "ns_per_image": 95004418.12121212,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 2097152,
+    "scratch_bytes": 2097152,
+    "inspect_work": 20740902,
+    "decode_work": 24935008,
+    "hash": "33b079fe65a0cbc5"
+  },
+  "functions": [
+    {
+      "function": "benchmark::<verified_tiff::deflate::Cursor>::step",
+      "samples": 700,
+      "percent": 82.93838862559242
+    },
+    {
+      "function": "benchmark::<verified_tiff::extended::image::ExtendedImage>::decode_with_scratch",
+      "samples": 44,
+      "percent": 5.213270142180095
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate_plane::decode",
+      "samples": 38,
+      "percent": 4.502369668246446
+    },
+    {
+      "function": "benchmark::<verified_tiff::raster_layout::RasterLayout>::index",
+      "samples": 33,
+      "percent": 3.909952606635071
+    },
+    {
+      "function": "benchmark::<verified_tiff::deflate_bits::Huff>::build",
+      "samples": 17,
+      "percent": 2.014218009478673
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate::validate",
+      "samples": 6,
+      "percent": 0.7109004739336493
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate_header::dynamic",
+      "samples": 4,
+      "percent": 0.47393364928909953
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 1,
+      "percent": 0.11848341232227488
+    },
+    {
+      "function": "benchmark::benchmark::main",
+      "samples": 1,
+      "percent": 0.11848341232227488
+    }
+  ]
+}

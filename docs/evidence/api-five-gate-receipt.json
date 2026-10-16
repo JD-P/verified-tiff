@@ -1,0 +1,96 @@
+{
+  "verify_sh_sha256": "06dc6364a17ccd74708cfe355c1dd8c5bd1d0c8c2727e76ecfd9a2268d0e962e",
+  "jobs": 3,
+  "results": [
+    {
+      "chunk": 0,
+      "exit_code": 0,
+      "seconds": 151.26050708899857,
+      "log": "target/parallel-verification/00.log"
+    },
+    {
+      "chunk": 1,
+      "exit_code": 0,
+      "seconds": 33.96503480699903,
+      "log": "target/parallel-verification/01.log"
+    },
+    {
+      "chunk": 2,
+      "exit_code": 0,
+      "seconds": 9.473769389995141,
+      "log": "target/parallel-verification/02.log"
+    },
+    {
+      "chunk": 3,
+      "exit_code": 0,
+      "seconds": 12.323456933998386,
+      "log": "target/parallel-verification/03.log"
+    },
+    {
+      "chunk": 4,
+      "exit_code": 0,
+      "seconds": 25.930759965005564,
+      "log": "target/parallel-verification/04.log"
+    },
+    {
+      "chunk": 5,
+      "exit_code": 0,
+      "seconds": 31.39447643099993,
+      "log": "target/parallel-verification/05.log"
+    },
+    {
+      "chunk": 6,
+      "exit_code": 0,
+      "seconds": 46.43983035499696,
+      "log": "target/parallel-verification/06.log"
+    },
+    {
+      "chunk": 7,
+      "exit_code": 0,
+      "seconds": 24.554269870001008,
+      "log": "target/parallel-verification/07.log"
+    },
+    {
+      "chunk": 8,
+      "exit_code": 0,
+      "seconds": 36.33781533600268,
+      "log": "target/parallel-verification/08.log"
+    },
+    {
+      "chunk": 9,
+      "exit_code": 0,
+      "seconds": 35.75650937700266,
+      "log": "target/parallel-verification/09.log"
+    },
+    {
+      "chunk": 10,
+      "exit_code": 0,
+      "seconds": 29.09788623600616,
+      "log": "target/parallel-verification/10.log"
+    },
+    {
+      "chunk": 11,
+      "exit_code": 0,
+      "seconds": 46.44174589400063,
+      "log": "target/parallel-verification/11.log"
+    },
+    {
+      "chunk": 12,
+      "exit_code": 0,
+      "seconds": 45.78988050699991,
+      "log": "target/parallel-verification/12.log"
+    },
+    {
+      "chunk": 13,
+      "exit_code": 0,
+      "seconds": 76.65286803199706,
+      "log": "target/parallel-verification/13.log"
+    },
+    {
+      "chunk": 14,
+      "exit_code": 0,
+      "seconds": 39.03836628199497,
+      "log": "target/parallel-verification/14.log"
+    }
+  ]
+}

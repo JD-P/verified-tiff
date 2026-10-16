@@ -1,0 +1,66 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module lerc_word (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/lerc_word.rs:58:1
+   |
+58 | pub(super) fn read(s:&[u8],p:usize,end:usize,n:usize) -> (r:Result<u32,Error>)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/lerc_word.rs:61:9
+   |
+61 |         r.is_ok() ==> r.unwrap() as int==zb::value(s@,p as int,n as nat),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+75 |     Ok((v as u32)^1u32)
+   |     ------------------- at the end of the function body
+
+error: postcondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-throughput-word/lerc_word.rs:62:9
+   |
+62 |         r.is_ok() ==> r.unwrap()<zb::pow(n as int),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+75 |     Ok((v as u32)^1u32)
+   |     ------------------- at the end of the function body
+
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

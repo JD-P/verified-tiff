@@ -1,0 +1,13 @@
+gray-deflate scan main main 0.833 recheck 0.892
+rgb-zstd native main main 0.822 recheck 0.961
+noise-lzw native main main 0.876 recheck 1.241
+jpeg-smooth rgba main main 0.86 recheck 0.987
+rgb-tiled-lzw native main main 0.835 recheck 1.12
+complex64-lzw native main main 0.807 recheck 0.968
+fax-rle native main main 0.878 recheck 1.037
+fax-g3 native main main 0.862 recheck 0.984
+many-strips open main main 0.869 recheck 0.986
+original-quad-lzw-compat.tiff native main main 0.818 recheck 1.034
+layout-rgb-deflate-16 crop layout main 0.786 recheck 0.882
+large-strip-lzw firstrow defaults main 0.877 recheck 1.006
+Rechecked 12 original slowdowns; retained all main measurements.

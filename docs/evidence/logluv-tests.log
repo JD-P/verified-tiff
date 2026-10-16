@@ -1,0 +1,13 @@
+test_all_chroma_values_and_luminance_signs (__main__.LogluvTests.test_all_chroma_values_and_luminance_signs) ... ok
+test_format_matrix (__main__.LogluvTests.test_format_matrix) ... ok
+test_libtiff_encoded_strips (__main__.LogluvTests.test_libtiff_encoded_strips) ... ok
+test_limits_and_original (__main__.LogluvTests.test_limits_and_original) ... ok
+test_malformed_streams (__main__.LogluvTests.test_malformed_streams) ... ok
+test_packet_boundaries_and_pages (__main__.LogluvTests.test_packet_boundaries_and_pages) ... ok
+test_unsupported_metadata (__main__.LogluvTests.test_unsupported_metadata) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.844s
+
+OK
+LogLuv format matrix: 96; exact rational reference and libtiff native components

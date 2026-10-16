@@ -1,0 +1,20 @@
+{
+  "compat/Cargo.toml": "8b1a225f425ff57e4665f3a7f62f32922ba4312f3ce73e6e1187a41022f7ea3b",
+  "compat/LICENSE-libtiff.md": "0e27c2382d7b8147972bbb746e04059a1152c8d0fda9d03ef1399d1a433c4ade",
+  "compat/api.json": "6a73a133f71e5be6256b34c4bc288d2da6aa5db6bcb07cf0ba5a83bcd52f4ac6",
+  "compat/bridge.h": "1182d8057591c4a015cd6c4a73620af90b34e3e14a2b6ce3d1ec72321cd22e0a",
+  "compat/check_exports.py": "00d8b8ceed1a9e6b3c24ec159d2c3829038ca31d56f9d1a40953309c652e135d",
+  "compat/generate_stubs.py": "40b3e4cb2a84ccb2f6c2e8a4b69ca2ec1922ae6a4490c03f6451005612ae523a",
+  "compat/include/tiff.h": "ff8668357867cefdb31d7807a441fea04422bcff929303be09e16d99c7528fa6",
+  "compat/include/tiffconf.h": "657217fb9e8e3f396373481da9c5065f474ea15e92fed87efedf4494b4325179",
+  "compat/include/tiffio.h": "a277ca92dd3962012db24d1c38df68565e045290be43f0a84ad0edbfc8051ee1",
+  "compat/include/tiffvers.h": "504b746b8ddbad7b3f16ede22700372e7e42a7ea31d0fdf1be60001e75aa62bb",
+  "compat/include/verified_tiff.h": "31d342516dd2b486dcf492116c7ce681b9dd40a8cb5e55d7560eaad3b643ba9c",
+  "compat/src/lib.rs": "0e35829e3924ab5542e8127d4bf15bcc926abedc2156f4cead353b5e90685f98",
+  "compat/tests/api.c": "a900b02b1a9b595cde3015a3cf2cfea8cb1b123c0eff0f22c11db42e7738f5dc",
+  "compat/tests/dump.c": "a883b47e77779b0ce137fabca8da0fc3545bba6ae1ca47c773a31ce4ee8c706c",
+  "compat/tests/mutate.c": "69db06cf100adf7be8e8288ab70f049319fed8171dee428e3ddb2626d0731f0a",
+  "compat/tests/test.py": "c64aa911d578c28df2a83fdc1e10c555d240af41cbf8529d714b87b6c5133f02",
+  "compat/tiff_compat.c": "f3e99295f6f6fc209b8446f81f319e384435d1e1dcb4a3d940ffb0132bffe80b",
+  "compat/upstream-libtiff.map": "bd5851d2ef578233eb348ffb734e02dc62d402da7e52aa2bc416214a3bb105bf"
+}

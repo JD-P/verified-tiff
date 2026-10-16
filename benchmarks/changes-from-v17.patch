@@ -1,0 +1,279 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1815,6 +1815,7 @@
+     }
+ }
+ 
++#[inline]
+ fn storage_target(g: Geometry, j: usize, i: usize, b: usize, stride: usize) -> (r: Option<usize>)
+     requires g.positive(), stride as int == g.row_bytes(),
+         g.width as int * g.height * g.channels <= usize::MAX,
+@@ -1829,6 +1830,38 @@
+             !g.bilevel ==> stride as int == g.block_width as int*g.channels;
+     let row=i/stride;
+     if row >= g.block_height { return None; }
++    // Full-width eight-bit segments have no horizontal padding. Avoid
++    // reconstructing pixel/channel coordinates for every decoded byte.
++    if !g.bilevel && g.block_width==g.width && g.across==1 {
++        reveal(target_y);reveal(target_x);reveal(target_channel);reveal(target_index);reveal(target_valid);
++        assert(g.row_bytes()==stride as int);
++        proof {vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(j as int,1,j as int,0);}
++        assert(j as int/(g.across as int)==j as int);
++        assert(i as int/g.row_bytes()==row as int);
++        assert(target_y(g,j as int,i as int)==(j as int/(g.across as int))*g.block_height+i as int/g.row_bytes());
++        assert(target_y(g,j as int,i as int)==j as int*g.block_height+row);
++        assert(target_x(g,j as int,i as int,b as int)==(i as int%(stride as int))/(g.channels as int));
++        let base_y=match mul(j,g.block_height) {Ok(v)=>v,Err(_)=>return None};
++        if base_y>=g.height || row>=g.height-base_y {return None;}
++        proof {
++            quotient_remainder(i as int%(stride as int),g.channels as int);
++            assert((i as int%(stride as int))/(g.channels as int)<g.width) by(nonlinear_arith)
++                requires 0<=i as int%(stride as int)<stride,
++                    stride as int==g.width as int*g.channels,g.width>0,g.channels>0,
++                    i as int%(stride as int)==g.channels as int*((i as int%(stride as int))/(g.channels as int))+(i as int%(stride as int))%(g.channels as int),
++                    0<=(i as int%(stride as int))%(g.channels as int)<g.channels;
++            assert(0<=(base_y as int+row)*stride+i%stride<g.width as int*g.height*g.channels) by(nonlinear_arith)
++                requires 0<=base_y as int+row<g.height,0<=i%stride<stride,stride>0,
++                    stride as int==g.width as int*g.channels;
++            assert(target_channel(g,i as int)==(i%stride)%g.channels);
++            assert(target_index(g,j as int,i as int,b as int)==((base_y as int+row)*g.width+(i%stride)/g.channels)*g.channels+(i%stride)%g.channels);
++            assert(target_index(g,j as int,i as int,b as int)==(base_y as int+row)*stride+i%stride) by(nonlinear_arith)
++                requires target_index(g,j as int,i as int,b as int)==((base_y as int+row)*g.width+(i%stride)/g.channels)*g.channels+(i%stride)%g.channels,
++                    stride as int==g.width as int*g.channels,
++                    i%stride==g.channels as int*((i%stride)/g.channels)+(i%stride)%g.channels;
++        }
++        return Some((base_y+row)*stride+i%stride);
++    }
+     let col=if g.bilevel {
+         let base=match mul(i%stride,8) { Ok(v)=>v, Err(_)=>return None };
+         match add(base,b) { Ok(v)=>v, Err(_)=>return None }
+@@ -1855,6 +1888,7 @@
+     if g.white && g.alpha==0 { (255-value) as u8 } else { value }
+ }
+ 
++#[inline]
+ fn scatter_byte(g: Geometry, j: usize, i: usize, stride: usize, byte: u8, output: &mut [u8])
+     requires g.positive(), stride as int == g.row_bytes(),
+         g.across as int == (g.width as int-1)/(g.block_width as int)+1,
+@@ -2624,6 +2658,53 @@
+     Ok(())
+ }
+ 
++// A complete byte row in an eight-bit strip is contiguous in both buffers.
++// This lemma relates that bulk operation to the unchanged per-sample model.
++proof fn strip_row_mapping(g:Geometry,y:int,i:int)
++    requires g.positive(), !g.bilevel, g.block_width==g.width, g.across==1,
++        0<=y<g.height, 0<=i<g.width as int*g.channels,
++    ensures g.segment(y*g.width*g.channels+i)==y/(g.block_height as int),
++        g.local(y*g.width*g.channels+i)==(y%(g.block_height as int))*g.width*g.channels+i,
++{
++    let w=g.width as int;let ch=g.channels as int;
++    let x=i/ch;let c=i%ch;let p=y*w+x;let k=y*w*ch+i;
++    quotient_remainder(i,ch);
++    assert(0<=x<w) by(nonlinear_arith)
++        requires 0<ch,0<w,0<=i<w*ch,i==ch*x+c,0<=c<ch,0<=x;
++    assert(k==p*ch+c) by(nonlinear_arith)
++        requires k==y*w*ch+i,p==y*w+x,i==ch*x+c;
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,ch,p,c);
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p,w,y,x);
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x,w,0,x);
++    assert(g.local(k)==(y%(g.block_height as int))*w*ch+i) by(nonlinear_arith)
++        requires g.local(k)==((y%(g.block_height as int))*w+x)*ch+c,i==ch*x+c;
++}
++
++fn copy_byte_run(input:&[u8],src:usize,output:&mut [u8],dst:usize,n:usize,invert:bool)
++    requires src as int+n<=input.len(),dst as int+n<=old(output).len(),
++    ensures final(output).len()==old(output).len(),
++        forall|i:int| 0<=i<n ==> #[trigger] final(output)@[dst as int+i]==
++            (if invert {(255-input@[src as int+i]) as u8} else {input@[src as int+i]}),
++        forall|i:int| 0<=i<old(output).len() && !(dst<=i<dst as int+n) ==> final(output)@[i]==old(output)@[i],
++{
++    let (_,source_tail)=input.split_at(src);
++    let (source,_)=source_tail.split_at(n);
++    let (_,target_tail)=output.split_at_mut(dst);
++    let (target,_)=target_tail.split_at_mut(n);
++    if !invert {
++        target.copy_from_slice(source);
++    } else {
++        let mut i=0usize;
++        while i<n
++            invariant i<=n,source.len()==n,target.len()==n,
++                forall|j:int| 0<=j<i ==> target@[j]==(255-source@[j]) as u8,
++            decreases n-i,
++        {
++            target[i]=255-source[i];i=i+1;
++        }
++    }
++}
++
+ pub struct Image<'a> {
+     input: &'a [u8],
+     geometry: Geometry,
+@@ -2789,6 +2870,9 @@
+             forall|i:int| 0<=i<self.byte_len() ==> final(output)@[i]==storage_pixel(self.input@,self.geometry,i),
+             forall|i:int| self.byte_len()<=i<old(output).len() ==> final(output)@[i]==old(output)@[i],
+     {
++        if !self.geometry.bilevel && !self.geometry.tiled {
++            return self.decode_uncompressed_rows(output);
++        }
+         let mut k=0usize;
+         while k<self.output_len
+             invariant self.well_formed(), !self.geometry.packbits && !self.geometry.lzw,
+@@ -2799,6 +2883,73 @@
+         {
+             output[k]=sample(self.input,self.geometry,k)?;
+             k=k+1;
++        }
++        Ok(())
++    }
++
++    fn decode_uncompressed_rows(&self,output:&mut [u8]) -> (r:Result<(),Error>)
++        requires self.well_formed(), !self.geometry.packbits && !self.geometry.lzw,
++            !self.geometry.bilevel,!self.geometry.tiled,old(output).len()>=self.byte_len(),
++        ensures r.is_ok(), final(output).len()==old(output).len(),
++            forall|i:int| 0<=i<self.byte_len() ==> final(output)@[i]==storage_pixel(self.input@,self.geometry,i),
++            forall|i:int| self.byte_len()<=i<old(output).len() ==> final(output)@[i]==old(output)@[i],
++    {
++        let g=self.geometry;
++        proof {
++            vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(g.width as int-1,g.width as int,0,g.width as int-1);
++            assert(g.across==1);
++            assert(0<g.width as int*g.channels<=self.output_len) by(nonlinear_arith)
++                requires g.width>0,g.channels>0,g.height>0,
++                    self.output_len as int==g.width as int*g.height*g.channels;
++        }
++        let row=mul(g.width,g.channels)?;
++        assert(self.output_len as int==g.height as int*row) by(nonlinear_arith)
++            requires row as int==g.width as int*g.channels,
++                self.output_len as int==g.width as int*g.height*g.channels;
++        let mut y=0usize;
++        while y<g.height
++            invariant self.well_formed(),g==self.geometry,!g.bilevel,!g.tiled,!g.packbits,!g.lzw,
++                g.block_width==g.width,g.across==1,row as int==g.width as int*g.channels,row>0,
++                y<=g.height,self.output_len as int==g.height as int*row,y as int*row<=self.output_len,
++                output.len()==old(output).len(),output.len()>=self.output_len,
++                forall|i:int| 0<=i<y as int*row ==> output@[i]==storage_pixel(self.input@,g,i),
++                forall|i:int| self.output_len<=i<output.len() ==> output@[i]==old(output)@[i],
++            decreases g.height-y,
++        {
++            proof {
++                assert(0<=y as int*row && y as int*row+row<=self.output_len) by(nonlinear_arith)
++                    requires 0<=y<g.height,row>0,self.output_len as int==g.height as int*row;
++                assert(y as int*row==y as int*g.width*g.channels) by(nonlinear_arith)
++                    requires row as int==g.width as int*g.channels;
++                strip_row_mapping(g,y as int,0);
++                strip_row_mapping(g,y as int,row as int-1);
++                assert(sample_valid(self.input@,g,y as int*row));
++                assert(sample_valid(self.input@,g,y as int*row+row-1));
++                assert(g.segment(y as int*row)==y as int/(g.block_height as int));
++                assert(value_valid(self.input@,g.offsets,y as int/(g.block_height as int)));
++                assert((y as int%(g.block_height as int))*row==g.local(y as int*row)) by(nonlinear_arith)
++                    requires row as int==g.width as int*g.channels,
++                        g.local(y as int*row)==(y as int%(g.block_height as int))*g.width*g.channels;
++            }
++            let dst=mul(y,row)?;
++            let off=value(self.input,g.offsets,y/g.block_height,g.le)?;
++            let local=mul(y%g.block_height,row)?;
++            let src=add(off,local)?;
++            assert(src as int+row<=self.input.len());
++            let ghost before=output@;
++            copy_byte_run(self.input,src,output,dst,row,g.white && g.alpha==0);
++            proof {
++                assert((y as int+1)*row==dst as int+row) by(nonlinear_arith)
++                    requires dst as int==y as int*row;
++                assert forall|i:int| 0<=i<(y as int+1)*row implies output@[i]==storage_pixel(self.input@,g,i) by {
++                    if i>=dst {
++                        assert(0<=i-dst<row);
++                        strip_row_mapping(g,y as int,i-dst);
++                        assert(sample_address(self.input@,g,i)==src as int+i-dst);
++                    }
++                }
++            }
++            y=y+1;
+         }
+         Ok(())
+     }
+@@ -2815,13 +2966,11 @@
+                 final(output)@[i] == old(output)@[i],
+     {
+         if output.len() < self.output_len { return Err(Error::OutputTooSmall); }
+-        if self.geometry.packbits || self.geometry.lzw || self.geometry.alpha!=0 {
+-            spend(budget,self.decode_work)?;
+-            if self.geometry.packbits || self.geometry.lzw {self.decode_compressed(output)?;}
+-            else {self.decode_uncompressed_storage(output)?;}
+-            if self.geometry.alpha!=0 {convert_alpha(self.input,self.geometry,self.output_len,output);}
+-            return Ok(());
+-        }
++        // Preserve the original partial-prefix behavior when a plain
++        // uncompressed decode runs out of quota. The sufficient-budget path
++        // reserves once and uses bulk rows.
++        if !self.geometry.packbits && !self.geometry.lzw && self.geometry.alpha==0
++            && budget.remaining<self.decode_work {
+         let mut k: usize = 0;
+         while k < self.output_len
+             invariant self.well_formed(), !(self.geometry.packbits || self.geometry.lzw), self.geometry.alpha==0, k <= self.output_len,
+@@ -2836,6 +2985,12 @@
+             output[k] = v;
+             k = k + 1;
+         }
++            return Ok(());
++        }
++        spend(budget,self.decode_work)?;
++        if self.geometry.packbits || self.geometry.lzw {self.decode_compressed(output)?;}
++        else {self.decode_uncompressed_storage(output)?;}
++        if self.geometry.alpha!=0 {convert_alpha(self.input,self.geometry,self.output_len,output);}
+         Ok(())
+     }
+ }
+@@ -3176,36 +3331,26 @@
+         assert((j as int+1)*(limits.max_input as int+1) == j as int*(limits.max_input as int+1)+limits.max_input+1) by(nonlinear_arith);
+         j = j + 1;
+     }
+-    // Segment coverage establishes sample validity for all codecs. Compressed
+-    // streams need no per-pixel preflight; uncompressed preflight remains below.
++    // Whole-segment checks already establish every sample address. Keep the
++    // historical conservative work charge, without rereading every pixel.
+     proof {
+         assert forall|i: int| 0 <= i < output_len implies sample_valid(s@, geometry, i) by {
+             segment_covers_sample(s@, geometry, tiled, i);
+         }
+     }
+-    if packbits || lzw { return Ok(Image { input: s, geometry, output_len, decode_work, directory: d, page }); }
+-    proof { if eligible {
+-        assert(budget.remaining >= output_len) by(nonlinear_arith)
+-            requires before_segments as int >= (limits.max_segments as int)*(limits.max_input as int+1)+limits.max_output,
+-                before_segments as int-budget.remaining <= segments as int*(limits.max_input as int+1),
+-                segments <= limits.max_segments, output_len <= limits.max_output;
+-    } }
+-    let ghost before_samples = budget.remaining;
+-    let mut k: usize = 0;
+-    while k < output_len
+-        invariant k <= output_len, geometry.positive(), !(geometry.packbits || geometry.lzw),
+-            eligible == (supported_profile(s@, page, *limits)
+-                && old(budget).remaining as int >= inspection_work_bound(page, *limits)),
+-            eligible ==> before_samples >= output_len,
+-            eligible ==> forall|i: int| 0 <= i < output_len ==> sample_valid(s@, geometry, i),
+-            budget.remaining as int + k == before_samples,
+-            budget.remaining <= old(budget).remaining,
+-            forall|i: int| 0 <= i < k ==> sample_valid(s@, geometry, i),
+-        decreases output_len - k,
+-    {
+-        spend(budget, 1)?;
+-        sample(s, geometry, k)?;
+-        k = k + 1;
++    if !(packbits || lzw) {
++        proof { if eligible {
++            assert(budget.remaining >= output_len) by(nonlinear_arith)
++                requires before_segments as int >= (limits.max_segments as int)*(limits.max_input as int+1)+limits.max_output,
++                    before_segments as int-budget.remaining <= segments as int*(limits.max_input as int+1),
++                    segments <= limits.max_segments, output_len <= limits.max_output;
++        } }
++        if budget.remaining<output_len {
++            let remaining=budget.remaining;
++            spend(budget,remaining)?;
++            return Err(Error::Limit);
++        }
++        spend(budget,output_len)?;
+     }
+     Ok(Image { input: s, geometry, output_len, decode_work, directory: d, page })
+ }

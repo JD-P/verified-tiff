@@ -1,0 +1,175 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 1416 dropped 0 interval_us 1000",
+  "samples": 1416,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/017cea9a2f6e/verified-tiff/target/reader-benchmark/verified",
+    "target/reader-benchmark/inputs/webp-lossy.tif",
+    "native",
+    "3000",
+    "memory"
+  ],
+  "binary_sha256": "0d830657f019133d13247bf2af67408f00d9acda949806e38417abe265797f7b",
+  "input_sha256": "1c2693e17904e1e68cabb18b0f5a44802bf06177be8a6736fd2f4e72b86cddd4",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "width": 1024,
+    "height": 1024,
+    "bytes": 4194304,
+    "iterations": 130,
+    "seconds": 5.61801378,
+    "ns_per_operation": 43215490.6,
+    "peak_rss_kib": 7388,
+    "hash": "392386e7d9b4db76"
+  },
+  "functions": [
+    {
+      "function": "libtiff.so.6::verified_tiff::native_vp8::render_rgba",
+      "samples": 302,
+      "percent": 21.327683615819208
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_filter_kernel::filter",
+      "samples": 211,
+      "percent": 14.901129943502825
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_coeff::decode",
+      "samples": 201,
+      "percent": 14.194915254237289
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_filter_write::filter",
+      "samples": 110,
+      "percent": 7.768361581920904
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::webp_spans::predict",
+      "samples": 82,
+      "percent": 5.790960451977401
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 72,
+      "percent": 5.084745762711864
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::webp_pixels::decode",
+      "samples": 58,
+      "percent": 4.096045197740113
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::webp_inverse::inverse",
+      "samples": 54,
+      "percent": 3.8135593220338984
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_render::block",
+      "samples": 52,
+      "percent": 3.672316384180791
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_postfilter::filter",
+      "samples": 52,
+      "percent": 3.672316384180791
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_residual::decode",
+      "samples": 37,
+      "percent": 2.6129943502824857
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::webp_alpha::unfilter",
+      "samples": 26,
+      "percent": 1.8361581920903955
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_bool::bit",
+      "samples": 24,
+      "percent": 1.694915254237288
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::Handle>::webp_lossy",
+      "samples": 22,
+      "percent": 1.5536723163841808
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_fields::parse",
+      "samples": 20,
+      "percent": 1.4124293785310735
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_plane::decode",
+      "samples": 19,
+      "percent": 1.3418079096045197
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_transform::transform",
+      "samples": 16,
+      "percent": 1.1299435028248588
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_header::parse",
+      "samples": 15,
+      "percent": 1.0593220338983051
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::storage::Buf<[u8; 4]>>::filled",
+      "samples": 9,
+      "percent": 0.635593220338983
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_macroblock::decode",
+      "samples": 9,
+      "percent": 0.635593220338983
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff::webp_huffman::Huff>::build",
+      "samples": 7,
+      "percent": 0.4943502824858757
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_image::decode",
+      "samples": 7,
+      "percent": 0.4943502824858757
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_modes::small_modes",
+      "samples": 3,
+      "percent": 0.211864406779661
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff::webp_huffman::Huff>::read",
+      "samples": 2,
+      "percent": 0.14124293785310735
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_modes::prefix",
+      "samples": 2,
+      "percent": 0.14124293785310735
+    },
+    {
+      "function": "libc.so.6::getenv@@GLIBC_2.2.5",
+      "samples": 1,
+      "percent": 0.07062146892655367
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::webp_header::read_table",
+      "samples": 1,
+      "percent": 0.07062146892655367
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::vp8_filter_info::prepare",
+      "samples": 1,
+      "percent": 0.07062146892655367
+    },
+    {
+      "function": "verified::main",
+      "samples": 1,
+      "percent": 0.07062146892655367
+    }
+  ]
+}

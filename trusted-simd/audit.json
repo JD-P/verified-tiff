@@ -1,0 +1,21 @@
+{
+  "authorization": "User explicitly requested trusted SSE2 operations and scalar fallback on 2026-10-15.",
+  "primitives": [
+    "available",
+    "add",
+    "sub",
+    "mul_shift16",
+    "shift3",
+    "mul_shift8",
+    "pack_shift6",
+    "add_bytes",
+    "clamp_add_sub",
+    "signed_product_shift5",
+    "wrap_bytes",
+    "add_bytes16"
+  ],
+  "files": {
+    "trusted-simd/src/lib.rs": "fe43b0591fb70a1b2eaa9821829b01b74d002d5030acb3ea7efc5588cb5af3d7",
+    "trusted-simd/src/cpu.rs": "43a7f2eceb63f1f48e6d7f6350d8dac515ab6ec7b53607837d061505b7e965d3"
+  }
+}

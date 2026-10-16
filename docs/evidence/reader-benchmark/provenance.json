@@ -1,0 +1,20 @@
+{
+  "zlib_runtime_version": "1.3",
+  "shared_libraries_sha256": {
+    "/workspace/scratch/017cea9a2f6e/verified-tiff/target/zstd-reference/lib/libzstd.so.1": "aa150295df3b63bcab9c434ccd1f78cb33f54090df2aa8c775598a54ac4d6ca7",
+    "/workspace/scratch/017cea9a2f6e/verified-tiff/target/lerc-reference/libLerc.so.4": "3ec633fe25001976259936b93c6ce478c7880aa9bee5dd69c9eaed04a53a3009",
+    "/lib/x86_64-linux-gnu/libz.so.1": "9b64150b28505a33d6bc3ecf709c279f6de97a1c184dbda65d06ee4537f6d286",
+    "/lib/x86_64-linux-gnu/libm.so.6": "f06f2ce1f1833df5f41cf13b6447ff07bea993ad9b27297d3428c2f70ab3f0e7",
+    "/lib/x86_64-linux-gnu/libc.so.6": "511f825ee075610ac9c0f7f91e2c13de2000d0f7b859f6461137e809a0a009d0",
+    "/lib/x86_64-linux-gnu/libstdc++.so.6": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb"
+  },
+  "source_checks_against_prior_delivery": {
+    "docs/evidence/reader-summary.json": 460,
+    "docs/evidence/reader-verification-summary.json": 117,
+    "docs/evidence/reader-c-api-source-sha256.json": 48
+  },
+  "source_unchanged": true,
+  "new_formal_verification_run": false,
+  "explanation": "Production code matches the recorded 1631-obligation proof and reader delivery. This benchmark changes only harnesses/documentation/evidence; prior proof results are not claimed as a new run."
+}

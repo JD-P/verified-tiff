@@ -1,0 +1,222 @@
+[
+  {
+    "name": "gray-none",
+    "label": "Gray8 / none",
+    "file": "target/benchmark/inputs/gray-none.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 1048850,
+    "input_sha256": "5a0264bfbdb64f1a6a38b0a2d76dc0e31e4c93fbea1ab1bc24fd4ba9f6a7685c"
+  },
+  {
+    "name": "gray-packbits",
+    "label": "Gray8 / PackBits",
+    "file": "target/benchmark/inputs/gray-packbits.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 262418,
+    "input_sha256": "ed8dd468721b0a0b58ceaa835a2994dd7443a29741d6abf2c4666fd6e115b59b"
+  },
+  {
+    "name": "gray-lzw",
+    "label": "Gray8 / LZW",
+    "file": "target/benchmark/inputs/gray-lzw.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 245570,
+    "input_sha256": "c838090e164ba39092d1ac2cabc06a5bc58b651fc5ee6f79ae6d08021d872e89"
+  },
+  {
+    "name": "gray-deflate",
+    "label": "Gray8 / Deflate",
+    "file": "target/benchmark/inputs/gray-deflate.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 9790,
+    "input_sha256": "c5da261c9cb6a0dcc4e4a9be772e2e2292431435a339771b5ac48118f868c2f6"
+  },
+  {
+    "name": "rgb-none",
+    "label": "RGB8 / none",
+    "file": "target/benchmark/inputs/rgb-none.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 3146014,
+    "input_sha256": "dc43c4aa87f60dfae63d942e91403324a146ea80f69504d5a6917c54b6b6e9be"
+  },
+  {
+    "name": "rgb-lzw",
+    "label": "RGB8 / LZW",
+    "file": "target/benchmark/inputs/rgb-lzw.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 889006,
+    "input_sha256": "8102e856e48f58a655ceb9e36c4f36e3198aebfe63ed6403d30139ba1759b0f8"
+  },
+  {
+    "name": "rgb-deflate",
+    "label": "RGB8 / Deflate",
+    "file": "target/benchmark/inputs/rgb-deflate.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 29048,
+    "input_sha256": "b632fc15ac1a2f0e11879be2ada455cb358f097c2948163f3ad32aca5cd21403"
+  },
+  {
+    "name": "rgb-jpeg",
+    "label": "RGB8 / JPEG (smooth blocks)",
+    "file": "target/benchmark/inputs/rgb-jpeg.tif",
+    "rgba": true,
+    "jpeg": true,
+    "origin": "generated",
+    "input_bytes": 54727,
+    "input_sha256": "e89c015f0a20e86a91e1030e72f488c7131bbc8d724234a07273e0a84975026a"
+  },
+  {
+    "name": "rgb-tile-lzw",
+    "label": "RGB8 / tiled LZW",
+    "file": "target/benchmark/inputs/rgb-tile-lzw.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 357738,
+    "input_sha256": "62bd26059ef2e41d66eb1043ef8f291bc6a306005b33ad3c6868938d5751cc91"
+  },
+  {
+    "name": "gray16-deflate",
+    "label": "Gray16 / Deflate",
+    "file": "target/benchmark/inputs/gray16-deflate.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 2068444,
+    "input_sha256": "ec0cd6e8f333f716d4a42f2fd4b2c327dd00363de3d86204e1d3fc40f21366a8"
+  },
+  {
+    "name": "float64-lzw-p2",
+    "label": "Float64 / LZW predictor 2",
+    "file": "target/benchmark/inputs/float64-lzw-p2.tif",
+    "rgba": false,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 221370,
+    "input_sha256": "eb06d2779b20c10cdda3265d86f96bbdb71489f8014894ba083d38dd8005d54d"
+  },
+  {
+    "name": "noise-lzw",
+    "label": "Random Gray8 / LZW",
+    "file": "target/benchmark/inputs/noise-lzw.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 1434698,
+    "input_sha256": "f289894e4e541e527288290703e3254c758d821f2261fd615dceb6d0c3e5994d"
+  },
+  {
+    "name": "noise-deflate",
+    "label": "Random Gray8 / Deflate",
+    "file": "target/benchmark/inputs/noise-deflate.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 1049266,
+    "input_sha256": "03f7f3ecd33fa602722fd33301ad59c532d7147328438855e44bb190abe06676"
+  },
+  {
+    "name": "fax3",
+    "label": "Bilevel / CCITT Group 3",
+    "file": "target/benchmark/inputs/fax3.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 48024,
+    "input_sha256": "c3d82c12b895049334ecdb22c5fb33444fa2b11f28f838411ec4593b2c2a43d3"
+  },
+  {
+    "name": "fax4",
+    "label": "Bilevel / CCITT Group 4",
+    "file": "target/benchmark/inputs/fax4.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 16804,
+    "input_sha256": "08805714e6c03d6ec3f25e3adcbfcea8ebe0d022827436d106b2509a36404120"
+  },
+  {
+    "name": "webp",
+    "label": "RGB8 / lossless WebP subset",
+    "file": "target/benchmark/inputs/webp.tif",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 1616,
+    "input_sha256": "72e9da70b932e23e7f0971901db75678f294c3576a6ea0ff627e260fa66de4d9"
+  },
+  {
+    "name": "logluv",
+    "label": "Native LogLuv16 / SGILog32",
+    "file": "target/benchmark/inputs/logluv.tif",
+    "rgba": false,
+    "jpeg": false,
+    "origin": "generated",
+    "input_bytes": 29506,
+    "input_sha256": "3e654d520f244f1279ec7fc6deb043af2de6b1241fd9a7d7a49727386add2056"
+  },
+  {
+    "name": "original-quad-lzw-compat.tiff",
+    "label": "Original legacy LZW",
+    "file": ".tools/tiff-4.7.1/test/images/quad-lzw-compat.tiff",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "libtiff 4.7.1 test/images, unchanged",
+    "input_bytes": 214342,
+    "input_sha256": "081118d951224d9909b105bb75f9667fd817e7b95122d141e91b43604dacd78b"
+  },
+  {
+    "name": "original-lzw-single-strip.tiff",
+    "label": "Original 24.3 MP LZW scan",
+    "file": ".tools/tiff-4.7.1/test/images/lzw-single-strip.tiff",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "libtiff 4.7.1 test/images, unchanged",
+    "input_bytes": 76264,
+    "input_sha256": "9cbff8fbe7a487da5d56e7e7566c0f3984e7092a3b1ccfe6bc1461449d008e4e"
+  },
+  {
+    "name": "original-testfax4.tiff",
+    "label": "Original 8.3 MP Group 4 scan",
+    "file": ".tools/tiff-4.7.1/test/images/testfax4.tiff",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "libtiff 4.7.1 test/images, unchanged",
+    "input_bytes": 39637,
+    "input_sha256": "42df253cef26450582d4810ff237cb1a1725cce9a27afb50ea89aa42b3e172b9"
+  },
+  {
+    "name": "original-deflate-last-strip-extra-data.tiff",
+    "label": "Original Deflate final-strip case",
+    "file": ".tools/tiff-4.7.1/test/images/deflate-last-strip-extra-data.tiff",
+    "rgba": true,
+    "jpeg": false,
+    "origin": "libtiff 4.7.1 test/images, unchanged",
+    "input_bytes": 12789,
+    "input_sha256": "031aa7e15c2dfb21fe2fdd89eff88c4505c306f641be8b98f3666707d698b5ae"
+  },
+  {
+    "name": "rgb-jpeg-textured",
+    "label": "RGB8 / JPEG (random texture)",
+    "file": "target/benchmark/inputs/rgb-jpeg-textured.tif",
+    "rgba": true,
+    "jpeg": true,
+    "origin": "generated",
+    "input_bytes": 2119873,
+    "input_sha256": "93fcfeee5276a3381c7a2c4e748a3f9dc8fd5b709328b396d05e7922094931eb"
+  }
+]

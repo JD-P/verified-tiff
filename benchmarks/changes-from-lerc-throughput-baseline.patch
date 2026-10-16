@@ -1,0 +1,504 @@
+--- a/src/lerc_bits.rs
++++ b/src/lerc_bits.rs
+@@ -71,13 +71,13 @@
+     }
+ }
+ pub(super) struct Array {pub at:usize,pub n:usize,pub data:[u32;256]}
+-pub(super) fn decode(s:&[u8],start:usize) -> (r:Result<Array,Error>)
++pub(super) fn decode_into(s:&[u8],start:usize,data:&mut[u32;256]) -> (r:Result<(usize,usize),Error>)
+     ensures r.is_ok()==decoded(s@,start).is_some(),
+-        r.is_ok() ==> r.unwrap().at==decoded(s@,start).unwrap().0 && r.unwrap().n<=256,
+-        r.is_ok() ==> r.unwrap().data@.take(r.unwrap().n as int)==decoded(s@,start).unwrap().1,
+-        r.is_ok() ==> start<r.unwrap().at<=s.len(),
++        r.is_ok() ==> r.unwrap().0==decoded(s@,start).unwrap().0 && r.unwrap().1<=256,
++        r.is_ok() ==> final(data)@.take(r.unwrap().1 as int)==decoded(s@,start).unwrap().1,
++        r.is_ok() ==> start<r.unwrap().0<=s.len(),
+ {
+-    reveal(decoded);let p=inspect(s,start)?;let mut data=[0u32;256];let mut k=0usize;
++    reveal(decoded);let p=inspect(s,start)?;let mut k=0usize;
+     while k<p.n
+         invariant plan(s@,start)==Some(p),k<=p.n<=256,p.bits<=31,p.width<=31,p.entries<=255,p.lut<=p.at<=p.next<=s.len(),s.len()<=usize::MAX/8,
+             p.at as int*8+p.n*p.width<=p.next as int*8,
+@@ -91,7 +91,7 @@
+         let bit=p.at*8+k*p.width;
+         assert(bit as int+p.width<=p.next as int*8) by(nonlinear_arith)
+             requires k<p.n,p.at as int*8+p.n*p.width<=p.next as int*8,bit==p.at as int*8+k*p.width;
+-        let q=zb::read(s,bit,p.next,p.width)?;
++        let q=crate::lerc_word::read(s,bit,p.next,p.width)?;
+         if p.entries>0 && q as usize>=p.entries{
+             assert(index(s@,p,k as int)==q);
+             assert(!(forall|j:int|0<=j<p.n ==> #[trigger] index(s@,p,j)<p.entries));
+@@ -103,12 +103,21 @@
+             let pos=p.lut*8+(q as usize-1)*p.bits;
+             assert(pos as int+p.bits<=p.at as int*8) by(nonlinear_arith)
+                 requires 0<q<p.entries,p.lut as int*8+(p.entries-1)*p.bits<=p.at as int*8,pos==p.lut as int*8+(q-1)*p.bits;
+-            zb::read(s,pos,p.at,p.bits)?
++            crate::lerc_word::read(s,pos,p.at,p.bits)?
+         };
+         data[k]=value;k=k+1;
+     }
+     assert(data@.take(p.n as int) =~= Seq::new(p.n as nat,|j:int|item(s@,p,j)));
+     reveal(plan);
+-    Ok(Array {at:p.next,n:p.n,data})
++    Ok((p.next,p.n))
++}
++pub(super) fn decode(s:&[u8],start:usize) -> (r:Result<Array,Error>)
++    ensures r.is_ok()==decoded(s@,start).is_some(),
++        r.is_ok() ==> r.unwrap().at==decoded(s@,start).unwrap().0 && r.unwrap().n<=256,
++        r.is_ok() ==> r.unwrap().data@.take(r.unwrap().n as int)==decoded(s@,start).unwrap().1,
++        r.is_ok() ==> start<r.unwrap().at<=s.len(),
++{
++    let mut data=[0u32;256];let (at,n)=decode_into(s,start,&mut data)?;
++    Ok(Array {at,n,data})
+ }
+ }
+--- a/src/lerc_block.rs
++++ b/src/lerc_block.rs
+@@ -41,26 +41,26 @@
+         }
+     }
+ }
+-pub(super) fn read_mode(s:&[u8],at:usize,h:Header,t:Tile) -> (r:Result<(Mode,packed::Array),Error>)
++pub(super) fn read_mode(s:&[u8],at:usize,h:Header,t:Tile,q:&mut packed::Array) -> (r:Result<Mode,Error>)
+     requires at<=s.len(),h.invariant(),t.valid(h),
+-    ensures r.is_ok()==mode(s@,at,h,t).is_some(),r.is_ok() ==> r.unwrap().0==mode(s@,at,h,t).unwrap(),
+-        r.is_ok() ==> at<r.unwrap().0.at<=s.len() && r.unwrap().0.flag<4 && r.unwrap().1.n<=256,
+-        r.is_ok() ==> r.unwrap().0.flag!=1 ==> r.unwrap().1.n==0,
+-        r.is_ok() ==> r.unwrap().0.flag==1 ==> packed::decoded(s@,r.unwrap().0.quant)==Some((r.unwrap().0.at,r.unwrap().1.data@.take(r.unwrap().1.n as int))),
++    ensures r.is_ok()==mode(s@,at,h,t).is_some(),r.is_ok() ==> r.unwrap()==mode(s@,at,h,t).unwrap(),
++        r.is_ok() ==> at<r.unwrap().at<=s.len() && r.unwrap().flag<4 && final(q).n<=256,
++        r.is_ok() ==> r.unwrap().flag!=1 ==> final(q).n==0,
++        r.is_ok() ==> r.unwrap().flag==1 ==> packed::decoded(s@,r.unwrap().quant)==Some((r.unwrap().at,final(q).data@.take(final(q).n as int))),
+ {
+     reveal(mode);if at==s.len(){return Err(Error::Truncated);}
+     let flag=s[at] as usize;
+     if (flag/4)%16!=(t.x/8)%16{return Err(Error::Invalid);}
+     let f=flag%4;
+-    let empty=packed::Array {at:0,n:0,data:[0u32;256]};
+-    if f==0 || f==2{return Ok((Mode {at:at+1,flag:f,offset:0,quant:0,next:at+1},empty));}
++    q.n=0;
++    if f==0 || f==2{return Ok(Mode {at:at+1,flag:f,offset:0,quant:0,next:at+1});}
+     let kind=sample::offset_kind(h.kind,flag/64)?;let offset=sample::read(s,at+1,kind)?;
+     if (offset/0x10000000000000u64)%2048==2047{return Err(Error::Invalid);}
+     let size=num::size(kind);
+     let next=at+1+size;
+-    if f==3{return Ok((Mode {at:next,flag:f,offset,quant:0,next},empty));}
+-    let q=packed::decode(s,next)?;
+-    Ok((Mode {at:q.at,flag:f,offset,quant:next,next:q.at},q))
++    if f==3{return Ok(Mode {at:next,flag:f,offset,quant:0,next});}
++    let (end,n)=packed::decode_into(s,next,&mut q.data)?;q.at=end;q.n=n;
++    Ok(Mode {at:end,flag:f,offset,quant:next,next:end})
+ }
+ pub(super) struct Step {pub value:u64,pub at:usize,pub q:usize}
+ pub(super) closed spec fn value(s:Seq<u8>,h:Header,m:Mode,q:Seq<u32>,at:usize,index:usize,maximum:u64) -> Option<Step> {
+@@ -113,12 +113,12 @@
+         }
+     }
+ }
+-fn target(h:Header,t:Tile,k:usize) -> (r:(usize,usize))
+-    requires t.valid(h),k<t.w*t.h,
+-    ensures r.0==t.pixel(h,k as int),r.1==t.target(h,k as int),r.0<h.width*h.height,r.1<h.width*h.height*h.depth,
+-{
+-    assert(k/t.w<t.h) by(nonlinear_arith) requires k<t.w*t.h,t.w>0;
+-    let yy=t.y+k/t.w;let xx=t.x+k%t.w;
++fn target_xy(h:Header,t:Tile,row:usize,col:usize) -> (r:(usize,usize))
++    requires t.valid(h),row<t.h,col<t.w,
++    ensures r.0==t.pixel(h,row as int*t.w+col),r.1==t.target(h,row as int*t.w+col),r.0<h.width*h.height,r.1<h.width*h.height*h.depth,
++{
++    proof {vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(row as int*t.w+col,t.w as int,row as int,col as int);}
++    let yy=t.y+row;let xx=t.x+col;
+     assert(yy*h.width+xx<h.width*h.height) by(nonlinear_arith)
+         requires yy<h.height,xx<h.width,h.width>0;
+     let p=yy*h.width+xx;
+@@ -126,8 +126,9 @@
+         requires p<h.width*h.height,t.depth<h.depth,h.depth<=64,h.width*h.height<=usize::MAX/512;
+     (p,p*h.depth+t.depth)
+ }
+-pub(super) fn reconstruct(s:&[u8],h:Header,t:Tile,m:Mode,q:&packed::Array,valid:&[u8],maximum:u64,out:&mut[u64]) -> (r:Result<usize,Error>)
++pub(super) fn reconstruct(s:&[u8],h:Header,t:Tile,m:Mode,q:&packed::Array,valid:&[u8],maximum:u64,all_valid:bool,out:&mut[u64]) -> (r:Result<usize,Error>)
+     requires t.valid(h),m.at<=s.len(),m.flag<4,q.n<=256,
++        all_valid ==> forall|p:int|0<=p<h.width as int*h.height ==> mask::valid(valid@,p),
+         (h.width as int*h.height+7)/8<=valid.len(),h.width as int*h.height*h.depth<=old(out).len(),
+     ensures final(out).len()==old(out).len(),
+         r.is_ok()==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,old(out)@,256).is_some(),
+@@ -136,11 +137,21 @@
+         r.is_ok() ==> m.at<=r.unwrap()<=s.len(),
+         forall|j:int|h.width as int*h.height*h.depth<=j<old(out).len() ==> final(out)@[j]==old(out)@[j],
+ {
+-    let mut k=0usize;let mut at=m.at;let mut index=0usize;
++    if m.flag==1 && h.kind==6{
++        if all_valid{return reconstruct_float(s,h,t,m,q,valid,maximum,true,6,out);}
++        return reconstruct_float(s,h,t,m,q,valid,maximum,false,6,out);
++    }
++    if m.flag==1 && h.kind==7{
++        if all_valid{return reconstruct_float(s,h,t,m,q,valid,maximum,true,7,out);}
++        return reconstruct_float(s,h,t,m,q,valid,maximum,false,7,out);
++    }
++    let mut k=0usize;let mut at=m.at;let mut index=0usize;let mut row=0usize;let mut col=0usize;
+     let ghost goal=finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,out@,256);
+     assert(t.w*t.h<=256) by(nonlinear_arith) requires t.w<=16,t.h<=16;
+     while k<t.w*t.h
+-        invariant t.valid(h),t.w*t.h<=256,k<=t.w*t.h,m.at<=at<=s.len(),m.flag<4,index<=q.n<=256,
++        invariant t.valid(h),t.w*t.h<=256,k<=t.w*t.h,
++            row<=t.h,col<t.w,k==row as int*t.w+col,
++            all_valid ==> forall|p:int|0<=p<h.width as int*h.height ==> mask::valid(valid@,p),m.at<=at<=s.len(),m.flag<4,index<=q.n<=256,
+             (h.width as int*h.height+7)/8<=valid.len(),h.width as int*h.height*h.depth<=out.len(),out.len()==old(out).len(),
+             goal==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,old(out)@,256),
+             goal==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,k,at,index,out@,(256-k) as nat),
+@@ -148,15 +159,59 @@
+         decreases 256-k,
+     {
+         reveal_with_fuel(finish,1);
+-        let (p,dest)=target(h,t,k);
+-        if mask::is_valid(valid,p){
++        assert(row<t.h) by(nonlinear_arith) requires k<t.w*t.h,k==row*t.w+col,t.w>0,col>=0;
++        let (p,dest)=target_xy(h,t,row,col);
++        if all_valid || mask::is_valid(valid,p){
+             let v=read_value(s,h,m,q,at,index,maximum)?;
+             out[dest]=v.value;at=v.at;index=v.q;
+         }
+         k=k+1;
++        if col+1==t.w{assert((row as int+1)*t.w==row as int*t.w+t.w) by(nonlinear_arith);col=0;row=row+1;}else{col=col+1;}
+     }
+     reveal_with_fuel(finish,1);
+     if m.flag==1 && index!=q.n{return Err(Error::Invalid);}
+     Ok(at)
+ }
+-}
++#[inline(always)]
++fn reconstruct_float(s:&[u8],h:Header,t:Tile,m:Mode,q:&packed::Array,valid:&[u8],maximum:u64,all_valid:bool,kind:usize,out:&mut[u64]) -> (r:Result<usize,Error>)
++    requires t.valid(h),m.at<=s.len(),m.flag==1,q.n<=256,kind==h.kind,kind==6 || kind==7,
++        all_valid ==> forall|p:int|0<=p<h.width as int*h.height ==> mask::valid(valid@,p),
++        (h.width as int*h.height+7)/8<=valid.len(),h.width as int*h.height*h.depth<=old(out).len(),
++    ensures final(out).len()==old(out).len(),
++        r.is_ok()==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,old(out)@,256).is_some(),
++        r.is_ok() ==> r.unwrap()==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,old(out)@,256).unwrap().at,
++        r.is_ok() ==> final(out)@==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,old(out)@,256).unwrap().data,
++        r.is_ok() ==> m.at<=r.unwrap()<=s.len(),
++        forall|j:int|h.width as int*h.height*h.depth<=j<old(out).len() ==> final(out)@[j]==old(out)@[j],
++{
++    let mut k=0usize;let mut at=m.at;let mut index=0usize;let mut row=0usize;let mut col=0usize;
++    let ghost goal=finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,out@,256);
++    assert(t.w*t.h<=256) by(nonlinear_arith) requires t.w<=16,t.h<=16;
++    while k<t.w*t.h
++        invariant kind==h.kind,kind==6 || kind==7,m.flag==1,t.valid(h),t.w*t.h<=256,k<=t.w*t.h,
++            row<=t.h,col<t.w,k==row as int*t.w+col,
++            all_valid ==> forall|p:int|0<=p<h.width as int*h.height ==> mask::valid(valid@,p),m.at<=at<=s.len(),m.flag<4,index<=q.n<=256,
++            (h.width as int*h.height+7)/8<=valid.len(),h.width as int*h.height*h.depth<=out.len(),out.len()==old(out).len(),
++            goal==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,0,m.at,0,old(out)@,256),
++            goal==finish(s@,h,t,m,q.data@.take(q.n as int),valid@,maximum,k,at,index,out@,(256-k) as nat),
++            forall|j:int|h.width as int*h.height*h.depth<=j<out.len() ==> out@[j]==old(out)@[j],
++        decreases 256-k,
++    {
++        reveal_with_fuel(finish,1);
++        assert(row<t.h) by(nonlinear_arith) requires k<t.w*t.h,k==row*t.w+col,t.w>0,col>=0;
++        let (p,dest)=target_xy(h,t,row,col);
++        if all_valid || mask::is_valid(valid,p){
++            reveal(value);reveal(sample::storage);
++            if index>=q.n{return Err(Error::Invalid);}
++            let v=num::minimum(num::plus(m.offset,num::scale(h.error,q.data[index])),maximum);
++            let bits=if kind==6{num::narrow(v) as u64}else{v};
++            out[dest]=bits;index=index+1;
++        }
++        k=k+1;
++        if col+1==t.w{assert((row as int+1)*t.w==row as int*t.w+t.w) by(nonlinear_arith);col=0;row=row+1;}else{col=col+1;}
++    }
++    reveal_with_fuel(finish,1);
++    if m.flag==1 && index!=q.n{return Err(Error::Invalid);}
++    Ok(at)
++}
++}
+--- a/src/lerc_image.rs
++++ b/src/lerc_image.rs
+@@ -61,10 +61,13 @@
+ {
+     assert(h.width*h.height*h.depth<=usize::MAX) by(nonlinear_arith)
+         requires h.width*h.height<=usize::MAX/512,h.depth<=64;
++    let all_valid=mask::all(valid,h.width*h.height);
++    let mut q=crate::lerc_bits::Array {at:0,n:0,data:[0u32;256]};
+     let mut fuel=h.width*h.height*h.depth;let mut p=Position {x:0,y:0,d:0};let mut at=start;
+     let ghost goal=tiles(s@,h,valid@,maximum@,p,start,out@,fuel as nat);
+     loop
+-        invariant h.invariant(),p.valid(h),start<=at<=s.len(),out.len()==old(out).len(),
++        invariant h.invariant(),p.valid(h),
++            all_valid ==> forall|i:int|0<=i<h.width as int*h.height ==> mask::valid(valid@,i),start<=at<=s.len(),out.len()==old(out).len(),
+             (h.width as int*h.height+7)/8<=valid.len(),h.width as int*h.height*h.depth<=out.len(),
+             goal==tiles(s@,h,valid@,maximum@,Position {x:0,y:0,d:0},start,old(out)@,(h.width as int*h.height*h.depth) as nat),
+             goal==tiles(s@,h,valid@,maximum@,p,at,out@,fuel as nat),
+@@ -74,9 +77,9 @@
+         reveal_with_fuel(tiles,1);
+         if p.y==h.height{return Ok(at);}
+         if fuel==0{return Err(Error::Invalid);}
+-        let tile=p.current(h);let (mode,q)=block::read_mode(s,at,h,tile)?;
++        let tile=p.current(h);let mode=block::read_mode(s,at,h,tile,&mut q)?;
+         if mode.flag!=1{assert(q.data@.take(q.n as int) =~= Seq::<u32>::empty());}
+-        at=block::reconstruct(s,h,tile,mode,&q,valid,maximum[p.d],out)?;
++        at=block::reconstruct(s,h,tile,mode,&q,valid,maximum[p.d],all_valid,out)?;
+         p=p.advance(h);fuel=fuel-1;
+     }
+ }
+--- a/src/lerc_mask.rs
++++ b/src/lerc_mask.rs
+@@ -77,4 +77,22 @@
+     requires pixel/8<mask.len(),
+     ensures r==valid(mask@,pixel as int),
+ {(mask[pixel/8]/bit_divisor(7-pixel%8))%2==1}
++// Conservative shortcut: padding bits may make this false, never incorrectly true.
++pub(super) fn all(mask:&[u8],pixels:usize) -> (r:bool)
++    requires pixels<=usize::MAX-7,(pixels as int+7)/8<=mask.len(),
++    ensures r ==> forall|p:int|0<=p<pixels ==> valid(mask@,p),
++{
++    let n=(pixels+7)/8;let mut i=0usize;
++    while i<n
++        invariant i<=n,n==(pixels as int+7)/8,n<=mask.len(),
++            forall|j:int|0<=j<i ==> mask@[j]==255,
++        decreases n-i,
++    {if mask[i]!=255{return false;}i=i+1;}
++    assert forall|p:int|0<=p<pixels implies valid(mask@,p) by {
++        assert(0<=p/8<n);assert(mask@[p/8]==255);
++        assert((255int/power2(7-p%8))%2==1);
++    }
++    true
+ }
++
++}
+--- a/src/lerc_numeric.rs
++++ b/src/lerc_numeric.rs
+@@ -206,7 +206,7 @@
+ 
+ /// Rounded q * (2 * maximum error). Header validation excludes overflow of
+ /// the intermediate doubled error, matching Lerc2's binary64 evaluation.
+-#[inline(always)]
++#[inline(never)]
+ pub(super) fn scale_software(a:u64,q:u32) -> (r:u64)
+     ensures r==scaled(a,q),
+ {
+@@ -282,7 +282,7 @@
+     assert(rounded(v,(n+4) as u32)==rounded(w as u128,(n-52) as u32)) by(bit_vector)
+         requires w as u128==sticky(v,56u32),54<=n<64;
+ }
+-#[inline(always)]
++#[inline(never)]
+ pub(super) fn plus_software(a:u64,b:u64) -> (r:u64)
+     ensures r==sum(a,b),
+ {
+@@ -346,7 +346,7 @@
+ pub(super) fn size(kind:usize) -> (r:usize) ensures r==type_size(kind),r==1 || r==2 || r==4 || r==8,
+ {if kind<2{1}else if kind<4{2}else if kind<7{4}else{8}}
+ 
+-#[inline(always)]
++#[inline(never)]
+ pub(super) fn number_software(v:u64,kind:usize) -> (r:u64)
+     requires kind<8,kind<7 ==> v<if kind<2{256int}else if kind<4{65536int}else{4294967296int},
+     ensures r==value(v,kind),
+@@ -362,7 +362,7 @@
+     pack(neg,if neg{(modulus-v) as u128}else{v as u128},0)
+ }
+ 
+-#[inline(always)]
++#[inline(never)]
+ pub(super) fn narrow_software(v:u64) -> (r:u32) ensures r==narrowed(v),
+ {
+     let exp=((v>>52u32)&2047) as u32;
+--- a/src/lerc_planes.rs
++++ b/src/lerc_planes.rs
+@@ -21,6 +21,14 @@
+         if count(v.unwrap(),(h.width as int*h.height) as nat)!=h.valid{None}else{v}
+     }
+ }
++proof fn count_uniform(s:Seq<u8>,n:nat,b:bool)
++    requires forall|p:int|0<=p<n ==> mask::valid(s,p)==b,
++    ensures count(s,n)==if b{n as int}else{0int},
++    decreases n,
++{
++    reveal_with_fuel(count,1);
++    if n>0{count_uniform(s,(n-1) as nat,b);}
++}
+ pub(super) fn prepare(s:&[u8],h:Header,reuse:bool,out:&mut[u8]) -> (r:Result<(),Error>)
+     requires h.invariant(),h.data<=s.len(),mask_size(h)<=old(out).len(),
+     ensures final(out).len()==old(out).len(),r.is_ok()==validity(s@,h,old(out)@,reuse).is_some(),
+@@ -28,7 +36,17 @@
+         forall|i:int|mask_size(h)<=i<old(out).len() ==> final(out)@[i]==old(out)@[i],
+ {
+     reveal(validity);let pixels=h.width*h.height;let size=(pixels+7)/8;
+-    if h.valid==0 || h.valid==pixels{crate::zstd_output::append_repeat(out,0,size,if h.valid==0{0u8}else{255u8});}
++    if h.valid==0 || h.valid==pixels{
++        let b=h.valid!=0;let byte=if b{255u8}else{0u8};
++        crate::zstd_output::append_repeat(out,0,size,byte);
++        let ghost bits=out@.take(size as int);
++        assert(bits =~= Seq::new(size as nat,|i:int|byte));
++        assert forall|p:int|0<=p<pixels implies mask::valid(bits,p)==b by {
++            assert(0<=p/8<size);assert(bits[p/8]==byte);
++        }
++        proof {count_uniform(bits,pixels as nat,b);}
++        return Ok(());
++    }
+     else if h.mask==0{if !reuse{return Err(Error::Invalid);}}
+     else{mask::decode(s,70,h.data,size,out)?;}
+     let ghost bits=out@.take(size as int);let mut i=0usize;let mut n=0usize;
+--- /dev/null
++++ b/src/lerc_word.rs
+@@ -0,0 +1,77 @@
++//! Bounded word extraction, proved against the original per-bit LERC model.
++use super::*;
++use crate::zstd_bits as zb;
++verus! {
++#[verifier::inline]
++pub(super) open spec fn word(a:u8,b:u8,c:u8,d:u8,e:u8) -> u64 {
++    a as u64 | (b as u64)<<8 | (c as u64)<<16 | (d as u64)<<24 | (e as u64)<<32
++}
++#[verifier::inline]
++pub(super) open spec fn extract(w:u64,skip:u64,n:u64) -> u64 {(w>>skip)&(((1u64<<n)-1) as u64)}
++proof fn powers(n:u64)
++    requires n<=32,
++    ensures (1u64<<n) as int==zb::pow(n as int),
++{
++    assert((1u64<<n)==if n==0 {1u64} else if n==1 {2u64} else if n==2 {4u64}
++        else if n==3 {8u64} else if n==4 {16u64} else if n==5 {32u64}
++        else if n==6 {64u64} else if n==7 {128u64} else if n==8 {256u64}
++        else if n==9 {512u64} else if n==10 {1024u64} else if n==11 {2048u64}
++        else if n==12 {4096u64} else if n==13 {8192u64} else if n==14 {16384u64}
++        else if n==15 {32768u64} else if n==16 {65536u64} else if n==17 {131072u64}
++        else if n==18 {262144u64} else if n==19 {524288u64} else if n==20 {1048576u64}
++        else if n==21 {2097152u64} else if n==22 {4194304u64} else if n==23 {8388608u64}
++        else if n==24 {16777216u64} else if n==25 {33554432u64} else if n==26 {67108864u64}
++        else if n==27 {134217728u64} else if n==28 {268435456u64} else if n==29 {536870912u64}
++        else if n==30 {1073741824u64} else if n==31 {2147483648u64} else {4294967296u64}) by(bit_vector) requires n<=32;
++}
++proof fn byte_bit(a:u8,b:u8,c:u8,d:u8,e:u8,j:u64)
++    requires j<40,
++    ensures ((word(a,b,c,d,e)>>j)&1) as int==
++        ((if j<8 {a as int}else if j<16 {b as int}else if j<24 {c as int}else if j<32 {d as int}else{e as int})/power2(j as int%8))%2,
++{
++    let bit=j%8;powers(bit);assert(zb::pow(bit as int)==power2(bit as int));
++    assert(((word(a,b,c,d,e)>>j)&1)==
++        ((if j<8 {a as u64}else if j<16 {b as u64}else if j<24 {c as u64}else if j<32 {d as u64}else{e as u64})/(1u64<<bit))%2)
++        by(bit_vector) requires j<40,bit==j%8;
++}
++proof fn model(s:Seq<u8>,at:int,skip:u64,n:u64)
++    requires 0<=at,at+5<=s.len(),skip<=40,skip+n<=40,n<=32,
++    ensures extract(word(s[at],s[at+1],s[at+2],s[at+3],s[at+4]),skip,n) as int==zb::value(s,at*8+skip,n as nat),
++    decreases n,
++{
++    reveal_with_fuel(zb::value,1);
++    let w=word(s[at],s[at+1],s[at+2],s[at+3],s[at+4]);
++    if n==0 {assert(extract(w,skip,n)==0) by(bit_vector) requires n==0;}
++    else {
++        model(s,at,skip,(n-1) as u64);powers((n-1) as u64);
++        assert(extract(w,skip,n)==extract(w,skip,(n-1) as u64)+(1u64<<((n-1) as u64))*((w>>((skip+n-1) as u64))&1))
++            by(bit_vector) requires skip<=40,skip+n<=40,0<n<=32;
++        assert(extract(w,skip,(n-1) as u64)<4294967296 && (1u64<<((n-1) as u64))<=2147483648 && ((w>>((skip+n-1) as u64))&1)<=1)
++            by(bit_vector) requires skip<=40,skip+n<=40,0<n<=32;
++        let j=(skip+n-1) as u64;byte_bit(s[at],s[at+1],s[at+2],s[at+3],s[at+4],j);
++        quotient_remainder(j as int,8);
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(at*8+j as int,8,at+j as int/8,j as int%8);
++        assert(s[(at*8+j as int)/8]==if j<8{s[at]}else if j<16{s[at+1]}else if j<24{s[at+2]}else if j<32{s[at+3]}else{s[at+4]});
++    }
++}
++#[inline(always)]
++pub(super) fn read(s:&[u8],p:usize,end:usize,n:usize) -> (r:Result<u32,Error>)
++    requires end<=s.len(),end<=usize::MAX/8,p<=end*8,n<=32,
++    ensures r.is_ok()==(p as int+n<=end as int*8),
++        r.is_ok() ==> r.unwrap() as int==zb::value(s@,p as int,n as nat),
++        r.is_ok() ==> r.unwrap()<zb::pow(n as int),
++{
++    if n>end*8-p{return Err(Error::Truncated);}
++    if end<5{return zb::read(s,p,end,n);}
++    let at=if end-p/8>=5{p/8}else{end-5};
++    let w=s[at] as u64 | (s[at+1] as u64)<<8 | (s[at+2] as u64)<<16 | (s[at+3] as u64)<<24 | (s[at+4] as u64)<<32;
++    let skip=(p-at*8) as u64;let len=n as u64;
++    proof {powers(len);quotient_remainder(p as int,8);assert(skip+len<=40);}
++    let v=(w>>skip)&((1u64<<len)-1);
++    proof {
++        model(s@,at as int,skip,len);quotient_remainder(p as int,8);
++        assert(v<(1u64<<len)) by(bit_vector) requires v==extract(w,skip,len),len<=32;
++    }
++    Ok(v as u32)
++}
++}
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -28,6 +28,7 @@
+ mod lerc_numeric;
+ mod lerc_checksum;
+ mod lerc_bits;
++mod lerc_word;
+ mod lerc_mask;
+ mod lerc_header;
+ mod lerc_samples;
+--- a/compat/src/lerc.rs
++++ b/compat/src/lerc.rs
+@@ -39,7 +39,7 @@
+         let bands=if banded{channels}else{1};let depth=if banded{1}else if alpha{channels-1}else{channels};
+         let pixels=product(m.bw,rows)?;let count=product(pixels,depth)?;
+         if product(count,8)?>self.limits.max_output{return Err((LIMIT,"LERC word scratch limit"));}
+-        let mut words=Buf::new(count,mem)?;for _ in 0..count{words.push(0u64)?;}
++        let mut words=Buf::filled(count,0u64,mem)?;
+         let mask_len=pixels.checked_add(7).ok_or((LIMIT,"LERC mask size overflow"))?/8;
+         let mut mask=Buf::zeros(mask_len,self.limits.max_output,mem)?;
+         let mut out=Buf::zeros(needed,self.limits.max_output,mem)?;let bytes=m.bits/8;let mut at=0usize;
+@@ -49,16 +49,13 @@
+                 return Err((INVALID,"LERC header does not match TIFF segment"));
+             }
+             native_lerc::decode(data,&mut words,&mut mask,band>0,budget).map_err(err)?;
+-            for p in 0..pixels{
+-                let valid=(mask[p/8]>>(7-p%8))&1!=0;
+-                for c in 0..depth{
+-                    let bits=if !valid && kind==6{0x7fc00000u64}else if !valid && kind==7{0x7ff8000000000000u64}else{words[p*depth+c]};
+-                    let target=(p*channels+if banded{band}else{c})*bytes;
+-                    let raw=if cfg!(target_endian="little"){bits.to_le_bytes()}else{bits.to_be_bytes()};
+-                    if cfg!(target_endian="little"){out[target..target+bytes].copy_from_slice(&raw[..bytes]);}
+-                    else{out[target..target+bytes].copy_from_slice(&raw[8-bytes..]);}
+-                }
+-                if alpha{out[p*channels+channels-1]=if valid{255}else{0};}
++            if needed!=product(product(pixels,channels)?,bytes)?{return Err((INVALID,"LERC output layout mismatch"));}
++            match bytes {
++                1=>pack::<1>(&words,&mask,&mut out,pixels,depth,channels,band,banded,alpha,kind),
++                2=>pack::<2>(&words,&mask,&mut out,pixels,depth,channels,band,banded,alpha,kind),
++                4=>pack::<4>(&words,&mask,&mut out,pixels,depth,channels,band,banded,alpha,kind),
++                8=>pack::<8>(&words,&mask,&mut out,pixels,depth,channels,band,banded,alpha,kind),
++                _=>unreachable!(),
+             }
+             at=at.checked_add(info.encoded_len).ok_or((LIMIT,"LERC blob size overflow"))?;
+         }
+@@ -66,3 +63,27 @@
+         Ok(out)
+     }
+ }
++
++// Fixed-width stores allow LLVM to combine/vectorize packing. Application output
++// remains private until the entire segment (all bands and endings) has passed.
++#[inline(always)]
++fn store<const N:usize>(dst:&mut[u8],bits:u64){
++    let raw=bits.to_ne_bytes();
++    if cfg!(target_endian="little"){dst.copy_from_slice(&raw[..N]);}
++    else{dst.copy_from_slice(&raw[8-N..]);}
++}
++fn pack<const N:usize>(words:&[u64],mask:&[u8],out:&mut[u8],pixels:usize,depth:usize,channels:usize,band:usize,banded:bool,alpha:bool,kind:usize){
++    if !banded && !alpha && mask.iter().all(|&b|b==255){
++        for (dst,&bits) in out.chunks_exact_mut(N).zip(words){store::<N>(dst,bits);}
++        return;
++    }
++    for p in 0..pixels{
++        let valid=(mask[p/8]>>(7-p%8))&1!=0;
++        for c in 0..depth{
++            let bits=if !valid && kind==6{0x7fc00000u64}else if !valid && kind==7{0x7ff8000000000000u64}else{words[p*depth+c]};
++            let target=(p*channels+if banded{band}else{c})*N;
++            store::<N>(&mut out[target..target+N],bits);
++        }
++        if alpha{out[p*channels+channels-1]=if valid{255}else{0};}
++    }
++}
+--- a/compat/src/storage.rs
++++ b/compat/src/storage.rs
+@@ -47,7 +47,9 @@
+     }
+     pub fn push(&mut self,value:T)->R<()>{if self.v.len()==self.capacity{return Err((LIMIT,"buffer capacity"));}self.v.push(value);Ok(())}
+ }
+-impl<T:Clone> Buf<T>{pub fn extend(&mut self,s:&[T])->R<()>{if s.len()>self.capacity-self.v.len(){return Err((LIMIT,"buffer capacity"));}self.v.extend_from_slice(s);Ok(())}}
++impl<T:Clone> Buf<T>{
++    pub fn filled(n:usize,value:T,mem:&Mem)->R<Self>{let mut b=Self::new(n,mem)?;b.v.resize(n,value);Ok(b)}
++pub fn extend(&mut self,s:&[T])->R<()>{if s.len()>self.capacity-self.v.len(){return Err((LIMIT,"buffer capacity"));}self.v.extend_from_slice(s);Ok(())}}
+ impl Buf<u8>{pub fn zeros(n:usize,cap:usize,mem:&Mem)->R<Self>{if n>cap{return Err((LIMIT,"buffer byte limit"));}let mut b=Self::new(n,mem)?;b.v.resize(n,0);Ok(b)}}
+ impl<T> Deref for Buf<T>{type Target=[T];fn deref(&self)->&[T]{&self.v}}
+ impl<T> DerefMut for Buf<T>{fn deref_mut(&mut self)->&mut[T]{&mut self.v}}

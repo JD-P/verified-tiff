@@ -1,0 +1,120 @@
+{
+  "verify_sh_sha256": "4b955b4f256c394a619520c86e44c6b1cb850e48863fd52cccefee23c0ea187b",
+  "jobs": 4,
+  "results": [
+    {
+      "chunk": 0,
+      "exit_code": 0,
+      "seconds": 233.82026004999352,
+      "log": "target/parallel-verification/00.log"
+    },
+    {
+      "chunk": 1,
+      "exit_code": 0,
+      "seconds": 58.35658210499969,
+      "log": "target/parallel-verification/01.log"
+    },
+    {
+      "chunk": 2,
+      "exit_code": 0,
+      "seconds": 17.794781313990825,
+      "log": "target/parallel-verification/02.log"
+    },
+    {
+      "chunk": 3,
+      "exit_code": 0,
+      "seconds": 18.241700030004722,
+      "log": "target/parallel-verification/03.log"
+    },
+    {
+      "chunk": 4,
+      "exit_code": 0,
+      "seconds": 57.07795122099924,
+      "log": "target/parallel-verification/04.log"
+    },
+    {
+      "chunk": 5,
+      "exit_code": 0,
+      "seconds": 65.76569804499741,
+      "log": "target/parallel-verification/05.log"
+    },
+    {
+      "chunk": 6,
+      "exit_code": 0,
+      "seconds": 89.09324461499637,
+      "log": "target/parallel-verification/06.log"
+    },
+    {
+      "chunk": 7,
+      "exit_code": 0,
+      "seconds": 55.03915873699589,
+      "log": "target/parallel-verification/07.log"
+    },
+    {
+      "chunk": 8,
+      "exit_code": 0,
+      "seconds": 82.78035648399964,
+      "log": "target/parallel-verification/08.log"
+    },
+    {
+      "chunk": 9,
+      "exit_code": 0,
+      "seconds": 71.34863980300725,
+      "log": "target/parallel-verification/09.log"
+    },
+    {
+      "chunk": 10,
+      "exit_code": 0,
+      "seconds": 54.54274364199955,
+      "log": "target/parallel-verification/10.log"
+    },
+    {
+      "chunk": 11,
+      "exit_code": 0,
+      "seconds": 91.78811308500008,
+      "log": "target/parallel-verification/11.log"
+    },
+    {
+      "chunk": 12,
+      "exit_code": 0,
+      "seconds": 93.65735205099918,
+      "log": "target/parallel-verification/12.log"
+    },
+    {
+      "chunk": 13,
+      "exit_code": 0,
+      "seconds": 132.27352454500215,
+      "log": "target/parallel-verification/13.log"
+    },
+    {
+      "chunk": 14,
+      "exit_code": 0,
+      "seconds": 238.3781306250021,
+      "log": "target/parallel-verification/14.log"
+    },
+    {
+      "chunk": 15,
+      "exit_code": 0,
+      "seconds": 105.78919192698959,
+      "log": "target/parallel-verification/15.log"
+    },
+    {
+      "chunk": 16,
+      "exit_code": 0,
+      "seconds": 201.23849577500368,
+      "log": "target/parallel-verification/16.log"
+    },
+    {
+      "chunk": 17,
+      "exit_code": 0,
+      "seconds": 69.33426575899648,
+      "log": "target/parallel-verification/17.log"
+    },
+    {
+      "chunk": 18,
+      "exit_code": 0,
+      "seconds": 66.23158542100282,
+      "log": "target/parallel-verification/18.log"
+    }
+  ]
+}

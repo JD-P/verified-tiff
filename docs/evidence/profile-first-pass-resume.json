@@ -1,0 +1,5 @@
+{
+  "completed_cases_at_restart": 9,
+  "reason": "Execution session was no longer available; no live benchmark process remained.",
+  "action": "Resumed checkpoint with unchanged binaries, source hashes, settings and CPU affinity; only complete case batches are retained."
+}

@@ -1,0 +1,11 @@
+test_code_widths_padding_and_dictionary (__main__.LzwTail.test_code_widths_padding_and_dictionary) ... ok
+test_format_matrix (__main__.LzwTail.test_format_matrix) ... ok
+test_original_single_strip (__main__.LzwTail.test_original_single_strip) ... ok
+test_reject_incomplete_pixels_and_extra_bytes (__main__.LzwTail.test_reject_incomplete_pixels_and_extra_bytes) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 5.669s
+
+OK
+LZW tail width/padding/dictionary cases: 135
+LZW tail profile matrix: 64 cases; independent pixels and live libtiff exact

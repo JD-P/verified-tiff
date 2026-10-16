@@ -1,0 +1,16 @@
+patching file examples/benchmark.rs
+patching file src/bit_window.rs
+patching file src/deflate.rs
+patching file src/deflate_bits.rs
+patching file src/deflate_plane.rs
+patching file src/extended_image.rs
+patching file src/jpeg.rs
+patching file src/jpeg_bits.rs
+patching file src/jpeg_block.rs
+patching file src/jpeg_huffman.rs
+patching file src/jpeg_layout.rs
+patching file src/jpeg_transform.rs
+patching file src/lib.rs
+patching file src/raster_layout.rs
+Restored all 51 original core files and unchanged adapter in /workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/throughput-delivery-restore19
+This is a benchmark build tree, not a separate deliverable or a fresh verification run.

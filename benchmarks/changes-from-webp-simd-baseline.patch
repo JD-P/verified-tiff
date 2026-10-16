@@ -1,0 +1,520 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -23,6 +23,10 @@
+ [dependencies]
+ vstd = "=0.0.0-2026-10-04-0306"
+ verified-tiff-float = { path = "trusted-float" }
++verified-tiff-simd = { path = "trusted-simd" }
++
++[features]
++force-scalar = ["verified-tiff-simd/force-scalar"]
+ 
+ [package.metadata.verus]
+ verify = true
+@@ -32,5 +36,5 @@
+ 
+ 
+ [workspace]
+-members = ["compat", "trusted-float"]
++members = ["compat", "trusted-float", "trusted-simd"]
+ resolver = "2"
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -81,6 +81,7 @@
+ version = "0.1.0"
+ dependencies = [
+  "verified-tiff-float",
++ "verified-tiff-simd",
+  "vstd",
+ ]
+ 
+@@ -93,6 +94,13 @@
+ 
+ [[package]]
+ name = "verified-tiff-float"
++version = "0.1.0"
++dependencies = [
++ "vstd",
++]
++
++[[package]]
++name = "verified-tiff-simd"
+ version = "0.1.0"
+ dependencies = [
+  "vstd",
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -73,6 +73,8 @@
+ mod webp_aux;
+ mod webp_transforms;
+ mod webp_inverse;
++mod webp_simd;
++mod webp_spans;
+ mod webp_prepare;
+ pub mod native_webp;
+ mod webp_huffman;
+--- a/src/vp8_transform.rs
++++ b/src/vp8_transform.rs
+@@ -43,6 +43,88 @@
+     let y=k/4;let v=pass(vertical(c,0,y,walsh),vertical(c,1,y,walsh),vertical(c,2,y,walsh),vertical(c,3,y,walsh),(k%4) as usize,if walsh{3int}else{4int},walsh);
+     if walsh{crate::vp8_coeff::wrapped(floor8(v)) as i32}else{floor8(v) as i32}
+ }
++// Four independent lanes share each butterfly intermediate. The only assumed
++// operations are the fixed-size integer primitives, not this transform.
++fn pass4(a:[i32;4],b:[i32;4],c:[i32;4],d:[i32;4],bias:i32,walsh:bool,limit:i32) -> (r:[[i32;4];4])
++    requires 0<=limit<=200000,0<=bias<=4,
++        verified_tiff_simd::bounded(a,limit as int),verified_tiff_simd::bounded(b,limit as int),
++        verified_tiff_simd::bounded(c,limit as int),verified_tiff_simd::bounded(d,limit as int),
++    ensures forall|k:int,j:int|0<=k<4 && 0<=j<4 ==>
++        #[trigger] r@[k]@[j]==pass(a@[j] as int,b@[j] as int,c@[j] as int,d@[j] as int,k as usize,bias as int,walsh)
++        && -6*limit-8<=r@[k]@[j]<=6*limit+8,
++{
++    use verified_tiff_simd::{add,sub,mul_shift16};
++    let z=[bias;4];
++    let r=if walsh {
++        let ab=add(a,b);let cd=add(c,d);let amb=sub(a,b);let cmd=sub(c,d);
++        [add(add(ab,cd),z),add(sub(ab,cd),z),add(sub(amb,cmd),z),add(add(amb,cmd),z)]
++    }else{
++        let m1b=mul_shift16(b,20091);let m2b=mul_shift16(b,35468);
++        let m1d=mul_shift16(d,20091);let m2d=mul_shift16(d,35468);
++        let u=sub(sub(m2b,m1d),d);let v=add(add(m1b,b),m2d);
++        let ac=add(add(a,c),z);let amc=add(sub(a,c),z);
++        [add(ac,v),add(amc,u),sub(amc,u),sub(ac,v)]
++    };
++    assert forall|k:int,j:int|0<=k<4 && 0<=j<4 implies
++        #[trigger] r@[k]@[j]==pass(a@[j] as int,b@[j] as int,c@[j] as int,d@[j] as int,k as usize,bias as int,walsh)
++        && -6*limit-8<=r@[k]@[j]<=6*limit+8 by {
++        assert(a@[j]>=-limit && b@[j]>=-limit && c@[j]>=-limit && d@[j]>=-limit);
++    }
++    r
++}
++fn transpose(t:[[i32;4];4]) -> (r:[[i32;4];4])
++    ensures forall|i:int,j:int|0<=i<4 && 0<=j<4 ==> #[trigger] r@[i]@[j]==t@[j]@[i],
++{
++    [[t[0][0],t[1][0],t[2][0],t[3][0]],[t[0][1],t[1][1],t[2][1],t[3][1]],
++     [t[0][2],t[1][2],t[2][2],t[3][2]],[t[0][3],t[1][3],t[2][3],t[3][3]]]
++}
++fn rounded_rows(h:[[i32;4];4],walsh:bool) -> (out:[i32;16])
++    requires forall|i:int,j:int|0<=i<4 && 0<=j<4 ==> -1200008<=#[trigger] h@[i]@[j]<=1200008,
++    ensures forall|k:int|0<=k<16 ==> #[trigger] out@[k]==
++        (if walsh{crate::vp8_coeff::wrapped(floor8(h@[k%4]@[k/4] as int)) as i32}else{floor8(h@[k%4]@[k/4] as int) as i32})
++        && -1250000<=out@[k]<=1250000 && (walsh ==> -32768<=out@[k]<=32767),
++{
++    let r=[verified_tiff_simd::shift3(h[0]),verified_tiff_simd::shift3(h[1]),verified_tiff_simd::shift3(h[2]),verified_tiff_simd::shift3(h[3])];
++    let mut out=[0i32;16];let mut k=0usize;
++    while k<16
++        invariant k<=16,
++            forall|i:int,j:int|0<=i<4 && 0<=j<4 ==> -1200008<=#[trigger] h@[i]@[j]<=1200008 && r@[i]@[j]==h@[i]@[j] as int/8,
++            forall|i:int|0<=i<k ==> #[trigger] out@[i]==
++                (if walsh{crate::vp8_coeff::wrapped(floor8(h@[i%4]@[i/4] as int)) as i32}else{floor8(h@[i%4]@[i/4] as int) as i32})
++                && -1250000<=out@[i]<=1250000 && (walsh ==> -32768<=out@[i]<=32767),
++        decreases 16-k,
++    {
++        assert(h@[(k%4) as int]@[(k/4) as int]>=-1200008);
++        assert(r@[(k%4) as int]@[(k/4) as int]==h@[(k%4) as int]@[(k/4) as int] as int/8);
++        let v=r[k%4][k/4];
++        out[k]=if walsh{crate::vp8_coeff::wrap(v as i64)}else{v};k=k+1;
++    }
++    out
++}
++#[verifier::spinoff_prover]
++fn vector_transform(c:&[i32;16],walsh:bool) -> (out:[i32;16])
++    requires forall|k:int|0<=k<16 ==> -32768<=#[trigger] c@[k]<=32767,
++    ensures forall|k:int|0<=k<16 ==> #[trigger] out@[k]==sample(c@,k,walsh) && -1250000<=out@[k]<=1250000 && (walsh ==> -32768<=out@[k]<=32767),
++{
++    let t=pass4([c[0],c[1],c[2],c[3]],[c[4],c[5],c[6],c[7]],
++                [c[8],c[9],c[10],c[11]],[c[12],c[13],c[14],c[15]],0,walsh,32768);
++    assert forall|y:int,x:int|0<=y<4 && 0<=x<4 implies
++        #[trigger] t@[y]@[x]==vertical(c@,x,y,walsh) by {}
++    let cols=transpose(t);
++    let h=pass4(cols[0],cols[1],cols[2],cols[3],if walsh{3}else{4},walsh,200000);
++    let out=rounded_rows(h,walsh);
++    assert forall|k:int|0<=k<16 implies #[trigger] out@[k]==sample(c@,k,walsh) by {
++        let x=k%4;let y=k/4;
++        assert(t@[y]@[0]==vertical(c@,0,y,walsh));
++        assert(t@[y]@[1]==vertical(c@,1,y,walsh));
++        assert(t@[y]@[2]==vertical(c@,2,y,walsh));
++        assert(t@[y]@[3]==vertical(c@,3,y,walsh));
++        assert(cols@[0]@[y]==t@[y]@[0]);assert(cols@[1]@[y]==t@[y]@[1]);
++        assert(cols@[2]@[y]==t@[y]@[2]);assert(cols@[3]@[y]==t@[y]@[3]);
++    }
++    out
++}
++#[verifier::spinoff_prover]
+ pub(super) fn transform(c:&[i32;16],walsh:bool) -> (out:[i32;16])
+     requires forall|k:int|0<=k<16 ==> -32768<=#[trigger] c@[k]<=32767,
+     ensures forall|k:int|0<=k<16 ==> #[trigger] out@[k]==sample(c@,k,walsh) && -1250000<=out@[k]<=1250000 && (walsh ==> -32768<=out@[k]<=32767),
+@@ -64,6 +146,7 @@
+         }
+         return out;
+     }
++    if verified_tiff_simd::available(){return vector_transform(c,walsh);}
+     let mut t=[0i64;16];let mut i=0usize;
+     while i<16
+         invariant i<=16,forall|k:int|0<=k<16 ==> -32768<=#[trigger] c@[k]<=32767,
+--- a/src/vp8_color.rs
++++ b/src/vp8_color.rs
+@@ -65,4 +65,61 @@
+     let yy=at(p,0,pw,ph,x,y);
+     let u=interpolate(p,ylen,pw/2,ph/2,w,h,x,y);let v=interpolate(p,ylen+clen,pw/2,ph/2,w,h,x,y);rgb(yy,u,v)
+ }
++fn rgb4(y:[u8;4],u:[u8;4],v:[u8;4]) -> (r:[[u8;4];4])
++    ensures forall|j:int|0<=j<4 ==> #[trigger] r@[j]==color(y@[j],u@[j],v@[j]),
++{
++    use verified_tiff_simd::{mul_shift8,add,sub,pack_shift6};
++    let yy=mul_shift8(y,19077);let vr=mul_shift8(v,26149);
++    let ug=mul_shift8(u,6419);let vg=mul_shift8(v,13320);let ub=mul_shift8(u,33050);
++    let red=pack_shift6(sub(add(yy,vr),[14234;4]));
++    let green=pack_shift6(add(sub(sub(yy,ug),vg),[8708;4]));
++    let blue=pack_shift6(sub(add(yy,ub),[17685;4]));
++    [[red[0],green[0],blue[0],255],[red[1],green[1],blue[1],255],
++     [red[2],green[2],blue[2],255],[red[3],green[3],blue[3],255]]
+ }
++// Four adjacent pixels share row geometry and execute RGB arithmetic in lanes.
++// The caller proves that the group stays in a row; edge interpolation is the
++// same verified scalar operation used by pixel().
++pub(super) fn pixels4(p:&[u8],pw:usize,ph:usize,w:usize,h:usize,k:usize) -> (r:[[u8;4];4])
++    requires 1<=w<=16383,1<=h<=16383,w<=pw<=16384,h<=ph<=16384,pw%2==0,ph%2==0,
++        k<w as int*h,k%w+4<=w,pw as int*ph+2*(pw/2)*(ph/2)<=p.len(),
++    ensures forall|j:int|0<=j<4 ==> #[trigger] r@[j]==sample(p@,pw,ph,w,h,(k+j) as usize),
++{
++    let x=k%w;let y=k/w;
++    proof{vstd::arithmetic::div_mod::lemma_fundamental_div_mod(k as int,w as int);}
++    assert(y<h) by(nonlinear_arith) requires k==w*y+x,0<=x<w,k<w*h,w>0;
++    assert(pw*ph<=268435456) by(nonlinear_arith) requires pw<=16384,ph<=16384;
++    assert((pw/2)*(ph/2)<=67108864) by(nonlinear_arith) requires pw<=16384,ph<=16384;
++    let ylen=pw*ph;let clen=(pw/2)*(ph/2);
++    assert(ylen+2*clen<=p.len()) by(nonlinear_arith) requires ylen==pw*ph,clen==(pw/2)*(ph/2),pw*ph+2*(pw/2)*(ph/2)<=p.len();
++    let mut yy=[0u8;4];let mut u=[0u8;4];let mut v=[0u8;4];let mut j=0usize;
++    while j<4
++        invariant j<=4,1<=w<=16383,1<=h<=16383,w<=pw<=16384,h<=ph<=16384,pw%2==0,ph%2==0,
++            k<w*h,k==w*y+x,x==k%w,y==k/w,y<h,x+4<=w,ylen==pw*ph,clen==(pw/2)*(ph/2),ylen+2*clen<=p.len(),
++            forall|n:int|0<=n<j ==> #[trigger] yy@[n]==p@[y*pw+x+n],
++            forall|n:int|0<=n<j ==> #[trigger] u@[n]==chroma(p@,ylen,(pw/2) as usize,w,h,(x+n) as usize,y),
++            forall|n:int|0<=n<j ==> #[trigger] v@[n]==chroma(p@,(ylen+clen) as usize,(pw/2) as usize,w,h,(x+n) as usize,y),
++        decreases 4-j,
++    {
++        assert(y*pw+x+j<p.len()) by(nonlinear_arith) requires y<h,h<=ph,x+4<=w,w<=pw,j<4,pw*ph<=p.len();
++        yy[j]=at(p,0,pw,ph,x+j,y);
++        assert(yy@[j as int]==p@[y*pw+x+j]);
++        u[j]=interpolate(p,ylen,pw/2,ph/2,w,h,x+j,y);
++        v[j]=interpolate(p,ylen+clen,pw/2,ph/2,w,h,x+j,y);j=j+1;
++    }
++    let r=rgb4(yy,u,v);
++    assert forall|j:int|0<=j<4 implies #[trigger] r@[j]==sample(p@,pw,ph,w,h,(k+j) as usize) by {
++        assert(k as int+j<w as int*h) by(nonlinear_arith) requires k==w*y+x,y<h,x+4<=w,0<=j<4,w>0;
++        assert(w as int*h<=268435456) by(nonlinear_arith) requires w<=16383,h<=16383;
++        assert(y as int*pw+x+j<p.len()) by(nonlinear_arith) requires y<h,h<=ph,x+4<=w,w<=pw,0<=j<4,pw*ph<=p.len();
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k as int+j,w as int,y as int,x as int+j);
++        assert(((k+j) as usize)/w==y && ((k+j) as usize)%w==x+j);
++        assert(r@[j]==color(yy@[j],u@[j],v@[j]));
++        assert(yy@[j]==p@[y*pw+x+j]);
++        assert(u@[j]==chroma(p@,ylen,(pw/2) as usize,w,h,(x+j) as usize,y));
++        assert(v@[j]==chroma(p@,(ylen+clen) as usize,(pw/2) as usize,w,h,(x+j) as usize,y));
++    }
++    r
++}
++
++}
+--- a/src/native_vp8.rs
++++ b/src/native_vp8.rs
+@@ -132,7 +132,18 @@
+             forall|j:int|0<=j<i ==> #[trigger] out@[j]==rgba_sample(p@,w,h,j as usize),
+             forall|j:int|n<=j<out.len() ==> out@[j]==old(out)@[j],
+         decreases n-i,
+-    {out[i]=crate::vp8_color::pixel(p,info.width,info.height,w,h,i);i=i+1;}
++    {
++        if verified_tiff_simd::available() && w-i%w>=4 {
++            proof{
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod(i as int,w as int);
++                let q=i as int/w as int;let r=i as int%w as int;
++                assert(q<h) by(nonlinear_arith) requires i==w*q+r,r>=0,i<n,n==w*h,w>0;
++                assert(i+4<=n) by(nonlinear_arith) requires i==w*q+r,q<h,r+4<=w,n==w*h,w>0;
++            }
++            let batch=crate::vp8_color::pixels4(p,info.width,info.height,w,h,i);
++            out[i]=batch[0];out[i+1]=batch[1];out[i+2]=batch[2];out[i+3]=batch[3];i=i+4;
++        }else{out[i]=crate::vp8_color::pixel(p,info.width,info.height,w,h,i);i=i+1;}
++    }
+     Ok(())
+ }
+ 
+--- a/src/webp_inverse.rs
++++ b/src/webp_inverse.rs
+@@ -4,13 +4,14 @@
+ use crate::webp_transforms::Transform;
+ use crate::webp_predict as pred;
+ verus! {
+-pub(super) closed spec fn coefficient(t:Transform,data:Seq<Pixel>,p:usize) -> Option<Pixel> {
++#[verifier::opaque]
++pub(super) open spec fn coefficient(t:Transform,data:Seq<Pixel>,p:usize) -> Option<Pixel> {
+     let side=pix::tile_size(t.bits) as int;
+     let cell=(p as int/(t.width as int)/side)*pix::sampled(t.width,t.bits)+(p as int%(t.width as int))/side;
+     let at=t.offset as int+cell;if at>=data.len(){None}else{Some(data[at])}
+ }
+ #[inline(always)]
+-fn matrix(t:Transform,data:&[Pixel],p:usize,x:usize,y:usize) -> (r:Result<Pixel,Error>)
++pub(super) fn matrix(t:Transform,data:&[Pixel],p:usize,x:usize,y:usize) -> (r:Result<Pixel,Error>)
+     requires t.valid(),t.kind<2,p<t.width*t.height,x==p%t.width,y==p/t.width,
+     ensures r.is_ok()==coefficient(t,data@,p).is_some(),r.is_ok() ==> r.unwrap()==coefficient(t,data@,p).unwrap(),
+ {
+@@ -44,7 +45,8 @@
+     let modulus=if bits==8{256usize}else{bit_divisor(bits) as usize};
+     (out[source][1] as usize/(bit_divisor(shift) as usize))%modulus
+ }
+-pub(super) closed spec fn value(t:Transform,data:Seq<Pixel>,out:Seq<Pixel>,p:usize) -> Option<Pixel> {
++#[verifier::opaque]
++pub(super) open spec fn value(t:Transform,data:Seq<Pixel>,out:Seq<Pixel>,p:usize) -> Option<Pixel> {
+     if t.kind==2{Some(pred::green(out[p as int]))}else if t.kind==3{
+         let k=entry(t,out,p);
+         if k>=t.colors{Some([0u8,0,0,0])}else if t.offset as int+k>=data.len(){None}else{Some(data[t.offset as int+k])}
+@@ -126,6 +128,29 @@
+             forall|i:int|count<=i<out.len() ==> out@[i]==old(out)@[i],
+         decreases count-k,
+     {
++        if verified_tiff_simd::available() && t.kind==2 {
++            crate::webp_spans::colors(t,data,out,k,count-k,[0u8;4]);k=count;continue;
++        }
++        if verified_tiff_simd::available() && (t.kind==1 || (t.kind==0 && x>0 && y>0)) {
++            proof{vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k as int,t.width as int,y as int,x as int);}
++            if t.kind==0{assert(k>t.width) by(nonlinear_arith) requires k==y*t.width+x,y>0,x>0,t.width>0;}
++            reveal_with_fuel(finish,1);reveal(value);
++            let (n,m)=crate::webp_spans::select(t,data,k,x,y)?;
++            if t.kind==0 {
++                if m[1]%16>13{reveal_with_fuel(finish,1);reveal(value);return Err(Error::Invalid);}
++                crate::webp_spans::predict(t,data,out,k,n,x,y,m);
++            }else{crate::webp_spans::colors(t,data,out,k,n,m);}
++            if k+n<count {
++                if x+n==t.width {
++                    assert(y+1<t.height) by(nonlinear_arith) requires k==y*t.width+x,x+n==t.width,k+n<count,count==t.width*t.height,t.width>0;
++                }
++                assert(k+n==(if x+n==t.width{(y+1)*t.width}else{y*t.width+x+n})) by(nonlinear_arith)
++                    requires k==y*t.width+x,x+n<=t.width;
++            }
++            k=k+n;
++            if k<count{if x+n==t.width{x=0;y=y+1;}else{x=x+n;}}
++            continue;
++        }
+         reveal_with_fuel(finish,1);let p=if t.kind==3{count-1-k}else{k};
+         proof{vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p as int,t.width as int,y as int,x as int);}
+         let value=pixel(t,data,out,p,x,y)?;out[p]=value;
+--- /dev/null
++++ b/src/webp_simd.rs
+@@ -0,0 +1,41 @@
++//! Lane composition for VP8L spans; codec semantics remain checked here.
++use super::*;
++use crate::webp_pixels::Pixel;
++use crate::webp_predict as pred;
++verus! {
++#[inline(always)]
++pub(super) fn predict12(residual:Pixel,left:Pixel,top:Pixel,top_left:Pixel) -> (r:Pixel)
++    ensures r==pred::sum(residual,pred::prediction(12,left,top,top_left,[0u8,0,0,0])),
++{
++    let p=verified_tiff_simd::clamp_add_sub(left,top,top_left);
++    verified_tiff_simd::add_bytes(residual,p)
++}
++#[inline(always)]
++fn widen(a:[u8;4]) -> (r:[i32;4])
++    ensures forall|j:int|0<=j<4 ==> #[trigger] r@[j]==a@[j] as int,
++{[a[0] as i32,a[1] as i32,a[2] as i32,a[3] as i32]}
++#[inline(always)]
++pub(super) fn color4(p:[Pixel;4],m:Pixel) -> (r:[Pixel;4])
++    ensures forall|j:int|0<=j<4 ==> #[trigger] r@[j]==pred::color(p@[j],m),
++{
++    use verified_tiff_simd::{add,signed_product_shift5,wrap_bytes};
++    let g=[p[0][1],p[1][1],p[2][1],p[3][1]];
++    let red=[p[0][0],p[1][0],p[2][0],p[3][0]];let blue=[p[0][2],p[1][2],p[2][2],p[3][2]];
++    let dr=signed_product_shift5([m[2];4],g);
++    let red=wrap_bytes(add(widen(red),dr));
++    let db=signed_product_shift5([m[1];4],g);let rb=signed_product_shift5([m[0];4],red);
++    let blue=wrap_bytes(add(add(widen(blue),db),rb));
++    [[red[0],p[0][1],blue[0],p[0][3]],[red[1],p[1][1],blue[1],p[1][3]],
++     [red[2],p[2][1],blue[2],p[2][3]],[red[3],p[3][1],blue[3],p[3][3]]]
++}
++#[inline(always)]
++pub(super) fn green4(p:[Pixel;4]) -> (r:[Pixel;4])
++    ensures forall|j:int|0<=j<4 ==> #[trigger] r@[j]==pred::green(p@[j]),
++{
++    let a=[p[0][0],p[0][1],p[0][2],p[0][3],p[1][0],p[1][1],p[1][2],p[1][3],
++           p[2][0],p[2][1],p[2][2],p[2][3],p[3][0],p[3][1],p[3][2],p[3][3]];
++    let b=[p[0][1],0,p[0][1],0,p[1][1],0,p[1][1],0,p[2][1],0,p[2][1],0,p[3][1],0,p[3][1],0];
++    let v=verified_tiff_simd::add_bytes16(a,b);
++    [[v[0],v[1],v[2],v[3]],[v[4],v[5],v[6],v[7]],[v[8],v[9],v[10],v[11]],[v[12],v[13],v[14],v[15]]]
++}
++}
+--- /dev/null
++++ b/src/webp_spans.rs
+@@ -0,0 +1,138 @@
++//! VP8L kernels selected once per row/tile span, refining the scalar model.
++use super::*;
++use crate::webp_pixels::{self as pix,Pixel};
++use crate::webp_transforms::Transform;
++use crate::webp_inverse as inv;
++use crate::webp_predict as pred;
++use crate::webp_simd as simd;
++verus! {
++#[verifier::spinoff_prover]
++pub(super) fn select(t:Transform,data:&[Pixel],k:usize,x:usize,y:usize) -> (r:Result<(usize,Pixel),Error>)
++    requires t.valid(),t.kind<2,k<t.width*t.height,x==k%t.width,y==k/t.width,
++    ensures r.is_ok()==inv::coefficient(t,data@,k).is_some(),
++        r.is_ok() ==> 1<=r.unwrap().0<=t.width-x && k+r.unwrap().0<=t.width*t.height,
++        r.is_ok() ==> forall|j:usize|k<=j<k+r.unwrap().0 ==> #[trigger] inv::coefficient(t,data@,j)==Some(r.unwrap().1),
++{
++    reveal(inv::coefficient);
++    let m=inv::matrix(t,data,k,x,y)?;let side=pix::size(t.bits);
++    let rem=side-x%side;let n=if rem<t.width-x{rem}else{t.width-x};
++    proof{
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod(k as int,t.width as int);
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod(x as int,side as int);
++    }
++    assert(y<t.height) by(nonlinear_arith) requires k==y*t.width+x,x>=0,k<t.width*t.height,t.width>0;
++    assert(k+n<=t.width*t.height) by(nonlinear_arith) requires k==y*t.width+x,y<t.height,n<=t.width-x,t.width>0;
++    assert(inv::coefficient(t,data@,k)==Some(m));
++    assert forall|p:usize|k<=p<k+n implies #[trigger] inv::coefficient(t,data@,p)==Some(m) by {
++        let j=p as int-k as int;let q=x as int/side as int;let r=x as int%side as int;
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x as int+j,side as int,q,r+j);
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p as int,t.width as int,y as int,x as int+j);
++        assert(p/t.width==y && p%t.width==x+j);
++        assert((p%t.width)/side==x/side);
++        assert(k/t.width==y && k%t.width==x);
++    }
++    Ok((n,m))
++}
++proof fn independent(t:Transform,data:Seq<Pixel>,a:Seq<Pixel>,b:Seq<Pixel>,k:usize)
++    requires t.valid(),t.kind==1 || t.kind==2,k<a.len(),k<b.len(),a[k as int]==b[k as int],
++    ensures inv::value(t,data,a,k)==inv::value(t,data,b,k),
++{reveal(inv::value);}
++fn write4(t:Transform,data:&[Pixel],out:&mut[Pixel],k:usize,v:[Pixel;4])
++    requires t.valid(),t.kind==1 || t.kind==2,k+4<=t.width*t.height,t.width*t.height<=old(out).len(),
++        forall|j:int|0<=j<4 ==> #[trigger] inv::value(t,data@,old(out)@,(k+j) as usize)==Some(v@[j]),
++    ensures final(out).len()==old(out).len(),
++        inv::finish(t,data@,old(out)@,k,(t.width*t.height-k) as nat)==inv::finish(t,data@,final(out)@,(k+4) as usize,(t.width*t.height-k-4) as nat),
++        forall|i:int|0<=i<old(out).len() && (i<k || i>=k+4) ==> final(out)@[i]==old(out)@[i],
++{
++    let ghost before=out@;let ghost goal=inv::finish(t,data@,out@,k,(t.width*t.height-k) as nat);
++    let mut j=0usize;
++    while j<4
++        invariant j<=4,t.valid(),t.kind==1 || t.kind==2,k+4<=t.width*t.height,t.width*t.height<=out.len(),out.len()==before.len(),
++            goal==inv::finish(t,data@,before,k,(t.width*t.height-k) as nat),
++            goal==inv::finish(t,data@,out@,(k+j) as usize,(t.width*t.height-k-j) as nat),
++            forall|n:int|j<=n<4 ==> #[trigger] inv::value(t,data@,out@,(k+n) as usize)==Some(v@[n]),
++            forall|i:int|0<=i<out.len() && (i<k || i>=k+j) ==> out@[i]==before[i],
++        decreases 4-j,
++    {
++        reveal_with_fuel(inv::finish,1);reveal(inv::value);
++        let ghost previous=out@;
++        assert(inv::value(t,data@,previous,(k+j) as usize)==Some(v@[j as int]));
++        out[k+j]=v[j];
++        assert forall|n:int|j+1<=n<4 implies #[trigger] inv::value(t,data@,out@,(k+n) as usize)==Some(v@[n]) by {
++            assert(inv::value(t,data@,previous,(k+n) as usize)==Some(v@[n]));
++            independent(t,data@,previous,out@,(k+n) as usize);
++        }
++        j=j+1;
++    }
++}
++pub(super) fn colors(t:Transform,data:&[Pixel],out:&mut[Pixel],start:usize,n:usize,m:Pixel)
++    requires t.valid(),t.kind==1 || t.kind==2,1<=n,start+n<=t.width*t.height,t.width*t.height<=old(out).len(),
++        t.kind==1 ==> forall|j:usize|start<=j<start+n ==> #[trigger] inv::coefficient(t,data@,j)==Some(m),
++    ensures final(out).len()==old(out).len(),
++        inv::finish(t,data@,old(out)@,start,(t.width*t.height-start) as nat)==inv::finish(t,data@,final(out)@,(start+n) as usize,(t.width*t.height-start-n) as nat),
++        forall|i:int|0<=i<old(out).len() && (i<start || i>=start+n) ==> final(out)@[i]==old(out)@[i],
++{
++    let end=start+n;let mut k=start;let ghost before=out@;
++    let ghost goal=inv::finish(t,data@,out@,start,(t.width*t.height-start) as nat);
++    while k<end
++        invariant t.valid(),t.kind==1 || t.kind==2,start<=k<=end,end==start+n,end<=t.width*t.height,t.width*t.height<=out.len(),out.len()==before.len(),
++            t.kind==1 ==> forall|j:usize|start<=j<end ==> #[trigger] inv::coefficient(t,data@,j)==Some(m),
++            goal==inv::finish(t,data@,before,start,(t.width*t.height-start) as nat),
++            goal==inv::finish(t,data@,out@,k,(t.width*t.height-k) as nat),
++            forall|i:int|0<=i<out.len() && (i<start || i>=k) ==> out@[i]==before[i],
++        decreases end-k,
++    {
++        reveal(inv::value);
++        if end-k>=4 {
++            let p=[out[k],out[k+1],out[k+2],out[k+3]];
++            let v=if t.kind==2{simd::green4(p)}else{simd::color4(p,m)};
++            assert forall|j:int|0<=j<4 implies #[trigger] inv::value(t,data@,out@,(k+j) as usize)==Some(v@[j]) by {
++                if t.kind==1{assert(inv::coefficient(t,data@,(k+j) as usize)==Some(m));}
++            }
++            write4(t,data,out,k,v);k=k+4;
++        }else{
++            reveal_with_fuel(inv::finish,1);
++            let v=if t.kind==2{pred::add_green(out[k])}else{pred::inverse_color(out[k],m)};
++            if t.kind==1{assert(inv::coefficient(t,data@,k)==Some(m));}
++            assert(inv::value(t,data@,out@,k)==Some(v));
++            out[k]=v;k=k+1;
++        }
++    }
++}
++pub(super) fn predict(t:Transform,data:&[Pixel],out:&mut[Pixel],start:usize,n:usize,x:usize,y:usize,m:Pixel)
++    requires t.valid(),t.kind==0,1<=n,0<x<t.width,0<y<t.height,start==y*t.width+x,n<=t.width-x,
++        t.width*t.height<=old(out).len(),m[1]%16<=13,
++        forall|j:usize|start<=j<start+n ==> #[trigger] inv::coefficient(t,data@,j)==Some(m),
++    ensures final(out).len()==old(out).len(),
++        inv::finish(t,data@,old(out)@,start,(t.width*t.height-start) as nat)==inv::finish(t,data@,final(out)@,(start+n) as usize,(t.width*t.height-start-n) as nat),
++        forall|i:int|0<=i<old(out).len() && (i<start || i>=start+n) ==> final(out)@[i]==old(out)@[i],
++{
++    assert(start+n<=t.width*t.height) by(nonlinear_arith) requires start==y*t.width+x,y<t.height,n<=t.width-x,t.width>0;
++    assert(start>t.width) by(nonlinear_arith) requires start==y*t.width+x,y>0,x>0,t.width>0;
++    let end=start+n;let mut k=start;let mode=(m[1]%16) as usize;
++    let mut left=out[start-1];let mut tl=out[start-t.width-1];
++    let ghost before=out@;let ghost goal=inv::finish(t,data@,out@,start,(t.width*t.height-start) as nat);
++    while k<end
++        invariant t.valid(),t.kind==0,0<x<t.width,0<y<t.height,start==y*t.width+x,
++            start<=k<=end,end==start+n,n<=t.width-x,end<=t.width*t.height,start>t.width,
++            t.width*t.height<=out.len(),out.len()==before.len(),mode==m[1]%16,mode<=13,
++            left==out@[k-1],tl==out@[k-t.width-1],
++            forall|j:usize|start<=j<end ==> #[trigger] inv::coefficient(t,data@,j)==Some(m),
++            goal==inv::finish(t,data@,before,start,(t.width*t.height-start) as nat),
++            goal==inv::finish(t,data@,out@,k,(t.width*t.height-k) as nat),
++            forall|i:int|0<=i<out.len() && (i<start || i>=k) ==> out@[i]==before[i],
++        decreases end-k,
++    {
++        reveal(inv::value);reveal_with_fuel(inv::finish,1);
++        proof{vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k as int,t.width as int,y as int,(x+k-start) as int);}
++        let top=out[k-t.width];
++        let v=if mode==12{simd::predict12(out[k],left,top,tl)}else{
++            pred::add_pixel(out[k],pred::predict(mode,left,top,tl,out[k-t.width+1]))
++        };
++        assert(inv::coefficient(t,data@,k)==Some(m));
++        assert(k%t.width==x+k-start && k>=t.width);
++        assert(inv::value(t,data@,out@,k)==Some(v));
++        out[k]=v;left=v;tl=top;k=k+1;
++    }
++}
++}
+--- a/compat/src/webp.rs
++++ b/compat/src/webp.rs
+@@ -7,16 +7,16 @@
+         let mem=&self.source.mem;let pixels=product(w,h)?;
+         let count=native_webp::scratch_len(w,h).map_err(err)?;
+         if product(count,4)?>self.limits.max_output{return Err((LIMIT,"WebP transform scratch limit"));}
+-        let mut scratch=Buf::new(count,mem)?;for _ in 0..count{scratch.push([0u8;4])?;}
++        let mut scratch=Buf::filled(count,[0u8;4],mem)?;
+         let groups=native_webp::required_groups(encoded,w,h,&mut scratch,budget).map_err(err)?;
+         let mut tables=Buf::new(groups,mem)?;for _ in 0..groups{tables.push(native_webp::EntropyGroup::empty())?;}
+-        let mut rgba=Buf::new(pixels,mem)?;for _ in 0..pixels{rgba.push([0u8;4])?;}
++        let mut rgba=Buf::filled(pixels,[0u8;4],mem)?;
+         native_webp::decode(encoded,w,h,&mut tables,&mut scratch,&mut rgba,budget).map_err(err)?;
+         Ok(rgba)
+     }
+     fn webp_lossy(&self,encoded:&[u8],w:usize,h:usize,container:native_webp::Container,budget:&mut Budget)->R<Buf<[u8;4]>>{
+         let mem=&self.source.mem;let pixels=product(w,h)?;
+-        let mut rgba=Buf::new(pixels,mem)?;for _ in 0..pixels{rgba.push([0u8;4])?;}
++        let mut rgba=Buf::filled(pixels,[0u8;4],mem)?;
+         {
+             let info=native_vp8::storage(w,h).map_err(err)?;
+             let mut yuv=Buf::zeros(info.bytes,self.limits.max_output,mem)?;
+@@ -60,7 +60,12 @@
+         let container=native_webp::inspect(encoded,m.bw,rows).map_err(err)?;
+         let rgba=if container.lossless{self.webp_lossless(encoded,m.bw,rows,budget)?}else{self.webp_lossy(encoded,m.bw,rows,container,budget)?};
+         let mut out=Buf::zeros(needed,self.limits.max_output,&self.source.mem)?;
+-        for (i,pixel) in rgba.iter().enumerate(){out[i*m.ch..(i+1)*m.ch].copy_from_slice(&pixel[..m.ch]);}
++        let bytes=product(rgba.len(),m.ch)?;
++        if bytes>out.len(){return Err((INVALID,"WebP sample size mismatch"));}
++        if m.ch==4{out[..bytes].copy_from_slice(rgba.as_flattened());}
++        else{for (dst,pixel) in out[..bytes].chunks_exact_mut(3).zip(rgba.iter()){
++            dst[0]=pixel[0];dst[1]=pixel[1];dst[2]=pixel[2];
++        }}
+         Ok(out)
+     }
+ }

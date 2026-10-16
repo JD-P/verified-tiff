@@ -1,0 +1,22 @@
+{
+  "platform": "x86_64-unknown-linux-gnu",
+  "rust": "1.98.1",
+  "rustup": "1.29.1",
+  "rustup_sha256": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71",
+  "verus": "0.2026.10.04.426d8b0",
+  "verus_commit": "426d8b01e7ffb910a36c15e1f870ff985bb61eef",
+  "verus_sha256": "624018662868563a7bec0dd07be5e4dd0c3d61124b4b55105765884bf2d4d1a0",
+  "vstd": "0.0.0-2026-10-04-0306",
+  "z3": "4.16.0",
+  "libtiff": "4.7.1",
+  "libtiff_sha256": "f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69",
+  "libjpeg_turbo": "3.1.1",
+  "libjpeg_turbo_sha256": "304165ae11e64ab752e9cfc07c37bfdc87abd0bfe4bc699e59f34036d9c84f72",
+  "cmake": "3.31.6",
+  "libwebp": "1.6.0",
+  "libwebp_sha256": "e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564",
+  "zstd": "1.5.7",
+  "zstd_sha256": "37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3",
+  "lerc": "4.0.0",
+  "lerc_sha256": "91431c2b16d0e3de6cbaea188603359f87caed08259a645fd5a3805784ee30a0"
+}

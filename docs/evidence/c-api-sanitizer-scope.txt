@@ -1,0 +1,3 @@
+ASan and UBSan instrumented the C shim/stubs and C consumers; Rust internals were not instrumented.
+ASAN_OPTIONS=detect_leaks=0:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1
+LeakSanitizer could not inspect /proc/PID/task under this environment tracer. No successful leak check is claimed.

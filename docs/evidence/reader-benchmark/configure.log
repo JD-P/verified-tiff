@@ -1,0 +1,274 @@
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether UID '0' is supported by ustar format... yes
+checking whether GID '0' is supported by ustar format... yes
+checking how to create a ustar tar archive... gnutar
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether gcc understands -c and -o together... yes
+checking whether make supports the include directive... yes (GNU style)
+checking dependency style of gcc... gcc3
+checking for C compiler warning flags... -Wall -W
+checking whether ln -s works... yes
+checking for cmake... no
+checking if LD -Wl,--version-script works... yes
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by gcc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... ranlib
+checking command to parse /usr/bin/nm -B output from gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking how to run the C preprocessor... gcc -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... yes
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... no
+checking whether to build static libraries... yes
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking dependency style of g++... gcc3
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /usr/bin/ld -m elf_x86_64
+checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for g++ option to produce PIC... -fPIC -DPIC
+checking if g++ PIC flag -fPIC -DPIC works... yes
+checking if g++ static flag -static works... yes
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether make supports nested variables... (cached) yes
+checking for sin in -lm... yes
+checking assert.h usability... yes
+checking assert.h presence... yes
+checking for assert.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking io.h usability... no
+checking io.h presence... no
+checking for io.h... no
+checking search.h usability... yes
+checking search.h presence... yes
+checking for search.h... yes
+checking for unistd.h... (cached) yes
+checking for an ANSI C-conforming const... yes
+checking whether byte ordering is bigendian... no
+checking for off_t... yes
+checking for size_t... yes
+checking whether struct tm is in sys/time.h or time.h... time.h
+checking for _LARGEFILE_SOURCE value needed for large files... no
+checking whether optarg is declared... yes
+checking size of size_t... 8
+checking for signed size type... int64_t
+checking for mmap... yes
+checking for setmode... no
+checking for getopt... yes
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+checking for inflateEnd in -lz... yes
+checking zlib.h usability... yes
+checking zlib.h presence... yes
+checking for zlib.h... yes
+checking for libdeflate_zlib_decompress in -ldeflate... no
+checking libdeflate.h usability... no
+checking libdeflate.h presence... no
+checking for libdeflate.h... no
+checking for jpeg_read_scanlines in -ljpeg... yes
+checking jpeglib.h usability... yes
+checking jpeglib.h presence... yes
+checking for jpeglib.h... yes
+checking for jpeg12_read_scanlines in -ljpeg... yes
+checking for jbg_dec_init in -ljbig... no
+checking jbig.h usability... no
+checking jbig.h presence... no
+checking for jbig.h... no
+checking for lerc_decode in -l"LercLib"... no
+checking for lerc_decode in -l"Lerc"... yes
+checking Lerc_c_api.h usability... yes
+checking Lerc_c_api.h presence... yes
+checking for Lerc_c_api.h... yes
+checking for lzma_code in -llzma... no
+checking lzma.h usability... no
+checking lzma.h presence... no
+checking for lzma.h... no
+checking for ZSTD_decompressStream in -lzstd... yes
+checking zstd.h usability... yes
+checking zstd.h presence... yes
+checking for zstd.h... yes
+checking for WebPDecode in -lwebp... yes
+checking webp/decode.h usability... yes
+checking webp/decode.h presence... yes
+checking for webp/decode.h... yes
+checking for X... no
+checking for the pthreads library -lpthreads... no
+checking whether pthreads work without any flags... yes
+checking for joinable pthread attribute... PTHREAD_CREATE_JOINABLE
+checking if more special flags are required for pthreads... no
+checking whether we are using the Microsoft C compiler... no
+checking GL/gl.h usability... no
+checking GL/gl.h presence... no
+checking for GL/gl.h... no
+checking OpenGL/gl.h usability... no
+checking OpenGL/gl.h presence... no
+checking for OpenGL/gl.h... no
+checking windows.h usability... no
+checking windows.h presence... no
+checking for windows.h... no
+checking for OpenGL library... no
+checking GL/glu.h usability... no
+checking GL/glu.h presence... no
+checking for GL/glu.h... no
+checking OpenGL/glu.h usability... no
+checking OpenGL/glu.h presence... no
+checking for OpenGL/glu.h... no
+checking for OpenGL Utility library... no
+checking GL/glut.h usability... no
+checking GL/glut.h presence... no
+checking for GL/glut.h... no
+checking GLUT/glut.h usability... no
+checking GLUT/glut.h presence... no
+checking for GLUT/glut.h... no
+checking for GLUT library... no
+checking for windows.h... (cached) no
+checking for python3.16... no
+checking for python3.15... no
+checking for python3.14... no
+checking for python3.13... no
+checking for python3.12... python3.12
+checking for sphinx-build... no
+checking generated manual pages... done
+checking prebuilt manual pages... done
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating build/Makefile
+config.status: creating contrib/Makefile
+config.status: creating contrib/addtiffo/Makefile
+config.status: creating contrib/dbs/Makefile
+config.status: creating contrib/dbs/xtiff/Makefile
+config.status: creating contrib/iptcutil/Makefile
+config.status: creating contrib/mfs/Makefile
+config.status: creating contrib/pds/Makefile
+config.status: creating contrib/ras/Makefile
+config.status: creating contrib/stream/Makefile
+config.status: creating contrib/tags/Makefile
+config.status: creating contrib/win_dib/Makefile
+config.status: creating doc/Makefile
+config.status: creating libtiff-4.pc
+config.status: creating libtiff/Makefile
+config.status: creating libtiff/tiffvers.h
+config.status: creating port/Makefile
+config.status: creating test/Makefile
+config.status: creating tools/Makefile
+config.status: creating config/config.h
+config.status: creating libtiff/tif_config.h
+config.status: creating libtiff/tiffconf.h
+config.status: creating port/libport_config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+
+Libtiff is now configured for x86_64-pc-linux-gnu
+
+  Libtiff build version:              4.7.1
+  Libtiff library version:            8:0:2
+  Libtiff release date:               20250911
+
+  Installation directory:             /usr/local
+  Documentation directory:            ${prefix}/share/doc/tiff-4.7.1
+  C compiler:                         gcc -g -O2 -Wall -W
+  C++ compiler:                       g++ -g -O2
+  Build tools:                        no
+  Build tests:                        no
+  Build contrib:                      yes
+  Build docs:                         no
+  Build deprecated features:          no
+  Enable runtime linker paths:        no
+  Enable linker symbol versioning:    yes
+  Support Microsoft Document Imaging: yes
+  Use Win32 IO:                       no
+
+ Support for internal codecs:
+  CCITT Group 3 & 4 algorithms:       yes
+  Macintosh PackBits algorithm:       yes
+  LZW algorithm:                      yes
+  ThunderScan 4-bit RLE algorithm:    yes
+  NeXT 2-bit RLE algorithm:           yes
+  LogLuv high dynamic range encoding: yes
+
+ Support for external codecs:
+  ZLIB support:                       yes
+  libdeflate support:                 no
+  Pixar log-format algorithm:         yes
+  JPEG support:                       yes
+  Old JPEG support:                   yes
+  JPEG 8/12 bit dual mode:            yes (libjpeg turbo >= 3.0 dual mode)
+  ISO JBIG support:                   no
+  LERC support:                       yes
+  LZMA2 support:                      no
+  ZSTD support:                       yes
+  WEBP support:                       yes
+
+  C++ support:                        yes
+
+  OpenGL support:                     no
+

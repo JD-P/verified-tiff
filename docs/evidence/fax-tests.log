@@ -1,0 +1,8 @@
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 2.348s
+
+OK
+Fax format matrix: 192; exact known pixels and independent libtiff rendering
+Fax independent libtiff encodings: 40; exact known pixels
+Fax edge/long-run/page cases: 126

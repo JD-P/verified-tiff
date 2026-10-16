@@ -1,0 +1,14 @@
+{
+  "reason": "User authorized hardware floating point on 2026-10-15. Five reviewed native arithmetic/conversion contracts; no codec or buffer assumptions.",
+  "primitives": [
+    "add",
+    "mul_twice_u32",
+    "narrow",
+    "widen",
+    "from_magnitude"
+  ],
+  "files": {
+    "trusted-float/src/lib.rs": "1483e06d9d9a55c150d28e926687f300f60aa8afca190fc036841f2cc8c9700b",
+    "trusted-float/src/model.rs": "5c4a71a5db64792164fda9f0ede28ca9decd5ca02c430548c7303c20a264fad6"
+  }
+}

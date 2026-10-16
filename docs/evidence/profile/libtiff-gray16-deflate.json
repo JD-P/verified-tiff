@@ -1,0 +1,79 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 1304 dropped 0 interval_us 1000",
+  "samples": 1304,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/benchmark/libtiff",
+    "target/benchmark/inputs/gray16-deflate.tif",
+    "total",
+    "3000"
+  ],
+  "binary_sha256": "baa77bde849ef286bf6640fed716294b6acf9677466ae52069c03988a6df4904",
+  "input_sha256": "ec0cd6e8f333f716d4a42f2fd4b2c327dd00363de3d86204e1d3fc40f21366a8",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "mode": "total",
+    "iterations": 628,
+    "seconds": 5.19916223,
+    "ns_per_image": 8278920.75,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 2097152,
+    "hash": "33b079fe65a0cbc5"
+  },
+  "functions": [
+    {
+      "function": "libz.so.1::[unresolved]",
+      "samples": 1018,
+      "percent": 78.06748466257669
+    },
+    {
+      "function": "libtiff::native",
+      "samples": 145,
+      "percent": 11.11963190184049
+    },
+    {
+      "function": "libz.so.1::adler32_z@@ZLIB_1.2.9",
+      "samples": 94,
+      "percent": 7.208588957055214
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 22,
+      "percent": 1.687116564417178
+    },
+    {
+      "function": "libz.so.1::inflate",
+      "samples": 16,
+      "percent": 1.2269938650306749
+    },
+    {
+      "function": "libc.so.6::brk@@GLIBC_2.2.5",
+      "samples": 5,
+      "percent": 0.3834355828220859
+    },
+    {
+      "function": "libtiff::TIFFFieldWithTag",
+      "samples": 1,
+      "percent": 0.07668711656441718
+    },
+    {
+      "function": "libtiff::TIFFReadDirEntryArrayWithLimit",
+      "samples": 1,
+      "percent": 0.07668711656441718
+    },
+    {
+      "function": "libtiff::TIFFFindField",
+      "samples": 1,
+      "percent": 0.07668711656441718
+    },
+    {
+      "function": "libtiff::main",
+      "samples": 1,
+      "percent": 0.07668711656441718
+    }
+  ]
+}

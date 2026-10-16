@@ -1,0 +1,7 @@
+WebP span gate: rejected broken tile-end
+WebP span gate: rejected broken carry
+WebP span gate: rejected broken store
+WebP span gate: rejected broken green
+WebP span gate: rejected broken cross-color
+WebP span gate: rejected broken predictor
+WebP span gate: rejected broken tail

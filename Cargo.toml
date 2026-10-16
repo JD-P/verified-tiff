@@ -1,0 +1,40 @@
+[package]
+name = "verified-tiff"
+version = "0.1.0"
+edition = "2021"
+publish = false
+default-run = "verified-tiff"
+license = "MIT"
+description = "Experimental Verus-verified Classic TIFF reader"
+
+[lib]
+name = "verified_tiff"
+path = "src/lib.rs"
+
+[[bin]]
+name = "verified-tiff"
+path = "src/main.rs"
+
+[[bin]]
+name = "fuzz-smoke"
+path = "fuzz/smoke.rs"
+
+
+[dependencies]
+vstd = "=0.0.0-2026-10-04-0306"
+verified-tiff-float = { path = "trusted-float" }
+verified-tiff-simd = { path = "trusted-simd" }
+
+[features]
+force-scalar = ["verified-tiff-simd/force-scalar"]
+
+[package.metadata.verus]
+verify = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(verus_keep_ghost)', 'cfg(verus_keep_ghost_body)', 'cfg(verus_verify_core)'] }
+
+
+[workspace]
+members = ["compat", "trusted-float", "trusted-simd"]
+resolver = "2"

@@ -1,0 +1,1052 @@
+warning: unused import: `model::*`
+ --> trusted-float/src/lib.rs:7:5
+  |
+7 | use model::*;
+  |     ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `verified-tiff-float` (lib) generated 1 warning (run `cargo fix --lib -p verified-tiff-float` to apply 1 suggestion)
+warning: unused imports: `Field` and `self as fields`
+ --> src/vp8_modes.rs:5:25
+  |
+5 | use crate::vp8_fields::{self as fields,Field};
+  |                         ^^^^^^^^^^^^^^ ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::vp8_edges as ed`
+ --> src/vp8_filter_plane.rs:5:5
+  |
+5 | use crate::vp8_edges as ed;
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `hw::model::*`
+ --> src/lerc_numeric.rs:6:16
+  |
+6 | pub(super) use hw::model::*;
+  |                ^^^^^^^^^^^^
+
+warning: unused import: `crate::lerc_block::ResultModel`
+ --> src/lerc_byte_image.rs:6:5
+  |
+6 | use crate::lerc_block::ResultModel;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::lerc_block::ResultModel`
+ --> src/native_lerc.rs:9:5
+  |
+9 | use crate::lerc_block::ResultModel;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self as zb`
+ --> src/zstd_weights.rs:5:24
+  |
+5 | use crate::zstd_bits::{self as zb,Reverse};
+  |                        ^^^^^^^^^^
+
+warning: unused import: `Cell`
+ --> src/zstd_weights.rs:6:31
+  |
+6 | use crate::zstd_table::{Table,Cell};
+  |                               ^^^^
+
+warning: unused import: `self as zh`
+ --> src/zstd_literals.rs:4:27
+  |
+4 | use crate::zstd_huffman::{self as zh,Huff};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `crate::zstd_bits as zb`
+ --> src/zstd_sequence_tables.rs:3:5
+  |
+3 | use crate::zstd_bits as zb;
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Cell` and `self as zt`
+ --> src/zstd_sequence_tables.rs:5:25
+  |
+5 | use crate::zstd_table::{self as zt,Table,TableModel,Cell};
+  |                         ^^^^^^^^^^                  ^^^^
+
+warning: unused import: `TableModel`
+ --> src/zstd_sequence_token.rs:4:31
+  |
+4 | use crate::zstd_table::{Table,TableModel};
+  |                               ^^^^^^^^^^
+
+warning: unused import: `crate::zstd_sequence_tables as zs`
+ --> src/zstd_sequence_token.rs:5:5
+  |
+5 | use crate::zstd_sequence_tables as zs;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self as zb`
+ --> src/zstd_sequences.rs:3:24
+  |
+3 | use crate::zstd_bits::{self as zb,Reverse};
+  |                        ^^^^^^^^^^
+
+warning: unused import: `Cell`
+ --> src/native_zstd.rs:5:42
+  |
+5 | use crate::zstd_table::{Table,TableModel,Cell};
+  |                                          ^^^^
+
+warning: unused import: `crate::zstd_sequence_tables as zt`
+ --> src/native_zstd.rs:9:5
+  |
+9 | use crate::zstd_sequence_tables as zt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::float64 as f64model`
+ --> src/native_samples.rs:5:5
+  |
+5 | use crate::float64 as f64model;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Model`
+ --> src/native_stream.rs:5:29
+  |
+5 | use crate::deflate::{Cursor,Model};
+  |                             ^^^^^
+
+warning: unused import: `crate::native_samples as ns`
+ --> src/container.rs:6:5
+  |
+6 | use crate::native_samples as ns;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `fax_meta as m`, `logluv as c`, `logluv_format as f`, `logluv_segment as seg`, and `logluv_tiff as t`
+ --> src/logluv_witness.rs:3:13
+  |
+3 | use crate::{fax_meta as m,logluv_format as f,logluv as c,logluv_segment as seg,logluv_tiff as t};
+  |             ^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `GroupModel` and `self as wc`
+ --> src/webp_pixels.rs:5:29
+  |
+5 | use crate::webp_container::{self as wc,Config,Group,GroupModel};
+  |                             ^^^^^^^^^^              ^^^^^^^^^^
+
+warning: unused import: `self as db`
+ --> src/webp_aux.rs:3:27
+  |
+3 | use crate::deflate_bits::{self as db,Bits};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `crate::webp as wp`
+ --> src/webp_aux.rs:6:5
+  |
+6 | use crate::webp as wp;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self as db`
+ --> src/webp_transforms.rs:3:27
+  |
+3 | use crate::deflate_bits::{self as db,Bits};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `self as db`
+ --> src/webp_prepare.rs:3:27
+  |
+3 | use crate::deflate_bits::{self as db,Bits};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `crate::webp_transforms::*`
+ --> src/webp_prepare.rs:7:5
+  |
+7 | use crate::webp_transforms::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::webp as wp`
+  --> src/native_webp.rs:10:5
+   |
+10 | use crate::webp as wp;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self as db`
+ --> src/webp_header.rs:2:27
+  |
+2 | use crate::deflate_bits::{self as db,Bits};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `self as db`
+ --> src/webp_container.rs:2:27
+  |
+2 | use crate::deflate_bits::{self as db,Bits};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `self as db`
+ --> src/webp_token.rs:2:27
+  |
+2 | use crate::deflate_bits::{self as db,Bits};
+  |                           ^^^^^^^^^^
+
+warning: unused import: `crate::webp_huffman as wh`
+ --> src/webp_token.rs:3:5
+  |
+3 | use crate::webp_huffman as wh;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `GroupModel`
+ --> src/webp_token.rs:4:46
+  |
+4 | use crate::webp_container::{self as wc,Group,GroupModel};
+  |                                              ^^^^^^^^^^
+
+warning: unused import: `GroupModel`
+ --> src/webp.rs:5:53
+  |
+5 | use crate::webp_container::{self as wc,Config,Group,GroupModel};
+  |                                                     ^^^^^^^^^^
+
+warning: unused imports: `deflate_bits as db`, `fax_meta as m`, `webp as w`, `webp_container as c`, `webp_format as f`, `webp_header as hd`, `webp_huffman as hf`, `webp_segment as seg`, `webp_tiff as t`, and `webp_token as tok`
+ --> src/webp_witness.rs:3:13
+  |
+3 | ...::{fax_meta as m,webp_format as f,webp_container as c,webp_header as hd,webp_huffman as hf,webp_token as tok,webp as w,webp_segment as seg,webp_tiff as t,deflate_bits as db};
+  |       ^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::deflate_bits as db`
+ --> src/fax_bits.rs:3:5
+  |
+3 | use crate::deflate_bits as db;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `fax as c`, `fax_bits as b`, `fax_format as f`, `fax_frame as e`, `fax_meta as m`, `fax_row as r`, `fax_segment as seg`, and `fax_tiff as t`
+ --> src/fax_witness.rs:3:13
+  |
+3 | use crate::{fax_meta as m,fax_format as f,fax_bits as b,fax_row as r,fax_frame as e,fax as c,fax_segment as seg,fax_tiff as t};
+  |             ^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^ ^^^^^^^^^^^^ ^^^^^^^^^^^^^^ ^^^^^^^^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^
+
+warning: unused import: `crate::deflate_bits as db`
+ --> src/bit_window.rs:3:5
+  |
+3 | use crate::deflate_bits as db;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::deflate_bits as db`
+ --> src/jpeg_bits.rs:3:5
+  |
+3 | use crate::deflate_bits as db;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::deflate_bits as db`
+ --> src/jpeg_huffman.rs:4:5
+  |
+4 | use crate::deflate_bits as db;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::jpeg_bits::*`
+ --> src/jpeg_block.rs:4:5
+  |
+4 | use crate::jpeg_bits::*;
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::deflate_bits as db`
+ --> src/jpeg_block.rs:6:5
+  |
+6 | use crate::deflate_bits as db;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::jpeg_header::*`
+ --> src/jpeg_scan.rs:5:5
+  |
+5 | use crate::jpeg_header::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::jpeg_scan::*`
+ --> src/jpeg_layout.rs:3:5
+  |
+3 | use crate::jpeg_scan::*;
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::jpeg_header::*`
+ --> src/jpeg_layout.rs:4:5
+  |
+4 | use crate::jpeg_header::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::jpeg_scan as js`
+ --> src/jpeg_tiff.rs:6:5
+  |
+6 | use crate::jpeg_scan as js;
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `jpeg as j`, `jpeg_bits as bits`, `jpeg_block as b`, `jpeg_container as c`, `jpeg_format as f`, `jpeg_header as h`, `jpeg_huffman as hf`, `jpeg_meta as m`, `jpeg_scan as scan`, `jpeg_segment as seg`, and `jpeg_tiff as t`
+ --> src/jpeg_witness.rs:3:13
+  |
+3 | ...::{jpeg_meta as m,jpeg_format as f,jpeg_header as h,jpeg_huffman as hf,jpeg_bits as bits,jpeg_block as b,jpeg_scan as scan,jpeg_segment as seg,jpeg_container as c,jpeg_tiff as t,jpeg as j};
+  |       ^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^ ^^^^^^^^^
+
+warning: unused import: `crate::deflate as df`
+ --> src/extended_witness.rs:3:5
+  |
+3 | use crate::deflate as df;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::deflate_bits::*`
+ --> src/extended_witness.rs:4:5
+  |
+4 | use crate::deflate_bits::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::extended::*`
+ --> src/raster_layout.rs:2:5
+  |
+2 | use super::extended::*;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `old_t`
+  --> src/vp8_bool.rs:66:13
+   |
+66 |         let old_t=t;
+   |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_old_t`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `prev`
+   --> src/vp8_coeff.rs:121:35
+    |
+121 |         let ghost before=out@;let prev=st;
+    |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_prev`
+
+warning: unused variable: `limit`
+  --> src/vp8_transform.rs:27:61
+   |
+27 | fn line(a:i64,b:i64,c:i64,d:i64,k:usize,bias:i64,walsh:bool,limit:i64) -> (r:i64)
+   |                                                             ^^^^^ help: if this is intentional, prefix it with an underscore: `_limit`
+
+warning: unused variable: `h`
+  --> src/vp8_edges.rs:12:37
+   |
+12 | pub(super) fn large(p:&[u8],w:usize,h:usize,x:usize,y:usize,n:usize) -> (r:[u8;33])
+   |                                     ^ help: if this is intentional, prefix it with an underscore: `_h`
+
+warning: unused variable: `h`
+  --> src/vp8_edges.rs:44:37
+   |
+44 | pub(super) fn small(p:&[u8],w:usize,h:usize,x:usize,y:usize) -> (e:[u8;13])
+   |                                     ^ help: if this is intentional, prefix it with an underscore: `_h`
+
+warning: unused variable: `h`
+  --> src/vp8_render.rs:40:29
+   |
+40 | fn write(p:&mut[u8],w:usize,h:usize,x:usize,y:usize,pred:&[u8;16],delta:&[i32;16])
+   |                             ^ help: if this is intentional, prefix it with an underscore: `_h`
+
+warning: unused variable: `h`
+  --> src/vp8_filter_plane.rs:15:35
+   |
+15 | fn filter_step(p:&mut[u8],w:usize,h:usize,x:usize,y:usize,n:usize,chroma:bool,f:Filter,i:usize)
+   |                                   ^ help: if this is intentional, prefix it with an underscore: `_h`
+
+warning: unused variable: `height`
+  --> src/vp8_color.rs:20:39
+   |
+20 | fn at(p:&[u8],base:usize,stride:usize,height:usize,x:usize,y:usize) -> (r:u8)
+   |                                       ^^^^^^ help: if this is intentional, prefix it with an underscore: `_height`
+
+warning: unused variable: `expected`
+   --> src/lerc_numeric.rs:392:13
+    |
+392 |         let expected=if ex>127{sg|0x7f800000u32}else{sg|(((ex+127) as u32)<<23u32)|(bits%8388608)};
+    |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_expected`
+
+warning: unused variable: `checked`
+   --> src/native_lerc.rs:120:9
+    |
+120 |     let checked=header::inspect(s)?;
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_checked`
+
+warning: unused variable: `counts`
+   --> src/zstd_huffman.rs:105:21
+    |
+105 | fn sort(s:&[u8;256],counts:&[usize;12]) -> (r:([u16;12],[u8;256]))
+    |                     ^^^^^^ help: if this is intentional, prefix it with an underscore: `_counts`
+
+warning: unused variable: `prior`
+  --> src/native_fp.rs:74:17
+   |
+74 |             let prior=base;assert(base+row==k);base=k;local=0;
+   |                 ^^^^^ help: if this is intentional, prefix it with an underscore: `_prior`
+
+warning: unused variable: `base`
+   --> src/native_stream.rs:120:13
+    |
+120 |         let base=c.produced;let mut written=0usize;let mut left=budget.remaining/2;
+    |             ^^^^ help: if this is intentional, prefix it with an underscore: `_base`
+
+warning: unused variable: `at_before`
+   --> src/native_stream.rs:136:21
+    |
+136 |                 let at_before=c.bits.at;let count_before=c.left;let prior_left=left;
+    |                     ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_at_before`
+
+warning: unused variable: `count_before`
+   --> src/native_stream.rs:136:45
+    |
+136 |                 let at_before=c.bits.at;let count_before=c.left;let prior_left=left;
+    |                                             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_count_before`
+
+warning: unused variable: `prior_left`
+   --> src/native_stream.rs:136:69
+    |
+136 |                 let at_before=c.bits.at;let count_before=c.left;let prior_left=left;
+    |                                                                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_prior_left`
+
+warning: unused variable: `h`
+  --> src/logluv_segment.rs:92:30
+   |
+92 | fn convert(raw:&[u8],w:usize,h:usize,out:&mut [u8])
+   |                              ^ help: if this is intentional, prefix it with an underscore: `_h`
+
+warning: unused variable: `g`
+   --> src/logluv_tiff.rs:267:31
+    |
+267 |         let f=self.format;let g=make_logluv_geometry(f);let mut k=0usize;
+    |                               ^ help: if this is intentional, prefix it with an underscore: `_g`
+
+warning: unused variable: `tail`
+   --> src/logluv_tiff.rs:287:27
+    |
+287 |                 let (tile,tail)=scratch.split_at_mut(p.pixels);
+    |                           ^^^^ help: if this is intentional, prefix it with an underscore: `_tail`
+
+warning: unused variable: `d`
+  --> src/webp_pixels.rs:21:9
+   |
+21 |     let d=size(bits);
+   |         ^ help: if this is intentional, prefix it with an underscore: `_d`
+
+warning: unused variable: `p`
+  --> src/webp_inverse.rs:13:37
+   |
+13 | fn matrix(t:Transform,data:&[Pixel],p:usize,x:usize,y:usize) -> (r:Result<Pixel,Error>)
+   |                                     ^ help: if this is intentional, prefix it with an underscore: `_p`
+
+warning: unused variable: `side`
+  --> src/webp_inverse.rs:17:29
+   |
+17 |     reveal(coefficient);let side=pix::size(t.bits);let across=pix::subsample(t.width,t.bits);
+   |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_side`
+
+warning: unused variable: `before`
+  --> src/webp_prepare.rs:84:9
+   |
+84 |     let before=b;let next=aux::append(s,b,x,y,false,start,out)?;
+   |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_before`
+
+warning: unused variable: `g`
+   --> src/webp_tiff.rs:267:31
+    |
+267 |         let f=self.format;let g=make_webp_geometry(f);let mut k=0usize;
+    |                               ^ help: if this is intentional, prefix it with an underscore: `_g`
+
+warning: unused variable: `tail`
+   --> src/webp_tiff.rs:285:27
+    |
+285 |                 let (tile,tail)=scratch.split_at_mut(p.pixels);
+    |                           ^^^^ help: if this is intentional, prefix it with an underscore: `_tail`
+
+warning: unused variable: `w`
+  --> src/fax.rs:31:48
+   |
+31 | pub(super) fn render(ends:&[u32;65538],n:usize,w:usize,base:usize,output:&mut [u8]) -> (r:Result<(),Error>)
+   |                                                ^ help: if this is intentional, prefix it with an underscore: `_w`
+
+warning: unused variable: `g`
+   --> src/fax_tiff.rs:267:31
+    |
+267 |         let f=self.format;let g=make_fax_geometry(f);let mut k=0usize;
+    |                               ^ help: if this is intentional, prefix it with an underscore: `_g`
+
+warning: unused variable: `tail`
+   --> src/fax_tiff.rs:285:27
+    |
+285 |                 let (tile,tail)=scratch.split_at_mut(p.pixels);
+    |                           ^^^^ help: if this is intentional, prefix it with an underscore: `_tail`
+
+warning: unused variable: `qb`
+   --> src/jpeg_bits.rs:141:17
+    |
+141 |             let qb=q.byte;let qleft=q.left;
+    |                 ^^ help: if this is intentional, prefix it with an underscore: `_qb`
+
+warning: unused variable: `qleft`
+   --> src/jpeg_bits.rs:141:31
+    |
+141 |             let qb=q.byte;let qleft=q.left;
+    |                               ^^^^^ help: if this is intentional, prefix it with an underscore: `_qleft`
+
+warning: unused variable: `slen`
+  --> src/jpeg_huffman.rs:79:9
+   |
+79 |     let slen=s.len();
+   |         ^^^^ help: if this is intentional, prefix it with an underscore: `_slen`
+
+warning: unused variable: `limit`
+  --> src/jpeg_transform.rs:23:24
+   |
+23 | fn transform(c:[i64;8],limit:i64) -> (out:[i64;8])
+   |                        ^^^^^ help: if this is intentional, prefix it with an underscore: `_limit`
+
+warning: unused variable: `legacy`
+   --> src/jpeg_scan.rs:145:72
+    |
+145 | pub(super) fn decode_blocks(s:&[u8],v:[usize;32],bits:Bits,count:usize,legacy:bool,output:&mut [u8]) -> (r:Result<(),Error>)
+    |                                                                        ^^^^^^ help: if this is intentional, prefix it with an underscore: `_legacy`
+
+warning: unused variable: `outlen`
+   --> src/jpeg_scan.rs:154:9
+    |
+154 |     let outlen=output.len();
+    |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_outlen`
+
+warning: unused variable: `down`
+  --> src/jpeg_layout.rs:17:31
+   |
+17 |     let a=(v[12]+mw-1)/mw;let down=(v[13]+mh-1)/mh;
+   |                               ^^^^ help: if this is intentional, prefix it with an underscore: `_down`
+
+warning: unused variable: `bx`
+  --> src/jpeg_layout.rs:29:13
+   |
+29 |         let bx=rx/8;let by=ry/8;
+   |             ^^ help: if this is intentional, prefix it with an underscore: `_bx`
+
+warning: unused variable: `by`
+  --> src/jpeg_layout.rs:29:25
+   |
+29 |         let bx=rx/8;let by=ry/8;
+   |                         ^^ help: if this is intentional, prefix it with an underscore: `_by`
+
+warning: unused variable: `be`
+   --> src/jpeg.rs:112:21
+    |
+112 |                 let be=if ch==3 {crate::jpeg_layout::source(&self.v,x+n-1,y,1)} else {ae};
+    |                     ^^ help: if this is intentional, prefix it with an underscore: `_be`
+
+warning: unused variable: `de`
+   --> src/jpeg.rs:114:21
+    |
+114 |                 let de=if ch==3 {crate::jpeg_layout::source(&self.v,x+n-1,y,2)} else {ae};
+    |                     ^^ help: if this is intentional, prefix it with an underscore: `_de`
+
+warning: unused variable: `limits`
+   --> src/jpeg.rs:214:101
+    |
+214 | ...l,ycbcr:bool,limited:bool,limits:&Limits) -> (r:Result<JpegSegment<'a>,Error>)
+    |                              ^^^^^^ help: if this is intentional, prefix it with an underscore: `_limits`
+
+warning: unused variable: `g`
+   --> src/jpeg_tiff.rs:299:31
+    |
+299 |         let f=self.format;let g=make_geometry(f);let mut k=0usize;
+    |                               ^ help: if this is intentional, prefix it with an underscore: `_g`
+
+warning: unused variable: `need`
+   --> src/jpeg_tiff.rs:316:63
+    |
+316 |             let raw=image.scratch;let pixels=image.output;let need=add(raw,pixels)?;
+    |                                                               ^^^^ help: if this is intentional, prefix it with an underscore: `_need`
+
+warning: unused variable: `tail`
+   --> src/jpeg_tiff.rs:321:73
+    |
+321 |                 let (blockbuf,rest)=scratch.split_at_mut(raw);let (tile,tail)=rest.split_at_mut(pixels);
+    |                                                                         ^^^^ help: if this is intentional, prefix it with an underscore: `_tail`
+
+warning: unused variable: `counts`
+   --> src/deflate_bits.rs:227:26
+    |
+227 | fn ordered(lens:[u8;288],counts:[usize;16]) -> (out:([usize;16],[u16;288]))
+    |                          ^^^^^^ help: if this is intentional, prefix it with an underscore: `_counts`
+
+warning: unused variable: `s`
+   --> src/deflate.rs:168:40
+    |
+168 |     pub(super) fn match_byte(&mut self,s:&[u8],cap:usize) -> (byte:u8)
+    |                                        ^ help: if this is intentional, prefix it with an underscore: `_s`
+
+warning: unused variable: `r`
+   --> src/deflate.rs:181:13
+    |
+181 |         let r=self.emit(byte,cap);assert(r.is_ok());byte
+    |             ^ help: if this is intentional, prefix it with an underscore: `_r`
+
+warning: unused variable: `cap`
+   --> src/deflate.rs:255:55
+    |
+255 |     pub(super) fn new(s:&[u8],start:usize,count:usize,cap:usize) -> (r:Result<Self,Error>)
+    |                                                       ^^^ help: if this is intentional, prefix it with an underscore: `_cap`
+
+warning: unused variable: `len`
+   --> src/deflate_plane.rs:150:48
+    |
+150 | pub(super) fn validate_into(s:&[u8],g:Geometry,len:usize,max_output:usize,budget:&mut Budget,output:&mut [u8],write:bool) -> (r:Res...
+    |                                                ^^^ help: if this is intentional, prefix it with an underscore: `_len`
+
+warning: unused variable: `len`
+   --> src/deflate_plane.rs:286:38
+    |
+286 | fn decode_segment(s:&[u8],g:Geometry,len:usize,j:usize,cap:usize,stride:usize,output:&mut [u8]) -> (r:Result<(),Error>)
+    |                                      ^^^ help: if this is intentional, prefix it with an underscore: `_len`
+
+warning: unused variable: `actual`
+   --> src/deflate_plane.rs:317:17
+    |
+317 |             let actual=deflate::process(s,start,count,cap,fuel,part,needed)?;
+    |                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_actual`
+
+warning: unused variable: `prefix`
+   --> src/extended_image.rs:147:22
+    |
+147 |                 let (prefix,rest)=scratch.split_at_mut(start);
+    |                      ^^^^^^ help: if this is intentional, prefix it with an underscore: `_prefix`
+
+warning: unused variable: `tail`
+   --> src/extended_image.rs:148:28
+    |
+148 |                 let (plane,tail)=rest.split_at_mut(l.plane_len);
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_tail`
+
+warning: unused variable: `encoded_width`
+   --> src/extended_image.rs:558:9
+    |
+558 |     let encoded_width=l.encoded_width;let plane_channels=l.plane_channels;let planes=l.planes;
+    |         ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_encoded_width`
+
+warning: unused variable: `plane_channels`
+   --> src/extended_image.rs:558:43
+    |
+558 |     let encoded_width=l.encoded_width;let plane_channels=l.plane_channels;let planes=l.planes;
+    |                                           ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_plane_channels`
+
+warning: unused variable: `head`
+   --> src/extended_image.rs:637:18
+    |
+637 |             let (head,tail)=scratch.split_at_mut(start);let (part,rest)=tail.split_at_mut(plane_len);
+    |                  ^^^^ help: if this is intentional, prefix it with an underscore: `_head`
+
+warning: unused variable: `rest`
+   --> src/extended_image.rs:637:67
+    |
+637 |             let (head,tail)=scratch.split_at_mut(start);let (part,rest)=tail.split_at_mut(plane_len);
+    |                                                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_rest`
+
+warning: unused variable: `len`
+   --> src/extended.rs:213:38
+    |
+213 | fn validate_plane(s:&[u8],g:Geometry,len:usize,budget:&mut Budget) -> (r:Result<usize,Error>)
+    |                                      ^^^ help: if this is intentional, prefix it with an underscore: `_len`
+
+warning: unused variable: `plen`
+   --> src/extended.rs:286:51
+    |
+286 |     fn plane_decode_compressed(s:&[u8],g:Geometry,plen:usize, output: &mut [u8]) -> (r: Result<(), Error>)
+    |                                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_plen`
+
+warning: unused variable: `i`
+  --> src/reader.rs:44:85
+   |
+44 | ...match &self.inner {Kind::Basic(i)=>1,Kind::Extended(i)=>i.planar_configuration(),Kind::Jpeg(i)=>i.planar_configuration(),Kind::Fa...
+   |                                   ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: unused variable: `i`
+  --> src/reader.rs:45:87
+   |
+45 | ...match &self.inner {Kind::Basic(i)=>8,Kind::Extended(i)=>i.output_bits_per_sample(),Kind::Jpeg(i)=>i.output_bits_per_sample(),Kind...
+   |                                   ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: unused variable: `i`
+  --> src/reader.rs:47:107
+   |
+47 | ...match &self.inner {Kind::Basic(i)=>0,Kind::Extended(i)=>i.scratch_len(),Kind::Jpeg(i)=>i.scratch_len(),Kind::Fax(i)=>i.scratch_le...
+   |                                   ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: unused variable: `w`
+    --> src/lib.rs:3483:9
+     |
+3483 |     let w=format.width;let height=format.height;let channels=format.channels;
+     |         ^ help: if this is intentional, prefix it with an underscore: `_w`
+
+warning: unused variable: `photo`
+    --> src/lib.rs:3484:9
+     |
+3484 |     let photo=format.photo;let alpha=format.alpha;let output_len=format.output_len;
+     |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_photo`
+
+warning: unused variable: `lsb`
+    --> src/lib.rs:3486:37
+     |
+3486 |     let bilevel=format.depth==1;let lsb=format.fill==2;
+     |                                     ^^^ help: if this is intentional, prefix it with an underscore: `_lsb`
+
+warning: unused variable: `across`
+    --> src/lib.rs:3489:66
+     |
+3489 |     let bw=geometry.block_width;let bh=geometry.block_height;let across=geometry.across;
+     |                                                                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_across`
+
+warning: struct `Model` is never constructed
+  --> src/vp8_residual.rs:10:19
+   |
+10 | pub(super) struct Model {pub reader:ar::Reader,pub top:Seq<u8>,pub left:Seq<u8>,pub dc:Seq<i32>,pub blocks:Seq<Seq<i32>>,pub empty:b...
+   |                   ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `pixel` is never used
+  --> src/vp8_filter_kernel.rs:46:15
+   |
+46 | pub(super) fn pixel(e:&[u8;8],simple:bool,edge:bool,limit:u8,inner:u8,threshold:u8,k:usize) -> (r:u8)
+   |               ^^^^^
+
+warning: struct `Model` is never constructed
+ --> src/vp8_frame.rs:8:19
+  |
+8 | pub(super) struct Model {pub header:Seq<i32>,pub reader:ar::Reader,pub parts:Seq<ar::Reader>,pub count:usize}
+  |                   ^^^^^
+
+warning: struct `ContextModel` is never constructed
+  --> src/vp8_macroblock.rs:10:19
+   |
+10 | pub(super) struct ContextModel {pub modes:Seq<u8>,pub nz:Seq<u8>}
+   |                   ^^^^^^^^^^^^
+
+warning: struct `ModeModel` is never constructed
+  --> src/vp8_macroblock.rs:20:19
+   |
+20 | pub(super) struct ModeModel {pub prefix:modes::Prefix,pub reader:ar::Reader,pub modes:Seq<u8>,pub chroma:u8}
+   |                   ^^^^^^^^^
+
+warning: struct `BlockModel` is never constructed
+  --> src/vp8_macroblock.rs:46:19
+   |
+46 | pub(super) struct BlockModel {pub modes:ModeModel,pub residual:residual::Model,pub top:ContextModel,pub left:ContextModel,pub filter...
+   |                   ^^^^^^^^^^
+
+warning: struct `Model` is never constructed
+  --> src/vp8_image.rs:11:19
+   |
+11 | pub(super) struct Model {pub reader:ar::Reader,pub parts:Seq<ar::Reader>,pub left:ContextModel,pub columns:Seq<ContextModel>,pub fil...
+   |                   ^^^^^
+
+warning: struct `Model` is never constructed
+ --> src/vp8_postfilter.rs:6:19
+  |
+6 | pub(super) struct Model {pub y:Seq<u8>,pub u:Seq<u8>,pub v:Seq<u8>}
+  |                   ^^^^^
+
+warning: fields `quant` and `next` are never read
+  --> src/lerc_block.rs:20:72
+   |
+20 | pub(super) struct Mode {pub at:usize,pub flag:usize,pub offset:u64,pub quant:usize,pub next:usize}
+   |                   ---- fields in this struct                           ^^^^^           ^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `ResultModel` is never constructed
+   --> src/lerc_block.rs:100:19
+    |
+100 | pub(super) struct ResultModel {pub at:usize,pub data:Seq<u64>}
+    |                   ^^^^^^^^^^^
+
+warning: struct `TableModel` is never constructed
+  --> src/lerc_huffman.rs:30:19
+   |
+30 | pub(super) struct TableModel {pub lengths:Seq<u32>,pub codes:Seq<u32>}
+   |                   ^^^^^^^^^^
+
+warning: struct `Description` is never constructed
+  --> src/lerc_huffman.rs:35:19
+   |
+35 | pub(super) struct Description {pub base:usize,pub first:usize,pub size:usize,pub lengths:Seq<u32>}
+   |                   ^^^^^^^^^^^
+
+warning: struct `Parsed` is never constructed
+  --> src/lerc_huffman.rs:47:19
+   |
+47 | pub(super) struct Parsed {pub at:usize,pub table:TableModel}
+   |                   ^^^^^^
+
+warning: struct `RangeModel` is never constructed
+  --> src/lerc_planes.rs:51:19
+   |
+51 | pub(super) struct RangeModel {pub at:usize,pub constant:bool,pub min:Seq<u64>,pub max:Seq<u64>}
+   |                   ^^^^^^^^^^
+
+warning: struct `NModel` is never constructed
+  --> src/zstd_fse.rs:49:8
+   |
+49 | struct NModel {p:int,index:int,left:int,zero:bool,active:int,counts:Seq<i16>}
+   |        ^^^^^^
+
+warning: struct `DistributionModel` is never constructed
+   --> src/zstd_fse.rs:113:19
+    |
+113 | pub(super) struct DistributionModel {pub counts:Seq<i16>,pub log:int,pub at:int}
+    |                   ^^^^^^^^^^^^^^^^^
+
+warning: struct `SModel` is never constructed
+  --> src/zstd_table.rs:14:8
+   |
+14 | struct SModel {high:int,table:Seq<u8>}
+   |        ^^^^^^
+
+warning: struct `Spread` is never constructed
+  --> src/zstd_table.rs:48:8
+   |
+48 | struct Spread {pos:int,symbol:int,used:int,table:Seq<u8>}
+   |        ^^^^^^
+
+warning: struct `TableModel` is never constructed
+   --> src/zstd_table.rs:166:19
+    |
+166 | pub(super) struct TableModel {pub cells:Seq<Cell>,pub log:usize,pub ready:bool}
+    |                   ^^^^^^^^^^
+
+warning: field `weights` is never read
+   --> src/zstd_huffman.rs:159:9
+    |
+158 | pub(super) struct Huff {
+    |                   ---- field in this struct
+159 |     pub weights:[u8;256],pub counts:[usize;12],pub bases:[usize;12],pub starts:[u16;12],pub ordered:[u8;256],pub log:usize,pub read...
+    |         ^^^^^^^
+    |
+    = note: `Huff` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `WModel` is never constructed
+ --> src/zstd_description.rs:8:19
+  |
+8 | pub(super) struct WModel {pub values:Seq<u8>,pub at:int}
+  |                   ^^^^^^
+
+warning: struct `Description` is never constructed
+  --> src/zstd_description.rs:67:19
+   |
+67 | pub(super) struct Description {pub weights:Seq<u8>,pub log:usize,pub at:int}
+   |                   ^^^^^^^^^^^
+
+warning: struct `LiteralModel` is never constructed
+   --> src/zstd_literals.rs:162:19
+    |
+162 | pub(super) struct LiteralModel {pub data:Seq<u8>,pub at:usize,pub weights:Seq<u8>,pub log:usize,pub ready:bool}
+    |                   ^^^^^^^^^^^^
+
+warning: struct `ReadModel` is never constructed
+  --> src/zstd_sequence_tables.rs:14:19
+   |
+14 | pub(super) struct ReadModel {pub table:TableModel,pub at:usize}
+   |                   ^^^^^^^^^
+
+warning: struct `HeaderModel` is never constructed
+  --> src/zstd_sequence_tables.rs:85:19
+   |
+85 | pub(super) struct HeaderModel {pub tables:Seq<TableModel>,pub at:usize,pub count:usize}
+   |                   ^^^^^^^^^^^
+
+warning: field `p` is never read
+  --> src/zstd_sequence_token.rs:19:105
+   |
+19 | pub(super) struct Token {pub literals:usize,pub matched:usize,pub offset:usize,pub states:[usize;3],pub p:usize}
+   |                   ----- field in this struct                                                            ^
+   |
+   = note: `Token` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `RunModel` is never constructed
+ --> src/zstd_sequences.rs:9:19
+  |
+9 | pub(super) struct RunModel {pub data:Seq<u8>,pub previous:[usize;3]}
+  |                   ^^^^^^^^
+
+warning: struct `SeqModel` is never constructed
+  --> src/zstd_sequences.rs:72:19
+   |
+72 | pub(super) struct SeqModel {pub data:Seq<u8>,pub previous:[usize;3],pub tables:Seq<TableModel>}
+   |                   ^^^^^^^^
+
+warning: struct `ContextModel` is never constructed
+  --> src/native_zstd.rs:13:8
+   |
+13 | struct ContextModel {weights:Seq<u8>,log:usize,ready:bool,tables:Seq<TableModel>,previous:[usize;3]}
+   |        ^^^^^^^^^^^^
+
+warning: struct `BlockModel` is never constructed
+  --> src/native_zstd.rs:39:8
+   |
+39 | struct BlockModel {data:Seq<u8>,context:ContextModel}
+   |        ^^^^^^^^^^
+
+warning: field `alpha` is never read
+  --> src/logluv_format.rs:50:46
+   |
+49 | pub(super) struct Format {
+   |                   ------ field in this struct
+50 |     pub w:usize,pub h:usize,pub ch:usize,pub alpha:usize,pub bw:usize,pub bh:usize,
+   |                                              ^^^^^
+   |
+   = note: `Format` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Model` is never constructed
+  --> src/webp_transforms.rs:55:19
+   |
+55 | pub(super) struct Model {pub bits:Bits,pub width:usize,pub transforms:Seq<Transform>,pub data:Seq<Pixel>}
+   |                   ^^^^^
+
+warning: struct `Model` is never constructed
+  --> src/webp_prepare.rs:31:19
+   |
+31 | pub(super) struct Model {pub transforms:tr::Model,pub bits:Bits,pub cache:usize,pub meta_bits:usize,pub meta_start:usize,pub meta_co...
+   |                   ^^^^^
+
+warning: field `meta_count` is never read
+  --> src/webp_prepare.rs:56:132
+   |
+56 | ...ct Prepared {pub transforms:tr::Prepared,pub bits:Bits,pub cache:usize,pub meta_bits:usize,pub meta_start:usize,pub meta_count:us...
+   |       -------- field in this struct                                                                                    ^^^^^^^^^^
+
+warning: struct `Groups` is never constructed
+  --> src/webp_prepare.rs:92:19
+   |
+92 | pub(super) struct Groups {pub bits:Bits,pub tables:Seq<GroupModel>}
+   |                   ^^^^^^
+
+warning: struct `HModel` is never constructed
+  --> src/webp_huffman.rs:28:19
+   |
+28 | pub(super) struct HModel {pub lens:Seq<u8>,pub counts:Seq<usize>}
+   |                   ^^^^^^
+
+warning: struct `GroupModel` is never constructed
+  --> src/webp_container.rs:53:19
+   |
+53 | pub(super) struct GroupModel {pub g:wh::HModel,pub r:wh::HModel,pub b:wh::HModel,pub a:wh::HModel,pub d:wh::HModel}
+   |                   ^^^^^^^^^^
+
+warning: struct `State` is never constructed
+  --> src/webp.rs:27:19
+   |
+27 | pub(super) struct State {pub pos:int,pub left:usize,pub dist:usize,pub pixels:Seq<[u8;4]>,pub cache:Seq<[u8;4]>}
+   |                   ^^^^^
+
+warning: fields `history` and `colors` are never read
+  --> src/webp.rs:65:83
+   |
+65 | struct Cursor {bits:Bits,left:usize,dist:usize,produced:usize,cache:[[u8;4];2048],history:Ghost<Seq<[u8;4]>>,colors:Ghost<Seq<[u8;4]>>}
+   |        ------ fields in this struct                                               ^^^^^^^                    ^^^^^^
+
+warning: struct `Model` is never constructed
+  --> src/fax_row.rs:74:19
+   |
+74 | pub(super) struct Model {pub bits:Bits,pub a:usize,pub bi:usize,pub ends:Seq<u32>}
+   |                   ^^^^^
+
+warning: struct `Model` is never constructed
+  --> src/fax.rs:62:19
+   |
+62 | pub(super) struct Model {pub bits:Bits,pub reference:Seq<u32>,pub history:Seq<Seq<u32>>}
+   |                   ^^^^^
+
+warning: field `off` is never read
+  --> src/fax_meta.rs:55:78
+   |
+55 | pub(super) struct Meta {pub tags:[Tag;32],pub count:usize,pub next:usize,pub off:usize,pub le:bool}
+   |                   ---- field in this struct                                  ^^^
+   |
+   = note: `Meta` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Model` is never constructed
+  --> src/jpeg_block.rs:29:19
+   |
+29 | pub(super) struct Model {pub bits:Bits,pub coef:Seq<i64>,pub pred:i64,pub k:usize,pub done:bool}
+   |                   ^^^^^
+
+warning: struct `Model` is never constructed
+   --> src/jpeg_header.rs:104:19
+    |
+104 | pub(super) struct Model {pub v:Seq<usize>,pub at:usize,pub end:usize,pub sub:usize,pub kind:usize}
+    |                   ^^^^^
+
+warning: struct `Model` is never constructed
+  --> src/jpeg_scan.rs:47:19
+   |
+47 | pub(super) struct Model {pub bits:Bits,pub pred:Seq<i64>,pub blocks:Seq<Seq<i64>>}
+   |                   ^^^^^
+
+warning: field `history` is never read
+  --> src/jpeg_scan.rs:67:81
+   |
+67 | pub(super) struct Cursor {pub bits:Bits,pub pred:[i64;3],pub produced:usize,pub history:Ghost<Seq<Seq<i64>>>}
+   |                   ------ field in this struct                                   ^^^^^^^
+
+warning: field `off` is never read
+  --> src/jpeg_meta.rs:67:78
+   |
+67 | pub(super) struct Meta {pub tags:[Tag;32],pub count:usize,pub next:usize,pub off:usize,pub le:bool}
+   |                   ---- field in this struct                                  ^^^
+   |
+   = note: `Meta` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Model` is never constructed
+  --> src/jpeg_segment.rs:37:19
+   |
+37 | pub(super) struct Model {pub v:Seq<usize>,pub bits:Bits}
+   |                   ^^^^^
+
+warning: struct `HModel` is never constructed
+   --> src/deflate_bits.rs:115:19
+    |
+115 | pub(super) struct HModel {pub lens:Seq<u8>,pub counts:Seq<usize>}
+    |                   ^^^^^^
+
+warning: field `lens` is never read
+   --> src/deflate_bits.rs:157:9
+    |
+156 | pub(super) struct Huff {
+    |                   ---- field in this struct
+157 |     pub lens:[u8;288],pub counts:[usize;16],
+    |         ^^^^
+    |
+    = note: `Huff` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Model` is never constructed
+  --> src/deflate.rs:36:19
+   |
+36 | pub(super) struct Model {
+   |                   ^^^^^
+
+warning: field `history` is never read
+  --> src/deflate.rs:96:9
+   |
+93 | pub(super) struct Cursor {
+   |                   ------ field in this struct
+...
+96 |     pub history:Ghost<Seq<u8>>,
+   |         ^^^^^^^
+
+warning: fields `fill` and `output_len` are never read
+  --> src/extended.rs:49:29
+   |
+47 | struct ExtFormat {
+   |        --------- fields in this struct
+48 |     width:usize,height:usize,channels:usize,photo:usize,compression:usize,
+49 |     alpha:usize,depth:usize,fill:usize,output_len:usize,planar:usize,predictor:usize,
+   |                             ^^^^       ^^^^^^^^^^
+   |
+   = note: `ExtFormat` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: field `limits` is never read
+  --> src/extended_image.rs:53:36
+   |
+51 | pub struct ExtendedImage<'a> {
+   |            ------------- field in this struct
+52 |     input:&'a [u8],format:ExtFormat,layout:RasterLayout,geometry:[Geometry;4],
+53 |     directory:Directory,page:usize,limits:Limits,decode_work:usize,
+   |                                    ^^^^^^
+
+warning: `verified-tiff` (lib) generated 167 warnings (run `cargo fix --lib -p verified-tiff` to apply 113 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running `target/release/fuzz-smoke 20000`
+seed=0x5449464650524f4f iterations=20000 accepted=325 errors=[3326, 7046, 37, 4267, 0, 4999] jpeg_accepted=14 jpeg_decoded=3 fax_accepted=9 fax_decoded=8 float_accepted=21 float_decoded=15 webp_accepted=14 webp_decoded=8 logluv_accepted=32 logluv_decoded=32

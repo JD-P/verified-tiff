@@ -1,0 +1,57 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module webp_predict (selected functions)
+
+error: postcondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-predictor/webp_predict.rs:26:31
+   |
+26 |       requires mode<=13,ensures r==component(mode,l,t,tl,tr,choose_left,alpha),
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+27 |   {
+28 | /     if mode==0{if alpha{255}else{0}}
+29 | |     else if mode==1{l}else if mode==2{t}else if mode==3{tr}else if mode==4{tl}
+30 | |     else if mode==5{avg(avg(l,tr),t)}else if mode==6{avg(l,tl)}else if mode==7{avg(l,t)}
+31 | |     else if mode==8{avg(tl,t)}else if mode==9{avg(t,tr)}else if mode==10{avg(avg(l,tl),avg(t,tr))}
+32 | |     else if mode==11{if choose_left{l}else{t}}
+33 | |     else if mode==12{clip(l as i32+t as i32+tl as i32)}
+34 | |     else{let a=avg(l,t) as i32;let d=a-tl as i32;clip(a+if d<0{-((-d)/2)}else{d/2})}
+   | |____________________________________________________________________________________- at the end of the function body
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error; 3 warnings emitted
+

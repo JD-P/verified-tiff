@@ -1,0 +1,83 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 1252 dropped 0 interval_us 1000",
+  "samples": 1252,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/baseline-v18/verified-tiff/target/release/examples/benchmark",
+    "target/benchmark/inputs/rgb-jpeg.tif",
+    "total",
+    "3000"
+  ],
+  "binary_sha256": "7e8a2b500b6904743c15ff5e287168079918534f92849dd59869e779f5c1189b",
+  "input_sha256": "e89c015f0a20e86a91e1030e72f488c7131bbc8d724234a07273e0a84975026a",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "engine": "rust",
+    "mode": "total",
+    "iterations": 5,
+    "seconds": 3.016856352,
+    "ns_per_image": 603371270.4,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 3145728,
+    "scratch_bytes": 393216,
+    "inspect_work": 157613807,
+    "decode_work": 160540422,
+    "hash": "cf57ce8ffd4c3325"
+  },
+  "functions": [
+    {
+      "function": "benchmark::verified_tiff::jpeg_scan::decode_blocks",
+      "samples": 1111,
+      "percent": 88.73801916932908
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_layout::source",
+      "samples": 44,
+      "percent": 3.5143769968051117
+    },
+    {
+      "function": "benchmark::<verified_tiff::jpeg::JpegSegment>::decode_with_scratch",
+      "samples": 22,
+      "percent": 1.7571884984025559
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_huffman::decode",
+      "samples": 20,
+      "percent": 1.597444089456869
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 19,
+      "percent": 1.5175718849840256
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_block::block",
+      "samples": 12,
+      "percent": 0.9584664536741214
+    },
+    {
+      "function": "benchmark::<verified_tiff::jpeg_tiff::JpegImage>::decode_with_scratch",
+      "samples": 11,
+      "percent": 0.8785942492012779
+    },
+    {
+      "function": "benchmark::<verified_tiff::jpeg_scan::Cursor>::next",
+      "samples": 7,
+      "percent": 0.5591054313099042
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_bits::bit",
+      "samples": 5,
+      "percent": 0.3993610223642173
+    },
+    {
+      "function": "benchmark::benchmark::main",
+      "samples": 1,
+      "percent": 0.07987220447284345
+    }
+  ]
+}

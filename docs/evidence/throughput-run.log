@@ -1,0 +1,26 @@
+gray-none {'before': 0.0327, 'libtiff': 0.0339, 'before_rgba': 3.5851, 'system_rgba': 0.7117, 'after': 0.0323, 'after_rgba': 3.512, 'libtiff_rgba': 0.5192} speedup 1.01
+gray-packbits {'before': 4.8114, 'libtiff': 1.1987, 'before_rgba': 8.9095, 'system_rgba': 1.8393, 'after': 4.1717, 'after_rgba': 7.8574, 'libtiff_rgba': 1.6651} speedup 1.15
+gray-lzw {'before': 14.2606, 'libtiff': 0.9275, 'before_rgba': 23.2464, 'system_rgba': 1.6773, 'after': 6.9373, 'after_rgba': 11.8016, 'libtiff_rgba': 1.4398} speedup 2.06
+gray-deflate {'before': 18.5252, 'libtiff_rgba': 0.9073, 'before_rgba': 27.9221, 'system_rgba': 0.8149, 'libtiff': 0.4369, 'after': 6.7794, 'after_rgba': 15.1902, 'combined': 3.8684} speedup 2.73
+rgb-none {'before': 0.0923, 'libtiff': 0.0819, 'before_rgba': 7.5129, 'system_rgba': 0.732, 'after': 0.0947, 'after_rgba': 7.4975, 'libtiff_rgba': 0.7508} speedup 0.98
+rgb-lzw {'before': 46.8229, 'libtiff': 2.808, 'before_rgba': 70.8945, 'system_rgba': 3.3711, 'after': 22.518, 'after_rgba': 34.7788, 'libtiff_rgba': 3.4039} speedup 2.08
+rgb-deflate {'before': 52.8703, 'libtiff_rgba': 1.7069, 'before_rgba': 81.4043, 'system_rgba': 0.8426, 'libtiff': 1.1962, 'after': 19.6852, 'after_rgba': 43.9635, 'combined': 10.169} speedup 2.69
+rgb-jpeg {'before': 78.5473, 'libtiff': 3.1788, 'before_rgba': 94.0432, 'system_rgba': 2.6344, 'after': 28.168, 'after_rgba': 39.841, 'libtiff_rgba': 3.9817} speedup 2.79
+rgb-jpeg-textured {'before': 311.5608, 'libtiff': 26.355, 'before_rgba': 455.5175, 'system_rgba': 21.2589, 'after': 127.5792, 'after_rgba': 188.6268, 'libtiff_rgba': 26.2672} speedup 2.44
+rgb-tile-lzw {'before': 61.1795, 'libtiff': 2.8262, 'before_rgba': 74.2847, 'system_rgba': 3.2222, 'after': 32.4594, 'after_rgba': 41.8227, 'libtiff_rgba': 3.1775} speedup 1.88
+gray16-deflate {'before': 85.4815, 'libtiff_rgba': 8.0467, 'before_rgba': 132.796, 'system_rgba': 5.4156, 'libtiff': 8.4421, 'after': 61.4428, 'after_rgba': 98.1793, 'combined': 30.658} speedup 1.39
+float64-lzw-p2 {'after': 77.1911, 'before': 93.587, 'libtiff': 12.0285} speedup 1.21
+noise-lzw {'before': 56.5517, 'libtiff': 2.4129, 'before_rgba': 87.9876, 'system_rgba': 3.192, 'after': 20.3488, 'after_rgba': 34.7136, 'libtiff_rgba': 3.0331} speedup 2.78
+noise-deflate {'before': 18.1563, 'libtiff_rgba': 1.1049, 'before_rgba': 28.8421, 'system_rgba': 0.9308, 'libtiff': 0.397, 'after': 5.8412, 'after_rgba': 12.9962, 'combined': 3.3741} speedup 3.11
+fax3 {'before': 14.266, 'libtiff': 1.8251, 'before_rgba': 23.8658, 'system_rgba': 0.7313, 'after': 14.5228, 'after_rgba': 23.6596, 'libtiff_rgba': 0.7497} speedup 0.98
+fax4 {'before': 6.9073, 'libtiff': 1.8084, 'before_rgba': 12.7648, 'system_rgba': 0.8758, 'after': 6.7762, 'after_rgba': 12.4616, 'libtiff_rgba': 0.7833} speedup 1.02
+webp {'before': 19.9773, 'libtiff': 1.23, 'before_rgba': 32.6302, 'system_rgba': 1.7975, 'after': 21.1114, 'after_rgba': 32.7122, 'libtiff_rgba': 1.8368} speedup 0.95
+logluv {'after': 7.7418, 'before': 7.8936, 'libtiff': 1.119} speedup 1.02
+original-quad-lzw-compat.tiff {'before': 10.0585, 'libtiff': 1.2865, 'before_rgba': 14.381, 'system_rgba': 1.3617, 'after': 5.8668, 'after_rgba': 8.5961, 'libtiff_rgba': 1.3627} speedup 1.71
+original-lzw-single-strip.tiff {'before': 119.8917, 'libtiff': 30.6527, 'before_rgba': 240.4943, 'system_rgba': 8.0704, 'after': 53.7917, 'after_rgba': 173.671, 'libtiff_rgba': 7.4786} speedup 2.23
+original-testfax4.tiff {'before': 25.8453, 'libtiff': 11.5012, 'before_rgba': 60.2926, 'system_rgba': 3.9659, 'after': 26.0761, 'after_rgba': 59.3607, 'libtiff_rgba': 4.0402} speedup 0.99
+original-deflate-last-strip-extra-data.tiff {'before': 5.6373, 'libtiff_rgba': 0.3403, 'before_rgba': 8.333, 'system_rgba': 0.3054, 'libtiff': 0.2162, 'after': 2.8084, 'after_rgba': 5.2412, 'combined': 1.3853} speedup 2.01
+white-none {'before': 0.013, 'libtiff': 0.1195, 'before_rgba': 0.8418, 'system_rgba': 0.1756, 'after': 0.0123, 'after_rgba': 0.8505, 'libtiff_rgba': 0.1443} speedup 1.06
+rgba-none {'before': 1.889, 'libtiff': 0.0415, 'before_rgba': 3.6097, 'system_rgba': 0.329, 'after': 0.0313, 'after_rgba': 1.7466, 'libtiff_rgba': 0.3218} speedup 60.38
+rgba-tile-none {'before': 21.9019, 'libtiff': 0.1054, 'before_rgba': 22.8667, 'system_rgba': 0.3887, 'after': 0.2493, 'after_rgba': 2.011, 'libtiff_rgba': 0.393} speedup 87.84
+bilevel-none {'before': 4.6427, 'libtiff': 0.3041, 'before_rgba': 5.5546, 'system_rgba': 0.0808, 'after': 4.6362, 'after_rgba': 5.6899, 'libtiff_rgba': 0.0814} speedup 1.0

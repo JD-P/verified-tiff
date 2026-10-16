@@ -1,0 +1,41 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-alpha/native_stream.rs:14:5
+   |
+14 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-alpha/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-alpha/native_stream.rs:15:5
+   |
+15 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-alpha/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module webp_alpha (selected functions)
+
+error: postcondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-codecs-webp-alpha/webp_alpha.rs:22:13
+   |
+22 |       ensures r==predictor(p@,w,filter,i),
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+23 |   {
+24 | /     if filter==0 || i==0{0}else if i<w{p[i-1]}else if i%w==0{0}
+25 | |     else if filter==1{p[i-1]}else if filter==2{p[i-w]}
+26 | |     else{proof{if i==w{vstd::arithmetic::div_mod::lemma_mod_self_0(w as int);}}assert(i>w);crate::vp8_predict::clip(p[i-1] as i32+p[i-w] as i32-p[i-w-1] as i32)}
+   | |_________________________________________________________________________________________________________________________________________________________________- at the end of the function body
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error; 2 warnings emitted
+

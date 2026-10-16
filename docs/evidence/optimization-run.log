@@ -1,0 +1,43 @@
+Initial measured cases (24); stopped on pinned reference RGB tile preflight:
+gray-none {'before': 52.4301, 'libtiff': 0.035, 'before_rgba': 85.6442, 'system_rgba': 0.7099, 'after': 0.0344, 'after_rgba': 3.8111, 'libtiff_rgba': 0.5428} speedup 1522.84
+gray-packbits {'before': 15.0589, 'libtiff': 1.2817, 'before_rgba': 18.3812, 'system_rgba': 1.9585, 'after': 7.1831, 'after_rgba': 10.9793, 'libtiff_rgba': 1.821} speedup 2.1
+gray-lzw {'before': 21.8648, 'libtiff': 0.9271, 'before_rgba': 27.7222, 'system_rgba': 1.5791, 'after': 14.9502, 'after_rgba': 23.9931, 'libtiff_rgba': 1.4204} speedup 1.46
+gray-deflate {'before': 29.0313, 'libtiff': 0.4249, 'before_rgba': 39.9052, 'system_rgba': 0.8067, 'after': 23.9284, 'after_rgba': 35.1832, 'libtiff_rgba': 0.8834} speedup 1.21
+rgb-none {'before': 145.1315, 'libtiff': 0.0825, 'before_rgba': 243.5247, 'system_rgba': 0.7167, 'after': 0.0911, 'after_rgba': 7.239, 'libtiff_rgba': 0.7125} speedup 1592.57
+rgb-lzw {'before': 71.111, 'libtiff': 2.8895, 'before_rgba': 83.8781, 'system_rgba': 3.453, 'after': 52.0636, 'after_rgba': 80.7902, 'libtiff_rgba': 3.5935} speedup 1.37
+rgb-deflate {'before': 86.2285, 'libtiff': 1.2309, 'before_rgba': 125.0026, 'system_rgba': 0.871, 'after': 70.8862, 'after_rgba': 104.3005, 'libtiff_rgba': 1.9452} speedup 1.22
+rgb-jpeg {'before': 632.6304, 'libtiff': 3.2263, 'before_rgba': 651.7427, 'system_rgba': 2.6854, 'after': 592.7494, 'after_rgba': 625.5292, 'libtiff_rgba': 3.8239} speedup 1.07
+rgb-jpeg-textured {'before': 1320.6608, 'libtiff': 24.8418, 'before_rgba': 1664.6569, 'system_rgba': 20.0344, 'after': 1290.6077, 'after_rgba': 1587.2383, 'libtiff_rgba': 25.2823} speedup 1.02
+rgb-tile-lzw {'before': 60.2411, 'libtiff': 3.0699, 'before_rgba': 69.9728, 'system_rgba': 3.3546, 'after': 57.6428, 'after_rgba': 74.8481, 'libtiff_rgba': 3.2303} speedup 1.05
+gray16-deflate {'before': 429.234, 'libtiff': 8.1853, 'before_rgba': 619.8888, 'system_rgba': 5.2445, 'after': 358.1692, 'after_rgba': 616.4936, 'libtiff_rgba': 8.031} speedup 1.2
+float64-lzw-p2 {'after': 104.9965, 'before': 158.039, 'libtiff': 12.4818} speedup 1.51
+noise-lzw {'before': 59.9542, 'libtiff': 2.1642, 'before_rgba': 74.6874, 'system_rgba': 2.9786, 'after': 51.7281, 'after_rgba': 92.4541, 'libtiff_rgba': 2.6914} speedup 1.16
+noise-deflate {'before': 37.7515, 'libtiff': 0.3706, 'before_rgba': 51.1875, 'system_rgba': 0.8802, 'after': 33.4028, 'after_rgba': 47.2936, 'libtiff_rgba': 1.0289} speedup 1.13
+fax3 {'before': 26.8552, 'libtiff': 1.7258, 'before_rgba': 36.7655, 'system_rgba': 0.7391, 'after': 14.4929, 'after_rgba': 24.2261, 'libtiff_rgba': 0.7634} speedup 1.85
+fax4 {'before': 21.4454, 'libtiff': 1.7486, 'before_rgba': 28.4131, 'system_rgba': 0.8383, 'after': 9.4214, 'after_rgba': 16.4693, 'libtiff_rgba': 0.7388} speedup 2.28
+webp {'before': 59.1103, 'libtiff': 1.2248, 'before_rgba': 73.2103, 'system_rgba': 1.8396, 'after': 47.8766, 'after_rgba': 59.8854, 'libtiff_rgba': 1.8447} speedup 1.23
+logluv {'after': 7.963, 'before': 26.5692, 'libtiff': 1.1286} speedup 3.34
+original-quad-lzw-compat.tiff {'before': 13.9441, 'libtiff': 1.318, 'before_rgba': 20.1647, 'system_rgba': 1.4309, 'after': 10.5009, 'after_rgba': 16.0027, 'libtiff_rgba': 1.4539} speedup 1.33
+original-lzw-single-strip.tiff {'before': 112.4059, 'libtiff': 29.9325, 'before_rgba': 225.7227, 'system_rgba': 7.4975, 'after': 113.7793, 'after_rgba': 227.1002, 'libtiff_rgba': 7.4093} speedup 0.99
+original-testfax4.tiff {'before': 124.8459, 'libtiff': 12.1116, 'before_rgba': 163.4361, 'system_rgba': 4.2127, 'after': 28.9269, 'after_rgba': 62.8245, 'libtiff_rgba': 4.0461} speedup 4.32
+original-deflate-last-strip-extra-data.tiff {'before': 10.0936, 'libtiff': 0.2199, 'before_rgba': 13.7619, 'system_rgba': 0.3083, 'after': 8.1076, 'after_rgba': 12.7271, 'libtiff_rgba': 0.3394} speedup 1.24
+white-none {'before': 11.7374, 'libtiff': 0.1203, 'before_rgba': 20.9032, 'system_rgba': 0.1773, 'after': 0.0132, 'after_rgba': 0.8427, 'libtiff_rgba': 0.1441} speedup 892.53
+rgba-none {'before': 51.4661, 'libtiff': 0.0437, 'before_rgba': 86.7658, 'system_rgba': 0.3498, 'after': 2.0287, 'after_rgba': 3.8852, 'libtiff_rgba': 0.3458} speedup 25.37
+Traceback (most recent call last):
+  File "/workspace/scratch/ecc0c012b313/optimization/verified-tiff/benchmarks/compare.py", line 179, in <module>
+    main()
+  File "/workspace/scratch/ecc0c012b313/optimization/verified-tiff/benchmarks/compare.py", line 134, in main
+    m = run([exe, path, mode, 0, dump])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/ecc0c012b313/optimization/verified-tiff/benchmarks/compare.py", line 30, in run
+    raise RuntimeError(f'{args}: {p.returncode}\n{p.stderr[-4000:]}')
+RuntimeError: [PosixPath('/workspace/scratch/ecc0c012b313/optimization/verified-tiff/target/benchmark/libtiff'), PosixPath('/workspace/scratch/ecc0c012b313/optimization/verified-tiff/target/optimization/rgb-tile-none.tif'), 'rgba', 0, PosixPath('/workspace/scratch/ecc0c012b313/optimization/verified-tiff/target/optimization/libtiff_rgba.raw')]: -6
+benchmark: Invalid tile byte count for tile 0. Expected 768, got 1024.
+libtiff: benchmarks/libtiff.c:172: run: Assertion `TIFFReadRGBAImageOriented(t, im->w, im->h, (uint32_t *)im->out, ORIENTATION_TOPLEFT, 1)' failed.
+
+
+Supplemental RGBA tile case:
+rgba-tile-none {'before': 53.6305, 'libtiff': 0.1149, 'before_rgba': 86.6333, 'system_rgba': 0.4172, 'after': 22.7083, 'after_rgba': 24.2754, 'libtiff_rgba': 0.43} speedup 2.36
+
+Supplemental bilevel case:
+bilevel-none {'before': 11.4888, 'libtiff': 0.3008, 'before_rgba': 18.8841, 'system_rgba': 0.081, 'after': 4.6281, 'after_rgba': 5.5016, 'libtiff_rgba': 0.0809} speedup 2.48

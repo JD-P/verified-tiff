@@ -1,0 +1,50 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-stream-phrase/native_stream.rs:14:5
+   |
+14 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-stream-phrase/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-stream-phrase/native_stream.rs:15:5
+   |
+15 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-stream-phrase/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module native_stream (selected functions)
+
+error: postcondition not satisfied
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-native-stream-phrase/native_stream.rs:96:13
+    |
+ 96 | /             r.is_ok() && c!=256 && c!=257 ==> {
+ 97 | |                 &&& r.unwrap()==phrase(old(self).dict(),old(self).previous(),c as int).len()
+ 98 | |                 &&& 1<=r.unwrap()<=4096
+ 99 | |                 &&& final(self).dict()==after(old(self).dict(),old(self).previous(),c as int)
+100 | |                 &&& final(self).previous()==c
+101 | |                 &&& forall|k:int|0<=k<r.unwrap() ==> final(out)@[k]==phrase(old(self).dict(),old(self).previous(),c as int)[k]
+102 | |             },
+    | |_____________^ failed this postcondition
+103 | /     {
+104 | |         reveal(code_valid);reveal(phrase);reveal(after);reveal(initial_dict);
+105 | |         if c>=4096||(self.first&&c!=256){return Err(Error::Invalid);}
+106 | |         self.first=false;
+...   |
+109 | |         else{self.table.data(c,self.legacy)?;Ok(0usize)}
+110 | |     }
+    | |_____- at the end of the function body
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error; 2 warnings emitted
+

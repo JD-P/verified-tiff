@@ -1,0 +1,1 @@
+Full-crate proof: 1764 verified, zero errors. All 115 negative gates passed. New mutation test counterexample search was refined and its two gate chunks rerun; see gate-first-attempt.json/log and gate-rerun-receipt.json. Decoder sources were unchanged.

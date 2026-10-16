@@ -1,0 +1,11 @@
+patching file Cargo.toml
+patching file Cargo.lock
+patching file src/lib.rs
+patching file src/vp8_transform.rs
+patching file src/vp8_color.rs
+patching file src/native_vp8.rs
+patching file src/webp_inverse.rs
+patching file src/webp_simd.rs
+patching file src/webp_spans.rs
+patching file compat/src/webp.rs
+All 154 archived source hashes matched.

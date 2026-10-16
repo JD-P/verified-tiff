@@ -1,0 +1,1066 @@
+--- a/compat/src/color.rs
++++ b/compat/src/color.rs
+@@ -29,6 +29,8 @@
+         let d50=96.4250f32+100.+82.4680;let defaults=[96.4250/d50,100./d50];let white=if photo==8{self.reals(318,defaults)?}else{defaults};
+         if white[1]<=0.{return Err((INVALID,"white point"));}
+         let reference=[white[0]/white[1]*100.,100.,(1.-white[0]-white[1])/white[1]*100.];
++        let mut gamma=[0u8;1501];
++        if photo==8{for (i,v) in gamma.iter_mut().enumerate(){let q=255.*((i as f64/1500.).powf(1./(2.4f32 as f64)) as f32);*v=(q+0.5).min(255.) as u8;}}
+         let luma=if photo==6{self.reals(529,[0.299,0.587,0.114])?}else{[0.299,0.587,0.114]};let rbw=if photo==6{self.reals(532,[0.,255.,128.,255.,128.,255.])?}else{[0.,255.,128.,255.,128.,255.]};
+         if luma.iter().any(|v|*v<0.||*v>1.)||luma[1]<=0.||rbw.iter().any(|v|*v<0.||*v>255.){return Err((INVALID,"YCbCr conversion coefficients"));}
+         let mut out=Buf::zeros(product(product(w,h)?,4)?,self.limits.max_output,&self.source.mem)?;
+@@ -36,15 +38,21 @@
+         for by in y/bh..=(bottom-1)/bh{for bx in x/bw..=(right-1)/bw{
+             let k=by*across+bx;let rr=right.min((bx+1)*bw);let bb=bottom.min((by+1)*bh);let left=x.max(bx*bw);let top=y.max(by*bh);
+             let mut band=None;let mut band_index=usize::MAX;
++            let needed=product(row,self.meta.segment_rows(k)?)?;
++            let complete=left==bx*bw&&rr==width.min((bx+1)*bw)&&top==by*bh&&bb==height.min((by+1)*bh);
++            let full=if photo!=6&&planar==1&&complete&&self.rgba_full_segment(k,needed)?{Some(self.native_range(k,0,needed,&mut budget)?)}else{None};
+             for yy in top..bb{
+                 let ly=yy-by*bh;
+-                let mut words=Buf::new(if photo==6{0}else{product(rr-left,ch)?},&self.source.mem)?;
++                let mut words=Buf::new(if photo==6||planar==1{0}else{product(rr-left,ch)?},&self.source.mem)?;
++                let mut direct=None;
+                 if photo==6{
+                     let index=ly/vs;
+                     if index!=band_index{
+                         let bytes=product((bw-1)/hs+1,hs*vs+2)?;
+                         band=Some(self.native_range(k,index*bytes,bytes,&mut budget)?);band_index=index;
+                     }
++                }else if planar==1{
++                    if full.is_none(){direct=Some(self.native_range(k,ly*row,row,&mut budget)?);}
+                 }else{
+                     for _ in 0..product(rr-left,ch)?{words.push(0u16)?;}
+                     for plane in 0..if planar==2{ch}else{1}{
+@@ -57,14 +65,18 @@
+                 }
+                 for xx in left..rr{
+                 let lx=xx-bx*bw;let off=(xx-left)*ch;
++                let component=|c:usize|->u16{
++                    let data=if let Some(data)=&full{Some(&data[ly*row..ly*row+row])}else{direct.as_ref().map(|data|&**data)};
++                    if let Some(data)=data{let p=(lx*ch+c)*(bits/8);if bits==8{data[p] as u16}else{u16::from_ne_bytes([data[p],data[p+1]])}}else{words[off+c]}
++                };
+                 let mut q=if photo==6{
+                     let at=(lx/hs)*(hs*vs+2);let data=band.as_ref().unwrap();
+                     ycbcr(data[at+(ly%vs)*hs+lx%hs],data[at+hs*vs],data[at+hs*vs+1],luma,rbw)
+                 }else if photo==5{
+-                    let scale=|v:u16|if bits==8{v as u32}else{(v as u32+128)/257};let black=255-scale(words[off+3]);
+-                    [(black*(255-scale(words[off]))/255) as u8,(black*(255-scale(words[off+1]))/255) as u8,(black*(255-scale(words[off+2]))/255) as u8,255]
+-                }else{lab(words[off],words[off+1],words[off+2],bits,reference)};
+-                if let Some((a,kind))=alpha{q[3]=if bits==8{words[off+a] as u8}else{((words[off+a] as u32+128)/257) as u8};if kind==2{for c in 0..3{q[c]=((q[c] as u32*q[3] as u32+127)/255) as u8;}}}
++                    let scale=|v:u16|if bits==8{v as u32}else{(v as u32+128)/257};let black=255-scale(component(3));
++                    [(black*(255-scale(component(0)))/255) as u8,(black*(255-scale(component(1)))/255) as u8,(black*(255-scale(component(2)))/255) as u8,255]
++                }else{lab(component(0),component(1),component(2),bits,reference,&gamma)};
++                if let Some((a,kind))=alpha{q[3]=if bits==8{component(a) as u8}else{((component(a) as u32+128)/257) as u8};if kind==2{for c in 0..3{q[c]=((q[c] as u32*q[3] as u32+127)/255) as u8;}}}
+                 let dx=xx-x;let dy=yy-y;let tx=if fx{right-x-1-dx}else{dx};let ty=h-(bottom-y)+if fy{bottom-y-1-dy}else{dy};
+                 decoder::pack(&mut out[(ty*w+tx)*4..(ty*w+tx)*4+4],q);
+             }}
+@@ -79,11 +91,11 @@
+     let y=code(y as f32,r[0],r[1],255.);let cb=code(cb as f32-128.,r[2]-128.,r[3]-128.,127.);let cr=code(cr as f32-128.,r[4]-128.,r[5]-128.,127.);
+     [(y+((d[0]*cr+32768)>>16)).clamp(0,255) as u8,(y+((d[1]*cr+d[3]*cb+32768)>>16)).clamp(0,255) as u8,(y+((d[2]*cb+32768)>>16)).clamp(0,255) as u8,255]
+ }
+-fn lab(l:u16,a:u16,b:u16,bits:usize,white:[f32;3])->[u8;4]{
++fn lab(l:u16,a:u16,b:u16,bits:usize,white:[f32;3],gamma:&[u8;1501])->[u8;4]{
+     let l=if bits==8{l as u32*257}else{l as u32} as f32*100./65535.;
+     let a=if bits==8{a as u8 as i8 as f32}else{a as i16 as f32/256.};let b=if bits==8{b as u8 as i8 as f32}else{b as i16 as f32/256.};
+     let (y,cy)=if l<8.856{let y=l*white[1]/903.292;(y,7.787*(y/white[1])+16./116.)}else{let cy=(l+16.)/116.;(white[1]*cy*cy*cy,cy)};
+     let f=|v:f32,w:f32|if v<0.2069{w*(v-0.13793)/7.787}else{w*v*v*v};let x=f(a/500.+cy,white[0]);let z=f(cy-b/200.,white[2]);
+     let values=[3.2410*x-1.5374*y-0.4986*z,-0.9692*x+1.8760*y+0.0416*z,0.0556*x-0.2040*y+1.0570*z];let mut out=[0,0,0,255];
+-    for c in 0..3{let i=(((values[c].clamp(1.,100.)-1.)/(99./1500.)) as usize).min(1500);let v=255.*((i as f64/1500.).powf(1./(2.4f32 as f64)) as f32);out[c]=(v+0.5).min(255.) as u8;}out
++    for c in 0..3{let i=(((values[c].clamp(1.,100.)-1.)/(99./1500.)) as usize).min(1500);out[c]=gamma[i];}out
+ }
+--- a/compat/src/decoder.rs
++++ b/compat/src/decoder.rs
+@@ -139,6 +139,17 @@
+         let flip=|o:usize|{let o=(o-1)%4+1;(o==2||o==3,o==3||o==4)};
+         let (sx,sy)=flip(source_orientation);let (ox,oy)=flip(orientation);let fx=sx!=ox;let fy=sy!=oy;
+         let fast=planar==1&&matches!(bits,8|16)&&photo!=3;
++        let packed=channels==1&&matches!(photo,0|1|3)&&(matches!(bits,1|2|4)||(photo==3&&bits==8));
++        let mut expansion=[[0u8;32];256];
++        if packed{
++            let mask=(1usize<<bits)-1;
++            for byte in 0..256{for j in 0..8/bits{
++                let v=(byte>>(8-bits-j*bits))&mask;
++                let q=if photo==3{let n=1usize<<bits;[(self.meta.map[v]>>8) as u8,(self.meta.map[n+v]>>8) as u8,(self.meta.map[2*n+v]>>8) as u8,255]}
++                    else{let v=if photo==0{mask-v}else{v};let b=((v*255+mask/2)/mask) as u8;[b,b,b,255]};
++                pack(&mut expansion[byte][j*4..j*4+4],q);
++            }}
++        }
+         // Work in the requested region's coordinates, matching libtiff's strip
+         // and tile orientation conventions. Padding remains zero.
+         for by in y/bh..=(bottom-1)/bh{for bx in x/bw..=(right-1)/bw{
+@@ -153,6 +164,12 @@
+                     let at=(yy-by*bh)*row;
+                     let owned=if full.is_none()&&cached.is_none(){Some(self.native_range(segment,at,row,&mut budget)?)}else{None};
+                     let data=if let Some(d)=&full{&d[at..at+row]}else if let Some((_,d))=&cached{&d[at..at+row]}else{&**owned.as_ref().unwrap()};
++                    if packed{
++                        let tx=if fx{right-rr}else{left-x};let dy=yy-y;
++                        let ty=h-(bottom-y)+if fy{bottom-y-1-dy}else{dy};let dest=(ty*w+tx)*4;
++                        packed_rgba_row(data,left-bx*bw,rr-left,bits,&expansion,fx,&mut result[dest..dest+(rr-left)*4]);
++                        continue;
++                    }
+                     if fast{
+                         let tx=if fx{right-rr}else{left-x};let dy=yy-y;
+                         let ty=h-(bottom-y)+if fy{bottom-y-1-dy}else{dy};let dest=(ty*w+tx)*4;
+@@ -288,6 +305,17 @@
+         b.finish()
+     }
+ }
++
++// Presentation-only byte expansion, in the same unverified adapter boundary
++// as palette selection and the former scalar packed-pixel conversion.
++fn packed_rgba_row(data:&[u8],start:usize,n:usize,bits:usize,table:&[[u8;32];256],reverse:bool,out:&mut[u8]){
++    let per=8/bits;let mut x=0;
++    if !reverse{
++        while x<n&&(start+x)%per!=0{let p=start+x;let j=p%per*4;out[x*4..x*4+4].copy_from_slice(&table[data[p/per] as usize][j..j+4]);x+=1;}
++        while n-x>=per{let p=start+x;out[x*4..(x+per)*4].copy_from_slice(&table[data[p/per] as usize][..per*4]);x+=per;}
++    }
++    while x<n{let p=start+x;let j=p%per*4;let to=if reverse{n-1-x}else{x}*4;out[to..to+4].copy_from_slice(&table[data[p/per] as usize][j..j+4]);x+=1;}
++}
+ fn rgba_row(raw:&[u8],n:usize,ch:usize,bits:usize,rgb:bool,invert:bool,alpha:Option<(usize,u16)>,reverse:bool,out:&mut[u8])->R<()>{
+     use verified_tiff::native_rgba::row;
+     let le=cfg!(target_endian="little");let a=alpha.map_or(ch,|(a,_)|a);let premul=rgb&&alpha.is_some_and(|(_,kind)|kind==2);
+--- a/compat/src/stream.rs
++++ b/compat/src/stream.rs
+@@ -119,10 +119,10 @@
+ }
+ pub struct Cached{pub k:usize,pub stream:Stream}
+ impl Handle{
+-    /// Optional full Deflate staging is limited to 1 MiB even with unlimited
++    /// Optional full LZW/Deflate staging is limited to 1 MiB even with unlimited
+     /// deployment limits. Larger/tightly-budgeted requests retain row replay.
+     pub fn rgba_full_segment(&mut self,k:usize,needed:usize)->R<bool>{
+-        if !matches!(self.meta.compression,8|32946)||needed>1048576||needed>self.limits.max_output{return Ok(false);}
++        if !matches!(self.meta.compression,5|8|32946)||needed>1048576||needed>self.limits.max_output{return Ok(false);}
+         let count=usize::try_from(self.meta.counts.get(&mut self.source,k)?).map_err(|_|(LIMIT,"segment count overflow"))?;
+         if needed<=65536&&count<=65536{return Ok(false);}
+         let engine=std::mem::size_of::<Engine>();let window=count.min(WINDOW);
+@@ -142,7 +142,14 @@
+         if m.predictor==3{
+             if m.format!=3||!matches!(m.bits,16|24|32|64)||!matches!(m.compression,5|8|32946|50000){return Err((NOTIMPL,"floating predictor layout"));}
+             let mut scratch=Buf::zeros(n,self.limits.max_output,mem)?;let mut out=Buf::zeros(n,self.limits.max_output,mem)?;
+-            verified_tiff::native_fp::decode(&raw,row,if m.planar==2{1}else{m.ch},m.bits/8,cfg!(target_endian="little"),&mut scratch,&mut out).map_err(err)?;Ok(out)
++            let ch=if m.planar==2{1}else{m.ch};
++            let r=match (ch,m.bits){
++                (1,16)=>verified_tiff::native_fp::decode(&raw,row,1,2,cfg!(target_endian="little"),&mut scratch,&mut out),
++                (1,24)=>verified_tiff::native_fp::decode(&raw,row,1,3,cfg!(target_endian="little"),&mut scratch,&mut out),
++                (1,32)=>verified_tiff::native_fp::decode(&raw,row,1,4,cfg!(target_endian="little"),&mut scratch,&mut out),
++                (1,64)=>verified_tiff::native_fp::decode(&raw,row,1,8,cfg!(target_endian="little"),&mut scratch,&mut out),
++                _=>verified_tiff::native_fp::decode(&raw,row,ch,m.bits/8,cfg!(target_endian="little"),&mut scratch,&mut out),
++            };r.map_err(err)?;Ok(out)
+         }else if m.predictor==2{
+             if !matches!(m.bits,8|16|32|64)||matches!(m.format,5|6)||!matches!(m.compression,5|8|32946|50000){return Err((NOTIMPL,"horizontal predictor layout"));}
+             let mut out=Buf::zeros(n,self.limits.max_output,mem)?;
+@@ -182,9 +189,9 @@
+         // A complete native request already owns its entire staging buffer.
+         // Decode once into that private buffer, validate the ending/checksum,
+         // then return it. No caller-visible bytes are committed before success.
+-        if start==0&&len==needed&&matches!(self.meta.compression,8|32946){
++        if start==0&&len==needed&&matches!(self.meta.compression,5|8|32946){
+             self.stream=None;self.cache=None;
+-            let cap=if self.meta.tiled{needed}else{product(row,self.meta.bh)?};
++            let cap=if matches!(self.meta.compression,8|32946)&&!self.meta.tiled{product(row,self.meta.bh)?}else{needed};
+             let quota=native::work_limit(count,cap).map_err(err)?;
+             // Retain the former conservative validation-plus-replay charge.
+             let total=product(quota,2)?;if total>budget.remaining{return Err((LIMIT,"stream validation/decode budget"));}budget.remaining-=total;
+--- a/compat/tests/reader_features.py
++++ b/compat/tests/reader_features.py
+@@ -48,6 +48,31 @@
+             if oracle:
+                 ref=self.p/'ref';r=subprocess.run([str(OUT/'dump-libtiff'),str(f),mode,str(ref)],capture_output=True)
+                 self.assertEqual(r.returncode,0,(mode,r.stderr));self.assertEqual(ref.read_bytes(),expected)
++    def test_packed_rgba_tables_crops_and_fillorder(self):
++        for bits,photo,codec,fill in itertools.product([1,2,4,8],[0,1,3],[1,5,8],[1,2]):
++            if bits==8 and photo!=3:continue
++            mask=(1<<bits)-1;per=8//bits;w=256*per-3;h=3
++            values=[[(byte>>(8-bits-j*bits))&mask for byte in range(256) for j in range(per)][:w] for _ in range(h)]
++            rows=[packed(v,bits) for v in values];encoded=encode(rows,codec)
++            if fill==2:encoded=bytes(int(f'{v:08b}'[::-1],2) for v in encoded)
++            cmap=[(i*317+c*17381)&65535 for c in range(3) for i in range(mask+1)]
++            tags=[(256,4,[w]),(257,4,[h]),(258,3,[bits]),(259,3,[codec]),(262,3,[photo]),(266,3,[fill]),(273,4,('SEG',[encoded])),(277,3,[1]),(278,4,[h]),(279,4,[len(encoded)])]
++            if photo==3:tags.append((320,3,cmap))
++            data=assemble([tags])[0]
++            def pixel(v):
++                if photo==3:return bytes([cmap[c*(mask+1)+v]>>8 for c in range(3)]+[255])
++                gray=(mask-v if photo==0 else v)*255//mask
++                return bytes([gray,gray,gray,255])
++            for x,cw in [(0,w),(1,89),(3,87),(7,81)]:
++                for orientation in [1,2,3,4]:
++                    xs=list(range(x,x+cw));ys=list(range(2))
++                    if orientation in (2,3):xs.reverse()
++                    if orientation in (3,4):ys.reverse()
++                    expected=b''.join(pixel(values[y][xx]) for y in ys for xx in xs)
++                    # 4.7.1 applies its column offset to a byte pointer even
++                    # for packed samples; nonzero crops use independent pixels.
++                    self.assertEqual(self.run_reader('crop',data,cw,2,orientation,x,0,oracle=x==0),expected)
++
+     def test_packed_and_unusual_integer_widths(self):
+         for bits,codec,le in itertools.product([3,5,6,7,9,10,11,12,13,14,15,17,20,24,31,40,48,56,63], [1,32773,5,8],[False,True]):
+             w,ch,h=7,3,3;rows=[];expected=[]
+@@ -67,8 +92,8 @@
+                 rows.append(b''.join(v.to_bytes(component,'little' if le else 'big') for v in values));expected.append(b''.join(v.to_bytes(component,sys.byteorder) for v in values))
+             self.check_native(image(rows,w,bits,fmt,ch,codec,le=le,big=True),b''.join(expected))
+     def test_half_float_prediction(self):
+-        for bits,codec,le in itertools.product([16,24,32,64],[5,8],[False,True]):
+-            width=bits//8;w,ch=11,3;native=[];rows=[]
++        for bits,codec,le,ch in itertools.product([16,24,32,64],[5,8],[False,True],[1,3]):
++            width=bits//8;w=11;native=[];rows=[]
+             for y in range(4):
+                 values=[(i*7331+y*3359)&((1<<bits)-1) for i in range(w*ch)]
+                 row=b''.join(v.to_bytes(width,'little') for v in values);native.append(row);rows.append(fp_predict(row,width,ch))
+@@ -96,10 +121,25 @@
+             rows=[bytes((x*17+y*23+c*37)%256 for x in range(w) for c in range(ch)) for y in range(h)]
+             data=image(rows,w,ch=ch,photo=photo,codec=codec)
+             self.run_reader('cropbounded',data,9,7,1,3,190)
++    def test_full_color_lzw_and_deflate_staging(self):
++        for photo,bits,codec,le in itertools.product([5,8],[8,16],[5,8],[False,True]):
++            w,h=257,97;ch=4 if photo==5 else 3;mask=(1<<bits)-1;rows=[];expected=bytearray()
++            for y in range(h):
++                values=[(x*1013+y*3137+c*9109)&mask for x in range(w) for c in range(ch)]
++                rows.append(b''.join(v.to_bytes(bits//8,'little' if le else 'big') for v in values))
++                if photo==5:
++                    for x in range(w):
++                        v=values[x*ch:(x+1)*ch]
++                        if bits==16:v=[(q+128)//257 for q in v]
++                        expected.extend([(255-v[3])*(255-q)//255 for q in v[:3]]+[255])
++            data=image(rows,w,bits,ch=ch,codec=codec,le=le,photo=photo)
++            actual=self.run_reader('crop',data,w,h,1,oracle=photo==8 or bits==8)
++            if photo==5:self.assertEqual(actual,expected)
++
+     def test_full_deflate_rgba_rows_prediction_and_endian(self):
+         # One decoded strip >64 KiB triggers optional complete staging. The
+         # Mirrored crops exercise the bounded path as well.
+-        for bits,ch,predictor,le in itertools.product([8,16],[1,3],[1,2],[False,True]):
++        for bits,ch,predictor,le,codec in itertools.product([8,16],[1,3],[1,2],[False,True],[5,8]):
+             w,h=257,131;mask=(1<<bits)-1;rows=[];expected=bytearray()
+             for y in range(h):
+                 values=[(x*7331+y*3359+c*1777)&mask for x in range(w) for c in range(ch)]
+@@ -109,7 +149,7 @@
+                     expected.extend((pixel*3 if ch==1 else pixel)+[255])
+                 encoded=[(v-(values[i-ch] if predictor==2 and i>=ch else 0))&mask for i,v in enumerate(values)]
+                 rows.append(b''.join(v.to_bytes(bits//8,'little' if le else 'big') for v in encoded))
+-            data=image(rows,w,bits,ch=ch,codec=8,predictor=predictor,le=le,photo=2 if ch==3 else 1)
++            data=image(rows,w,bits,ch=ch,codec=codec,predictor=predictor,le=le,photo=2 if ch==3 else 1)
+             self.assertEqual(self.run_reader('crop',data,w,h,1),expected)
+             for req in [2,3,4]:
+                 cropped=b''.join(expected[((19+(96-yy if req in (3,4) else yy))*w+17+(102-xx if req in (2,3) else xx))*4:((19+(96-yy if req in (3,4) else yy))*w+17+(102-xx if req in (2,3) else xx))*4+4] for yy in range(97) for xx in range(103))
+@@ -140,9 +180,10 @@
+         self.assertEqual(self.run_reader('croptight',data,w,h,1),self.run_reader('crop',data,w,h,1))
+     def test_late_rgba_segment_failure_is_atomic(self):
+         w,h=257,131;rows=[bytes((x*17+y*23)%256 for x in range(w*3)) for y in range(h)]
+-        good=zlib.compress(b''.join(rows));bad=good[:-1]+bytes([good[-1]^1])
+-        tags=[(256,4,[w]),(257,4,[h*2]),(258,3,[8]*3),(259,3,[8]),(262,3,[2]),(273,4,('SEG',[good,bad])),(277,3,[3]),(278,4,[h]),(279,4,[len(good),len(bad)])]
+-        self.run_reader('rejectrgba',assemble([tags])[0],oracle=False)
++        for codec in [5,8]:
++            good=encode(rows,codec);bad=good+b'junk' if codec==5 else good[:-1]+bytes([good[-1]^1])
++            tags=[(256,4,[w]),(257,4,[h*2]),(258,3,[8]*3),(259,3,[codec]),(262,3,[2]),(273,4,('SEG',[good,bad])),(277,3,[3]),(278,4,[h]),(279,4,[len(good),len(bad)])]
++            self.run_reader('rejectrgba',assemble([tags])[0],oracle=False)
+     def test_streamed_predictors_and_fillorder(self):
+         for bits,codec,le,fill in itertools.product([16,24,32,64],[5,8],[False,True],[1,2]):
+             width=bits//8;w,ch,h=193,2,96;native=[];rows=[]
+--- a/src/deflate.rs
++++ b/src/deflate.rs
+@@ -111,7 +111,7 @@
+         &&& forall|k:int| 0<=k<self.produced && self.produced as int-32768<=k ==> self.ring@[k%32768]==self.history@[k]
+     }
+     #[inline(always)]
+-    fn emit(&mut self,byte:u8,cap:usize) -> (r:Result<(),Error>)
++    pub(super) fn emit(&mut self,byte:u8,cap:usize) -> (r:Result<(),Error>)
+         requires old(self).produced==old(self).history@.len(),old(self).produced<=cap,
+             old(self).a%65521==adler1(old(self).history@),old(self).b%65521==adler2(old(self).history@),
+             old(self).pending<=256,old(self).a<=65520+old(self).pending*255,old(self).b<=65520+old(self).pending*130800,
+@@ -164,6 +164,22 @@
+         Ok(())
+     }
+     pub(super) fn done(&self) -> (r:bool) ensures r==(self.model().mode==5) {self.mode==5}
++    #[inline(always)]
++    pub(super) fn match_byte(&mut self,s:&[u8],cap:usize) -> (byte:u8)
++        requires old(self).valid(s@,cap as int),old(self).mode==3,old(self).left>0,
++            0<old(self).distance<=old(self).produced,old(self).distance<=old(self).window,old(self).produced<cap,
++        ensures final(self).valid(s@,cap as int),final(self).end()==old(self).end(),
++            Some(final(self).model())==transition(s@,old(self).end(),cap as int,old(self).model()),
++            final(self).produced==old(self).produced+1,final(self).history@==old(self).history@.push(byte),
++            final(self).mode==3,final(self).left+1==old(self).left,final(self).distance==old(self).distance,
++            final(self).bits==old(self).bits,final(self).window==old(self).window,
++    {
++        reveal(transition);
++        let byte=self.ring[(self.produced-self.distance)%32768];
++        assert(byte==self.history@[self.produced as int-self.distance]);
++        self.left=self.left-1;
++        let r=self.emit(byte,cap);assert(r.is_ok());byte
++    }
+     #[inline(always)]
+     pub(super) fn step(&mut self,s:&[u8],cap:usize) -> (r:Result<Option<u8>,Error>)
+         requires old(self).valid(s@,cap as int),old(self).mode<5,
+--- a/src/fax_bits.rs
++++ b/src/fax_bits.rs
+@@ -14,6 +14,7 @@
+         Some(((s[b.pos as int/8] as int/db::pow(n)%2) as usize,Bits {pos:(b.pos+1) as usize,..b}))
+     }
+ }
++#[inline(always)]
+ pub(super) fn bit(s:&[u8],b:Bits) -> (r:Result<(usize,Bits),Error>)
+     requires b.valid(s@),
+     ensures r.is_ok()==one(s@,b).is_some(),r.is_ok() ==> r.unwrap()==one(s@,b).unwrap(),
+@@ -35,6 +36,7 @@
+         }
+     }
+ }
++#[inline(always)]
+ pub(super) fn code(s:&[u8],b:Bits,black:bool) -> (r:Result<(usize,Bits),Error>)
+     requires b.valid(s@),
+     ensures r.is_ok()==symbol(s@,b,if black {crate::fax_tables::black()} else {crate::fax_tables::white()},0,13).is_some(),
+--- a/src/fax_tables.rs
++++ b/src/fax_tables.rs
+@@ -36,8 +36,9 @@
+         569,570,88,571,572,89,573,768,574,575,640,704,90,832,896,960,1024,1088,1152,1216,1280,1344,1408,1472,
+         85,86,1536,1600,1664,1728,1792,1856,1920,1984,2048,2112,2176,2240,0,92,93,95,94,98,2304,97,96,101,
+         2368,2432,2496,2560,99,100,2624,2688,2752,2816,102,103,2880,2944,3008,3072] }
+-pub(super) fn table(black:bool) -> (r:[u16;208]) ensures r@==if black {self::black()} else {white()}, {
+- if black {[1,11,2,10,3,12,4,13,16,5,15,6,7,524,20,8,31,9,33,512,513,516,515,514,
++#[inline(always)]
++pub(super) fn table(black:bool) -> (r:&'static [u16;208]) ensures r@==if black {self::black()} else {white()}, {
++ if black {&[1,11,2,10,3,12,4,13,16,5,15,6,7,524,20,8,31,9,33,512,513,516,515,514,
+         518,517,14,519,521,520,522,523,25,17,18,19,525,21,23,526,527,29,36,22,71,528,24,34,
+         529,58,91,26,27,40,28,38,530,61,43,30,45,531,32,50,532,49,533,54,46,35,53,534,
+         37,55,535,60,69,39,74,536,41,65,42,63,537,78,77,44,538,539,540,541,47,48,542,543,
+@@ -45,7 +46,7 @@
+         562,563,62,68,564,81,79,64,80,565,66,576,67,84,566,83,82,567,70,73,568,87,72,75,
+         569,570,88,571,572,89,573,768,574,575,640,704,90,832,896,960,1024,1088,1152,1216,1280,1344,1408,1472,
+         85,86,1536,1600,1664,1728,1792,1856,1920,1984,2048,2112,2176,2240,0,92,93,95,94,98,2304,97,96,101,
+-        2368,2432,2496,2560,99,100,2624,2688,2752,2816,102,103,2880,2944,3008,3072]} else {[1,13,2,11,8,3,24,4,5,522,47,6,7,73,575,512,26,9,34,10,33,513,22,12,
++        2368,2432,2496,2560,99,100,2624,2688,2752,2816,102,103,2880,2944,3008,3072]} else {&[1,13,2,11,8,3,24,4,5,522,47,6,7,73,575,512,26,9,34,10,33,513,22,12,
+         70,514,14,17,15,16,515,20,21,516,18,19,517,28,518,519,640,520,521,30,23,41,523,31,
+         25,36,524,45,38,27,40,525,29,576,526,527,528,529,46,32,88,530,531,50,35,52,532,51,
+         55,37,58,533,48,39,59,534,535,60,42,64,43,44,536,61,62,537,63,538,539,68,540,69,
+--- a/src/jpeg_bits.rs
++++ b/src/jpeg_bits.rs
+@@ -2,8 +2,11 @@
+ use super::*;
+ use crate::deflate_bits as db;
+ verus! {
++#[inline(always)]
+ pub(super) fn power(n:usize) -> (r:usize) requires n<=16, ensures r==db::pow(n as int),1<=r<=65536, {
+-    let p=&[1usize,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536];p[n]
++    proof {crate::bit_window::powers(n as u32);}
++    assert((1usize<<n)==(1u32<<(n as u32)) as usize) by(bit_vector) requires n<=16;
++    1usize<<n
+ }
+ 
+ #[derive(Clone,Copy)]
+--- a/src/jpeg_block.rs
++++ b/src/jpeg_block.rs
+@@ -8,6 +8,7 @@
+ pub(super) open spec fn zig(k:int) -> int {
+     seq![0int,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63][k]
+ }
++#[inline(always)]
+ fn zigzag(k:usize) -> (r:usize) requires k<64,ensures r==zig(k as int),r<64, {
+     let a=&[0usize,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63];a[k]
+ }
+@@ -65,6 +66,7 @@
+         self.bits.valid(s) && self.k<=64 && -2048<=self.pred<=2047 &&
+         (forall|i:int| 0<=i<64 ==> -524288<=#[trigger] self.coef@[i]<=524288)
+     }
++    #[inline(always)]
+     fn advance(&mut self,s:&[u8],qt:usize,dc:Huff,ac:Huff) -> (r:Result<(),Error>)
+         requires old(self).valid(s@),range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),
+         ensures r.is_ok()==step(s@,qt as int,dc,ac,old(self).model()).is_some(),
+--- a/src/lerc_block.rs
++++ b/src/lerc_block.rs
+@@ -79,6 +79,7 @@
+         }
+     }
+ }
++#[inline(always)]
+ fn read_value(s:&[u8],h:Header,m:Mode,q:&packed::Array,at:usize,index:usize,maximum:u64) -> (r:Result<Step,Error>)
+     requires at<=s.len(),h.invariant(),m.flag<4,q.n<=256,index<=q.n,
+     ensures r.is_ok()==value(s@,h,m,q.data@.take(q.n as int),at,index,maximum).is_some(),
+--- a/src/lerc_numeric.rs
++++ b/src/lerc_numeric.rs
+@@ -12,6 +12,7 @@
+     let e=(v/0x10000000000000u64)%2048;
+     if e==0{-1074i32}else{(e as int-1075) as i32}
+ }
++#[inline(always)]
+ pub(super) fn parts(v:u64) -> (r:(bool,u128,i32))
+     ensures r==(sign(v),mantissa(v),exponent(v)),r.1<0x20000000000000u128,-1074<=r.2<=972,
+ {
+@@ -21,16 +22,34 @@
+ pub(super) open spec fn rounded(v:u128,n:u32) -> u128 {
+     if n==0{v}else if n>128{0}else if n==128{if v>0x80000000000000000000000000000000u128{1u128}else{0u128}}
+     else{
+-        let q=v>>n;let half=1u128<<(n-1);let rem=v&(((1u128<<n)-1) as u128);
++        let q=v>>n;let half=1u128<<((n-1) as u32);let rem=v&(((1u128<<n)-1) as u128);
+         (q+if rem>half || (rem==half && q%2==1){1u128}else{0u128}) as u128
+     }
+ }
++#[inline(always)]
+ pub(super) fn round(v:u128,n:u32) -> (r:u128)
+     ensures r==rounded(v,n),n>0 ==> r<=0x80000000000000000000000000000000u128,
+ {
+     if n==0{return v;}
+     if n>128{return 0;}
+     if n==128{return if v>0x80000000000000000000000000000000u128{1}else{0};}
++    if n>=64 {
++        let high=(v>>64u32) as u64;let low=v as u64;
++        let shift=n-64;
++        let q=high>>shift;
++        let up=if shift==0 {low>0x8000000000000000u64 || (low==0x8000000000000000u64 && q%2==1)}else{
++            assert((1u64<<shift)>0) by(bit_vector) requires 0<shift<64;
++            let half=1u64<<(shift-1);let rem=high&((1u64<<shift)-1);
++            rem>half || (rem==half && (low!=0 || q%2==1))
++        };
++        let r=q as u128+if up{1u128}else{0u128};
++        assert(r==rounded(v,n)) by(bit_vector)
++            requires 64<=n<128,high==(v>>64u32) as u64,low==v as u64,shift==n-64,q==high>>shift,
++                up==if shift==0 {low>0x8000000000000000u64 || (low==0x8000000000000000u64 && q%2==1)}else{
++                    (high&(((1u64<<shift)-1) as u64))>(1u64<<((shift-1) as u32)) || ((high&(((1u64<<shift)-1) as u64))==(1u64<<((shift-1) as u32)) && (low!=0 || q%2==1))},
++                r==q as u128+if up{1u128}else{0u128};
++        return r;
++    }
+     let q=v>>n;let half=1u128<<(n-1);
+     assert((1u128<<n)>0 && q<0x80000000000000000000000000000000u128) by(bit_vector)
+         requires 0<n<128,q==v>>n;
+@@ -41,6 +60,7 @@
+     if n==0{v}else if n>=128{if v==0{0u128}else{1u128}}
+     else{(v>>n)|if v&(((1u128<<n)-1) as u128)==0{0u128}else{1u128}}
+ }
++#[inline(always)]
+ fn shift_sticky(v:u128,n:u32) -> (r:u128)
+     ensures r==sticky(v,n),r<=v,
+ {
+@@ -123,6 +143,7 @@
+         sg|(((exp+1023) as u64)<<52)|(bits as u64%0x10000000000000u64)
+     }
+ }
++#[inline(always)]
+ pub(super) fn pack(negative:bool,v:u128,e:i32) -> (r:u64)
+     requires -4096<=e<=4096,
+     ensures r==packed(negative,v,e),
+@@ -145,6 +166,7 @@
+ }
+ /// Rounded q * (2 * maximum error). Header validation excludes overflow of
+ /// the intermediate doubled error, matching Lerc2's binary64 evaluation.
++#[inline(always)]
+ pub(super) fn scale(a:u64,q:u32) -> (r:u64)
+     ensures r==scaled(a,q),
+ {
+@@ -161,6 +183,7 @@
+     let sg=if m==0 && sign(a)!=sign(b){false}else if sign(a)==sign(b) || x>=y{sign(a)}else{sign(b)};
+     packed(sg,m as u128,(e-64) as i32)
+ }
++#[inline(always)]
+ pub(super) fn plus(a:u64,b:u64) -> (r:u64)
+     ensures r==sum(a,b),
+ {
+@@ -178,6 +201,7 @@
+     if a%0x8000000000000000u64==0 && b%0x8000000000000000u64==0{false}
+     else if sign(a)!=sign(b){sign(a)}else if sign(a){a>b}else{a<b}
+ }
++#[inline(always)]
+ pub(super) fn minimum(a:u64,b:u64) -> (r:u64)
+     ensures r==if less(a,b){a}else{b},
+ {
+@@ -200,6 +224,7 @@
+         packed(neg,if neg{(modulus-v) as u128}else{v as u128},0)
+     }
+ }
++#[inline(always)]
+ pub(super) fn number(v:u64,kind:usize) -> (r:u64)
+     requires kind<8,kind<7 ==> v<if kind<2{256int}else if kind<4{65536int}else{4294967296int},
+     ensures r==value(v,kind),
+@@ -223,8 +248,48 @@
+     else if q==0{sg}else if ex>127{sg|0x7f800000u32}else if ex< -126{sg|((q<<((e+n+149) as u32)) as u32)}
+     else{sg|(((ex+127) as u32)<<23)|((if hi2>23{q>>(hi2-23) as u32}else{q<<(23-hi2) as u32}) as u32%8388608)}
+ }
++#[inline(always)]
+ pub(super) fn narrow(v:u64) -> (r:u32) ensures r==narrowed(v),
+ {
++    let exp=((v>>52u32)&2047) as u32;
++    if 897<=exp && exp<=1150{
++        let m=(v&0xfffffffffffffu64)|0x10000000000000u64;
++        let base=(m>>29u32) as u32;let rem=m&0x1fffffffu64;
++        assert(8388608<=base<16777216) by(bit_vector)
++            requires m==(v&0xfffffffffffffu64)|0x10000000000000u64,base==(m>>29u32) as u32;
++        let q=base+if rem>0x10000000u64 || (rem==0x10000000u64 && base%2==1){1u32}else{0u32};
++        let sg=if v>=0x8000000000000000u64{0x80000000u32}else{0u32};
++        proof{
++            assert(exp==(v/0x10000000000000u64)%2048 && mantissa(v)==m as u128) by(bit_vector)
++                requires exp==((v>>52u32)&2047) as u32,897<=exp<=1150,m==(v&0xfffffffffffffu64)|0x10000000000000u64;
++            assert((m as u128)>>52u32==1u128) by(bit_vector) requires m==(v&0xfffffffffffffu64)|0x10000000000000u64;
++            top_shift(m as u128,52,128);reveal_with_fuel(top,1);
++            assert(q as u128==rounded(m as u128,29u32) && 8388608<=q<=16777216) by(bit_vector)
++                requires m==(v&0xfffffffffffffu64)|0x10000000000000u64,base==(m>>29u32) as u32,rem==m&0x1fffffffu64,
++                    q==base+if rem>0x10000000u64 || (rem==0x10000000u64 && base%2==1){1u32}else{0u32};
++            let hi=if q==16777216{24u32}else{23u32};
++            assert((q as u128)>>hi==1u128) by(bit_vector) requires 8388608<=q<=16777216,hi==if q==16777216{24u32}else{23u32};
++            top_shift(q as u128,hi,128);reveal_with_fuel(top,1);
++        }
++        let out=sg|((exp-897)*8388608+q);
++        let hi=if q==16777216{24u32}else{23u32};
++        let ex=exp as i32-1046+hi as i32;
++        let bits=if hi>23{q>>1u32}else{q};
++        let expected=if ex>127{sg|0x7f800000u32}else{sg|(((ex+127) as u32)<<23u32)|(bits%8388608)};
++        assert(top(m as u128,128)==52);
++        assert(top(q as u128,128)==hi);
++        assert(exponent(v)==exp as int-1075);
++        assert(bits as u128==if hi>23{(q as u128)>>((hi-23) as u32)}else{(q as u128)<<((23-hi) as u32)}) by(bit_vector)
++            requires hi==if q==16777216{24u32}else{23u32},bits==if hi>23{q>>1u32}else{q};
++        assert(narrowed(v)==expected);
++        assert(out==expected) by(bit_vector)
++            requires 897<=exp<=1150,8388608<=q<=16777216,
++                hi==if q==16777216{24u32}else{23u32},ex==exp as i32-1046+hi as i32,
++                bits==if hi>23{q>>1u32}else{q},
++                out==sg|(((exp-897)*8388608+q) as u32),
++                expected==if ex>127{sg|0x7f800000u32}else{sg|(((ex+127) as u32)<<23u32)|(bits%8388608)};
++        return out;
++    }
+     let (sgn,m,e)=parts(v);let sg=if sgn{0x80000000u32}else{0u32};
+     if (v/0x10000000000000u64)%2048==2047{return sg|0x7f800000u32|((v%0x10000000000000u64)>>29) as u32;}
+     let hi=highest(m);let shift=if hi>23{hi-23}else{0u32};let n=if -149-e>shift as i32{(-149-e) as u32}else{shift};
+--- a/src/lerc_samples.rs
++++ b/src/lerc_samples.rs
+@@ -20,6 +20,7 @@
+ pub(super) open spec fn storage(v:u64,kind:usize) -> Option<u64> {
+     if kind>=8{None}else if kind==7{Some(v)}else if kind==6{Some(num::narrowed(v) as u64)}else{num::integer(v,kind)}
+ }
++#[inline(always)]
+ pub(super) fn stored(v:u64,kind:usize) -> (r:Result<u64,Error>)
+     ensures r.is_ok()==storage(v,kind).is_some(),r.is_ok() ==> r.unwrap()==storage(v,kind).unwrap(),
+ {
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -726,6 +726,7 @@
+             self.at == self.end ==> self.bit == 0,
+         ensures r == (0 <= self.end as int*8-self.pos() < 8),
+     { self.at == self.end || (self.bit > 0 && self.end-self.at == 1) }
++    #[inline(always)]
+     fn read(&mut self, s: &[u8], n: usize) -> (r: Result<usize,Error>)
+         requires old(self).valid(s@), 1 <= n <= 12,
+         ensures final(self).valid(s@), final(self).end == old(self).end,
+@@ -820,6 +821,7 @@
+         requires old(self).valid(),
+         ensures final(self).valid(), final(self)._dict@ == lz_initial(), final(self).prev == 256,
+     { self.next=258; self.prev=256; self._dict=Ghost(lz_initial()); }
++    #[inline(always)]
+     fn width(&self,legacy:bool) -> (r: usize)
+         requires self.valid(),
+         ensures r as int == lz_width(self._dict@.len() as int,legacy), 9<=r<=12,
+@@ -844,6 +846,7 @@
+         proof { self.entry(c as int); }
+         if c<256 { (1,c as u8) } else { (self.entries[c].len as usize,self.entries[c].first) }
+     }
++    #[inline(always)]
+     fn data(&mut self,c:usize,legacy:bool) -> (r:Result<usize,Error>)
+         requires old(self).valid(), c<4096, c!=256, c!=257,
+         ensures final(self).valid(),
+@@ -880,6 +883,7 @@
+         let (len,_)=self.info(c);
+         Ok(len)
+     }
++    #[inline(always)]
+     fn expand(&self,c:usize,buf:&mut [u8;4096]) -> (len:usize)
+         requires self.valid(), lz_defined(self._dict@,c as int),
+         ensures len == self._dict@[c as int].len(), 1<=len<=4096,
+--- a/src/native_fp.rs
++++ b/src/native_fp.rs
+@@ -41,6 +41,7 @@
+     assert(q*row+row<=len) by(nonlinear_arith) requires q<total,row>0,len==row*total;
+ 
+ }
++#[inline(always)]
+ pub fn decode(raw:&[u8],row:usize,ch:usize,bytes:usize,out_le:bool,scratch:&mut [u8],out:&mut [u8]) -> (r:Result<(),Error>)
+     ensures r.is_ok()==(valid(raw@,row,ch,bytes) && old(scratch).len()>=raw.len() && old(out).len()>=raw.len()),
+         final(out).len()==old(out).len(),final(scratch).len()==old(scratch).len(),
+@@ -53,9 +54,10 @@
+     if out.len()<raw.len()||scratch.len()<raw.len(){return Err(Error::OutputTooSmall);}
+     proof{layout(row as int,ch as int,bytes as int,raw.len() as int);}
+     ns::convert(raw,row,ch,1,true,true,true,scratch)?;
+-    let samples=row/bytes;let mut k=0usize;
++    let samples=row/bytes;let mut k=0usize;let mut base=0usize;let mut local=0usize;
+     while k<raw.len()
+         invariant valid(raw@,row,ch,bytes),row%bytes==0,samples==row/bytes,samples>0,k<=raw.len(),
++            base<=k,base%row==0,local<row,k==base+local,
+             scratch.len()==old(scratch).len(),out.len()==old(out).len(),out.len()>=raw.len(),scratch.len()>=raw.len(),
+             forall|j:int| 0<=j<raw.len() ==> scratch@[j]==ns::converted(raw@,row,ch,1,true,true,true,j),
+             forall|j:int| 0<=j<k ==> out@[j]==decoded(raw@,row,ch,bytes,out_le,j),
+@@ -63,10 +65,19 @@
+             forall|j:int| raw.len()<=j<scratch.len() ==> scratch@[j]==old(scratch)@[j],
+         decreases raw.len()-k,
+     {
+-        let local=k%row;let plane=if out_le{bytes-1-local%bytes}else{local%bytes};
++        proof{quotient_remainder(base as int,row as int);vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k as int,row as int,base as int/(row as int),local as int);}
++        let plane=if out_le{bytes-1-local%bytes}else{local%bytes};
+         proof{index_bound(row,bytes,out_le,k as int,raw.len() as int);}
+-        let at=k/row*row+plane*samples+local/bytes;
++        let at=base+plane*samples+local/bytes;
+         reveal(decoded);out[k]=scratch[at];k=k+1;
++        if local==row-1{
++            let prior=base;assert(base+row==k);base=k;local=0;
++            proof{
++                quotient_remainder(prior as int,row as int);
++                assert(base==row*(prior as int/(row as int)+1)) by(nonlinear_arith) requires base==prior+row,prior==row*(prior as int/(row as int));
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(base as int,row as int,prior as int/(row as int)+1,0);
++            }
++        }else{local=local+1;}
+     }
+     Ok(())
+ }
+--- a/src/native_samples.rs
++++ b/src/native_samples.rs
+@@ -18,6 +18,7 @@
+     requires 0<=at<s.len(),
+     ensures word(s,at,1,le)==s[at] as int,
+ {reveal(word);}
++#[inline(always)]
+ pub fn read_word(s:&[u8],at:usize,bytes:usize,le:bool) -> (r:Result<u64,Error>)
+     ensures r.is_ok()==(width_ok(bytes) && range_ok(s.len() as int,at as int,bytes as int)),
+         r.is_ok() ==> r.unwrap()==word(s@,at as int,bytes,le) && r.unwrap()<modulus(bytes),
+@@ -33,9 +34,12 @@
+         Ok(if le {a+4294967296*b} else {4294967296*a+b})
+     }
+ }
++#[inline(always)]
+ fn width_ok_exec(bytes:usize) -> (r:bool) ensures r==width_ok(bytes) {bytes==1 || bytes==2 || bytes==4 || bytes==8}
++#[inline(always)]
+ fn divisor(j:usize) -> (r:u64) requires j<8,ensures r==f64model::scale(j as int),r>0,
+ {if j==0 {1} else if j==1 {256} else if j==2 {65536} else if j==3 {16777216} else if j==4 {4294967296} else if j==5 {1099511627776} else if j==6 {281474976710656} else {72057594037927936}}
++#[inline(always)]
+ fn store(out:&mut [u8],at:usize,bytes:usize,le:bool,v:u64)
+     requires width_ok(bytes),at as int+bytes<=old(out).len(),
+     ensures final(out).len()==old(out).len(),
+@@ -65,6 +69,7 @@
+ }
+ /// Input/output are separate caller buffers. All source bits and row padding
+ /// survive; prediction resets once per row and independently for each channel.
++#[inline(always)]
+ pub fn convert(raw:&[u8],row_bytes:usize,ch:usize,bytes:usize,le:bool,predict:bool,out_le:bool,out:&mut [u8]) -> (r:Result<(),Error>)
+     ensures r.is_ok()==(valid(raw@,row_bytes,ch,bytes) && old(out).len()>=raw.len()),
+         final(out).len()==old(out).len(),
+--- a/src/native_stream.rs
++++ b/src/native_stream.rs
+@@ -131,6 +131,34 @@
+                 forall|k:int|write<=k<output.len() ==> output@[k]==old(output)@[k],
+             decreases left,
+         {
++            if c.mode==3 && c.left>0 && c.distance>0 && c.distance<=c.produced && c.distance<=c.window && c.left<=self.cap-c.produced {
++                let n=c.left.min(write-written).min(left);let mut i=0usize;
++                let at_before=c.bits.at;let count_before=c.left;let prior_left=left;
++                while i<n
++                    invariant i<=n,n>0,n<=count_before,n<=left+i,n<=write-written+i,left+i==prior_left,
++                        c.mode==3,c.left+i==count_before,c.bits.at==at_before,
++                        0<c.distance<=c.produced,c.distance<=c.window,c.left<=self.cap-c.produced,
++                        last || (c.mode!=4 && s.len()-c.bits.at>=1024),
++                        c.valid(s@,self.cap as int),c.end()==end,
++                        c.produced==base+written,written<=write,write<=output.len(),output.len()==old(output).len(),
++                        budget.remaining==2*left+old(budget).remaining%2,budget.remaining<=old(budget).remaining,
++                        wanted==batch(s@,end as int,self.cap as int,c.model(),(write-written) as nat,left as nat,last),
++                        forall|k:int|0<=k<written ==> output@[k]==c.history@[base+k],
++                        forall|k:int|write<=k<output.len() ==> output@[k]==old(output)@[k],
++                    decreases n-i,
++                {
++                    reveal_with_fuel(batch,1);spend(budget,2)?;
++                    let ghost previous=c.history@;
++                    let byte=c.match_byte(s,self.cap);
++                    output[written]=byte;written=written+1;left=left-1;i=i+1;
++                    assert forall|k:int|0<=k<written implies output@[k]==c.history@[base+k] by {
++                        if k==written-1 {assert(c.history@[base+k]==byte);}
++                        else {assert(c.history@[base+k]==previous[base+k]);}
++                    }
++                }
++                assert(left<prior_left);
++                continue;
++            }
+             reveal_with_fuel(batch,1);
+             spend(budget,2)?;
+             let ghost previous=c.history@;
+@@ -166,10 +194,13 @@
+     pub fn new(legacy:bool)->(r:Self)
+         ensures r.valid(),r.dict()==initial_dict(),r.previous()==256,r.first(),r.legacy()==legacy,
+     {reveal(initial_dict);Self{table:LzTable::new(),legacy,first:true}}
++    #[inline(always)]
+     pub fn is_legacy(&self)->(r:bool) ensures r==self.legacy(), {self.legacy}
++    #[inline(always)]
+     pub fn width(&self)->(r:usize) requires self.valid(),
+         ensures r==code_width(self.dict(),self.legacy()),9<=r<=12,
+     {reveal(code_width);self.table.width(self.legacy)}
++    #[inline(always)]
+     pub fn code(&mut self,c:usize,out:&mut[u8;4096])->(r:Result<usize,Error>)
+         requires old(self).valid(),
+         ensures final(self).valid(),final(self).legacy()==old(self).legacy(),
+@@ -194,6 +225,7 @@
+         else{self.table.data(c,self.legacy)?;Ok(self.table.expand(c,out))}
+     }
+ }
++#[inline(always)]
+ pub fn lzw_code(s:&[u8],at:usize,bit:usize,width:usize,legacy:bool)->(r:Result<(usize,usize,usize),Error>)
+     ensures r.is_ok()==(at<=s.len()&&bit<8&&(at==s.len() ==> bit==0)&&1<=width<=12&&at as int*8+bit+width<=s.len() as int*8),
+         r.is_ok() ==> r.unwrap().0<4096 && r.unwrap().1<=s.len() && r.unwrap().2<8,
+--- a/src/vp8_color.rs
++++ b/src/vp8_color.rs
+@@ -3,17 +3,20 @@
+ use super::*;
+ verus! {
+ pub(super) open spec fn clipped(v:int) -> u8 {if v<0{0u8}else if v>=16384{255u8}else{(v/64) as u8}}
++#[inline(always)]
+ fn clip(v:i32) -> (r:u8) ensures r==clipped(v as int),
+ {if v<0{0}else if v>=16384{255}else{(v/64) as u8}}
+ pub(super) open spec fn color(y:u8,u:u8,v:u8) -> [u8;4] {
+     let yy=(y as int*19077)/256;
+     [clipped(yy+(v as int*26149)/256-14234),clipped(yy-(u as int*6419)/256-(v as int*13320)/256+8708),clipped(yy+(u as int*33050)/256-17685),255u8]
+ }
++#[inline(always)]
+ fn rgb(y:u8,u:u8,v:u8) -> (r:[u8;4]) ensures r==color(y,u,v),
+ {
+     let yy=y as i32*19077/256;
+     [clip(yy+v as i32*26149/256-14234),clip(yy-u as i32*6419/256-v as i32*13320/256+8708),clip(yy+u as i32*33050/256-17685),255]
+ }
++#[inline(always)]
+ fn at(p:&[u8],base:usize,stride:usize,height:usize,x:usize,y:usize) -> (r:u8)
+     requires stride>0,x<stride,y<height,base as int+stride as int*height<=p.len(),
+     ensures r==p@[base+y*stride+x],
+@@ -29,6 +32,7 @@
+     let a=p[base+y0*stride+x0] as int;let b=p[base+y0*stride+x1] as int;let c=p[base+y1*stride+x0] as int;let d=p[base+y1*stride+x1] as int;
+     ((wx*wy*a+(4-wx)*wy*b+wx*(4-wy)*c+(4-wx)*(4-wy)*d+8)/16) as u8
+ }
++#[inline(always)]
+ fn interpolate(p:&[u8],base:usize,stride:usize,height:usize,w:usize,h:usize,x:usize,y:usize) -> (r:u8)
+     requires 1<=w<=16383,1<=h<=16383,x<w,y<h,(w+1)/2<=stride,(h+1)/2<=height,base as int+stride as int*height<=p.len(),
+     ensures r==chroma(p@,base,stride,w,h,x,y),
+@@ -45,6 +49,7 @@
+     let x=k%w;let y=k/w;let ylen=pw*ph;let clen=(pw/2)*(ph/2);
+     color(p[y*pw+x],chroma(p,ylen as usize,(pw/2) as usize,w,h,x,y),chroma(p,(ylen+clen) as usize,(pw/2) as usize,w,h,x,y))
+ }
++#[inline(always)]
+ pub(super) fn pixel(p:&[u8],pw:usize,ph:usize,w:usize,h:usize,k:usize) -> (r:[u8;4])
+     requires 1<=w<=16383,1<=h<=16383,w<=pw<=16384,h<=ph<=16384,pw%2==0,ph%2==0,k<w as int*h,
+         pw as int*ph+2*(pw/2)*(ph/2)<=p.len(),
+--- a/src/vp8_filter_kernel.rs
++++ b/src/vp8_filter_kernel.rs
+@@ -4,14 +4,17 @@
+ use crate::vp8_predict as pr;
+ verus! {
+ pub(super) open spec fn absolute(v:int) -> int {if v<0{-v}else{v}}
++#[inline(always)]
+ fn abs(v:i32) -> (r:i32)
+     requires -255<=v<=255,ensures r==absolute(v as int),0<=r<=255,
+ {if v<0{-v}else{v}}
+ pub(super) open spec fn bounded(v:int,lo:int,hi:int) -> int {if v<lo{lo}else if v>hi{hi}else{v}}
++#[inline(always)]
+ fn bound(v:i32,lo:i32,hi:i32) -> (r:i32)
+     requires lo<=hi,ensures r==bounded(v as int,lo as int,hi as int),lo<=r<=hi,
+ {if v<lo{lo}else if v>hi{hi}else{v}}
+ pub(super) open spec fn divided(v:int,d:int) -> int {(v+1048576)/d-1048576int/d}
++#[inline(always)]
+ fn div(v:i32,d:i32) -> (r:i32)
+     requires -10000<=v<=10000,d==2 || d==8 || d==128,
+     ensures r==divided(v as int,d as int),-5000<=r<=5000,
+@@ -39,6 +42,7 @@
+         }
+     }
+ }
++#[inline(always)]
+ pub(super) fn pixel(e:&[u8;8],simple:bool,edge:bool,limit:u8,inner:u8,threshold:u8,k:usize) -> (r:u8)
+     requires k<8,
+     ensures r==sample(e@,simple,edge,limit,inner,threshold,k),
+@@ -68,11 +72,30 @@
+ pub(super) fn filter(e:&[u8;8],simple:bool,edge:bool,limit:u8,inner:u8,threshold:u8) -> (out:[u8;8])
+     ensures forall|k:int|0<=k<8 ==> #[trigger] out@[k]==sample(e@,simple,edge,limit,inner,threshold,k as usize),
+ {
+-    let mut out=[0u8;8];let mut k=0usize;
+-    while k<8
+-        invariant k<=8,forall|j:int|0<=j<k ==> #[trigger] out@[j]==sample(e@,simple,edge,limit,inner,threshold,j as usize),
+-        decreases 8-k,
+-    {out[k]=pixel(e,simple,edge,limit,inner,threshold,k);k=k+1;}
++    let mut out=*e;
++    let p3=e[0] as i32;let p2=e[1] as i32;let p1=e[2] as i32;let p0=e[3] as i32;
++    let q0=e[4] as i32;let q1=e[5] as i32;let q2=e[6] as i32;let q3=e[7] as i32;
++    let ok=4*abs(p0-q0)+abs(p1-q1)<=2*limit as i32+1;
++    let smooth=abs(p3-p2)<=inner as i32 && abs(p2-p1)<=inner as i32 && abs(p1-p0)<=inner as i32 &&
++        abs(q3-q2)<=inner as i32 && abs(q2-q1)<=inner as i32 && abs(q1-q0)<=inner as i32;
++    if ok && (simple || smooth){
++        let hev=abs(p1-p0)>threshold as i32 || abs(q1-q0)>threshold as i32;
++        if simple || hev {
++            let a=3*(q0-p0)+bound(p1-q1,-128,127);
++            let a1=bound(div(a+4,8),-16,15);let a2=bound(div(a+3,8),-16,15);
++            out[3]=pr::clip(p0+a2);out[4]=pr::clip(q0-a1);
++        }else if edge{
++            let a=bound(3*(q0-p0)+bound(p1-q1,-128,127),-128,127);
++            let a1=div(27*a+63,128);let a2=div(18*a+63,128);let a3=div(9*a+63,128);
++            out[1]=pr::clip(p2+a3);out[2]=pr::clip(p1+a2);out[3]=pr::clip(p0+a1);
++            out[4]=pr::clip(q0-a1);out[5]=pr::clip(q1-a2);out[6]=pr::clip(q2-a3);
++        }else{
++            let a=3*(q0-p0);let a1=bound(div(a+4,8),-16,15);let a2=bound(div(a+3,8),-16,15);let a3=div(a1+1,2);
++            out[2]=pr::clip(p1+a3);out[3]=pr::clip(p0+a2);out[4]=pr::clip(q0-a1);out[5]=pr::clip(q1-a3);
++        }
++    }
++    assert forall|k:int|0<=k<8 implies out@[k]==sample(e@,simple,edge,limit,inner,threshold,k as usize) by {}
++
+     out
+ }
+ }
+--- a/src/vp8_predict.rs
++++ b/src/vp8_predict.rs
+@@ -13,6 +13,7 @@
+     [[9,10,10,2],[9,10,11,3],[10,11,11,2],[10,11,12,3],[10,11,11,2],[10,11,12,3],[11,12,12,2],[11,12,12,3],[11,12,12,2],[11,12,12,3],[12,12,12,1],[12,12,12,1],[12,12,12,1],[12,12,12,1],[12,12,12,1],[12,12,12,1]],
+ ];
+ pub(super) open spec fn clipped(v:int) -> u8 {if v<0{0u8}else if v>255{255u8}else{v as u8}}
++#[inline(always)]
+ pub(super) fn clip(v:i32) -> (r:u8)
+     ensures r==clipped(v as int),
+ {if v<0{0}else if v>255{255}else{v as u8}}
+--- a/src/vp8_transform.rs
++++ b/src/vp8_transform.rs
+@@ -4,10 +4,12 @@
+ verus! {
+ pub(super) open spec fn floor16(v:int) -> int {(v+1099511627776)/65536-16777216}
+ pub(super) open spec fn floor8(v:int) -> int {(v+1073741824)/8-134217728}
++#[inline(always)]
+ fn div16(v:i64) -> (r:i64)
+     requires -100000000000<=v<=100000000000,
+     ensures r==floor16(v as int),r*65536<=v<(r+1)*65536,
+ {(v+1099511627776)/65536-16777216}
++#[inline(always)]
+ pub(super) fn div8(v:i64) -> (r:i64)
+     requires -10000000<=v<=10000000,
+     ensures r==floor8(v as int),r*8<=v<(r+1)*8,-1250000<=r<=1250000,
+@@ -21,6 +23,7 @@
+         if k==0{a+c+bias+v}else if k==1{a-c+bias+u}else if k==2{a-c+bias-u}else{a+c+bias-v}
+     }
+ }
++#[inline(always)]
+ fn line(a:i64,b:i64,c:i64,d:i64,k:usize,bias:i64,walsh:bool,limit:i64) -> (r:i64)
+     requires k<4,0<=bias<=4,0<=limit<=1000000,-limit<=a<=limit,-limit<=b<=limit,-limit<=c<=limit,-limit<=d<=limit,
+     ensures r==pass(a as int,b as int,c as int,d as int,k,bias as int,walsh),-6*limit-8<=r<=6*limit+8,
+@@ -44,6 +47,23 @@
+     requires forall|k:int|0<=k<16 ==> -32768<=#[trigger] c@[k]<=32767,
+     ensures forall|k:int|0<=k<16 ==> #[trigger] out@[k]==sample(c@,k,walsh) && -1250000<=out@[k]<=1250000 && (walsh ==> -32768<=out@[k]<=32767),
+ {
++    let mut zero=true;let mut j=1usize;
++    while j<16
++        invariant 1<=j<=16,zero==(forall|k:int|1<=k<j ==> c@[k]==0),
++        decreases 16-j,
++    {zero=zero&&c[j]==0;j=j+1;}
++    if zero{
++        let v=div8(c[0] as i64+if walsh{3}else{4});
++        let v=if walsh{crate::vp8_coeff::wrap(v)}else{v as i32};
++        let out=[v;16];
++        assert forall|k:int|0<=k<16 implies out@[k]==sample(c@,k,walsh) && -1250000<=out@[k]<=1250000 && (walsh ==> -32768<=out@[k]<=32767) by {
++            assert(c@[1]==0&&c@[2]==0&&c@[3]==0);
++            assert(c@[4]==0&&c@[5]==0&&c@[6]==0&&c@[7]==0);
++            assert(c@[8]==0&&c@[9]==0&&c@[10]==0&&c@[11]==0);
++            assert(c@[12]==0&&c@[13]==0&&c@[14]==0&&c@[15]==0);
++        }
++        return out;
++    }
+     let mut t=[0i64;16];let mut i=0usize;
+     while i<16
+         invariant i<=16,forall|k:int|0<=k<16 ==> -32768<=#[trigger] c@[k]<=32767,
+--- a/src/webp_inverse.rs
++++ b/src/webp_inverse.rs
+@@ -9,12 +9,13 @@
+     let cell=(p as int/(t.width as int)/side)*pix::sampled(t.width,t.bits)+(p as int%(t.width as int))/side;
+     let at=t.offset as int+cell;if at>=data.len(){None}else{Some(data[at])}
+ }
+-fn matrix(t:Transform,data:&[Pixel],p:usize) -> (r:Result<Pixel,Error>)
+-    requires t.valid(),t.kind<2,p<t.width*t.height,
++#[inline(always)]
++fn matrix(t:Transform,data:&[Pixel],p:usize,x:usize,y:usize) -> (r:Result<Pixel,Error>)
++    requires t.valid(),t.kind<2,p<t.width*t.height,x==p%t.width,y==p/t.width,
+     ensures r.is_ok()==coefficient(t,data@,p).is_some(),r.is_ok() ==> r.unwrap()==coefficient(t,data@,p).unwrap(),
+ {
+     reveal(coefficient);let side=pix::size(t.bits);let across=pix::subsample(t.width,t.bits);
+-    let y=p/t.width/side;let x=p%t.width/side;
++    let y=pix::coordinate(y,t.bits);let x=pix::coordinate(x,t.bits);
+     assert(p/t.width<t.height) by(nonlinear_arith) requires p<t.width*t.height,t.width>0;
+     assert(y*across+x<=268451840) by(nonlinear_arith) requires y<16384,across<=16384,x<16384;
+     let cell=y*across+x;
+@@ -28,6 +29,7 @@
+     let modulus=if bits==8{256int}else{power2(bits)};
+     ((out[source]@[1] as int/power2(shift))%modulus) as usize
+ }
++#[inline(always)]
+ fn index(t:Transform,out:&[Pixel],p:usize) -> (r:usize)
+     requires t.valid(),t.kind==3,p<t.width*t.height,t.width as int*t.height<=out.len(),
+     ensures r==entry(t,out@,p),r<256,
+@@ -59,8 +61,9 @@
+         if prediction.is_none(){None}else{Some(pred::sum(out[p as int],prediction.unwrap()))}
+     }
+ }
+-fn pixel(t:Transform,data:&[Pixel],out:&[Pixel],p:usize) -> (r:Result<Pixel,Error>)
+-    requires t.valid(),p<t.width*t.height,t.width as int*t.height<=out.len(),
++#[inline(always)]
++fn pixel(t:Transform,data:&[Pixel],out:&[Pixel],p:usize,x:usize,y:usize) -> (r:Result<Pixel,Error>)
++    requires t.valid(),p<t.width*t.height,t.width as int*t.height<=out.len(),x==p%t.width,y==p/t.width,
+     ensures r.is_ok()==value(t,data@,out@,p).is_some(),r.is_ok() ==> r.unwrap()==value(t,data@,out@,p).unwrap(),
+ {
+     reveal(value);
+@@ -71,9 +74,9 @@
+         if t.offset>data.len() || k>=data.len()-t.offset{return Err(Error::Invalid);}
+         return Ok(data[t.offset+k]);
+     }
+-    if t.kind==1{return Ok(pred::inverse_color(out[p],matrix(t,data,p)?));}
+-    let prediction=if p==0{[0u8,0,0,255]}else if p<t.width{out[p-1]}else if p%t.width==0{out[p-t.width]}else{
+-        let m=matrix(t,data,p)?;let mode=(m[1]%16) as usize;
++    if t.kind==1{return Ok(pred::inverse_color(out[p],matrix(t,data,p,x,y)?));}
++    let prediction=if p==0{[0u8,0,0,255]}else if p<t.width{out[p-1]}else if x==0{out[p-t.width]}else{
++        let m=matrix(t,data,p,x,y)?;let mode=(m[1]%16) as usize;
+         if mode>13{return Err(Error::Invalid);}
+         assert(p>t.width && t.width>=2) by(nonlinear_arith) requires p>=t.width,p%t.width!=0,t.width>=1;
+         pred::predict(mode,out[p-1],out[p-t.width],out[p-t.width-1],out[p-t.width+1])
+@@ -88,6 +91,24 @@
+         if v.is_none(){None}else{finish(t,data,out.update(p as int,v.unwrap()),(k+1) as usize,(fuel-1) as nat)}
+     }
+ }
++proof fn next_position(w:int,h:int,k:int,x:int,y:int,reverse:bool)
++    requires w>0,h>0,0<=x<w,0<=y<h,0<=k,k+1<w*h,
++        (if reverse{w*h-1-k}else{k})==y*w+x,
++    ensures reverse && x==0 ==> y>0,
++        !reverse && x==w-1 ==> y+1<h,
++        (if reverse{w*h-2-k}else{k+1})==
++            (if reverse{if x==0{(y-1)*w+w-1}else{y*w+x-1}}
++             else{if x==w-1{(y+1)*w}else{y*w+x+1}}),
++{
++    assert(reverse && x==0 ==> y>0) by(nonlinear_arith)
++        requires w>0,h>0,y>=0,k+1<w*h,reverse ==> w*h-1-k==y*w+x;
++    assert(!reverse && x==w-1 ==> y+1<h) by(nonlinear_arith)
++        requires w>0,h>0,y>=0,k+1<w*h,!reverse ==> k==y*w+x;
++    assert((if reverse{w*h-2-k}else{k+1})==
++        (if reverse{if x==0{(y-1)*w+w-1}else{y*w+x-1}}
++         else{if x==w-1{(y+1)*w}else{y*w+x+1}})) by(nonlinear_arith)
++        requires (if reverse{w*h-1-k}else{k})==y*w+x;
++}
+ pub(super) fn apply(t:Transform,data:&[Pixel],out:&mut[Pixel]) -> (r:Result<(),Error>)
+     requires t.valid(),t.width as int*t.height<=old(out).len(),
+     ensures final(out).len()==old(out).len(),r.is_ok()==finish(t,data@,old(out)@,0,(t.width as int*t.height) as nat).is_some(),
+@@ -95,15 +116,28 @@
+         forall|i:int|t.width as int*t.height<=i<old(out).len() ==> final(out)@[i]==old(out)@[i],
+ {
+     assert(t.width*t.height<=268435456) by(nonlinear_arith) requires t.width<=16384,t.height<=16384;
+-    let count=t.width*t.height;let mut k=0usize;let ghost goal=finish(t,data@,out@,0,count as nat);
++    let count=t.width*t.height;let mut k=0usize;let mut x=if t.kind==3{t.width-1}else{0};let mut y=if t.kind==3{t.height-1}else{0};let ghost goal=finish(t,data@,out@,0,count as nat);
++    assert((if t.kind==3{count-1}else{0})==y*t.width+x) by(nonlinear_arith)
++        requires count==t.width*t.height,x==(if t.kind==3{t.width-1}else{0}),y==(if t.kind==3{t.height-1}else{0});
+     while k<count
+         invariant t.valid(),count==t.width as int*t.height,k<=count,count<=out.len(),out.len()==old(out).len(),
++            x<t.width,y<t.height,k<count ==> (if t.kind==3{count-1-k}else{k as int})==y*t.width+x,
+             goal==finish(t,data@,old(out)@,0,count as nat),goal==finish(t,data@,out@,k,(count-k) as nat),
+             forall|i:int|count<=i<out.len() ==> out@[i]==old(out)@[i],
+         decreases count-k,
+     {
+         reveal_with_fuel(finish,1);let p=if t.kind==3{count-1-k}else{k};
+-        let value=pixel(t,data,out,p)?;out[p]=value;k=k+1;
++        proof{vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p as int,t.width as int,y as int,x as int);}
++        let value=pixel(t,data,out,p,x,y)?;out[p]=value;
++        proof{if k+1<count{next_position(t.width as int,t.height as int,k as int,x as int,y as int,t.kind==3);}}
++        k=k+1;
++        if k<count{
++            if t.kind==3{
++                if x==0{assert(y>0);x=t.width-1;y=y-1;}else{x=x-1;}
++            }else{
++                if x==t.width-1{x=0;y=y+1;}else{x=x+1;}
++            }
++        }
+     }
+     reveal_with_fuel(finish,1);Ok(())
+ }
+--- a/src/webp_pixels.rs
++++ b/src/webp_pixels.rs
+@@ -9,9 +9,22 @@
+ pub(super) type Pixel=[u8;4];
+ pub(super) open spec fn groups(g:Seq<Group>) -> Seq<GroupModel> {Seq::new(g.len(),|i:int|g[i].model())}
+ pub(super) open spec fn tile_size(bits:usize) -> usize {if bits==0{1}else if bits==1{2}else if bits==2{4}else if bits==3{8}else if bits==4{16}else if bits==5{32}else if bits==6{64}else if bits==7{128}else if bits==8{256}else{512}}
++#[inline(always)]
+ pub(super) fn size(bits:usize) -> (r:usize) requires bits<=9,ensures r==tile_size(bits),1<=r<=512,
+ {if bits==0{1}else if bits==1{2}else if bits==2{4}else if bits==3{8}else if bits==4{16}else if bits==5{32}else if bits==6{64}else if bits==7{128}else if bits==8{256}else{512}}
+ pub(super) open spec fn sampled(n:usize,bits:usize) -> usize {((n as int+tile_size(bits)-1)/(tile_size(bits) as int)) as usize}
++#[inline(always)]
++pub(super) fn coordinate(n:usize,bits:usize) -> (r:usize)
++    requires bits<=9,
++    ensures r==n as int/(tile_size(bits) as int),r<=n,
++{
++    let d=size(bits);
++    assert(d==1usize<<bits) by(bit_vector)
++        requires bits<=9,d==if bits==0{1usize}else if bits==1{2}else if bits==2{4}else if bits==3{8}else if bits==4{16}else if bits==5{32}else if bits==6{64}else if bits==7{128}else if bits==8{256}else{512};
++    assert(n>>bits==n/d && n>>bits<=n) by(bit_vector) requires bits<=9,d==1usize<<bits;
++    n>>bits
++}
++#[inline(always)]
+ pub(super) fn subsample(n:usize,bits:usize) -> (r:usize)
+     requires 1<=n<=16384,bits<=9,
+     ensures r==sampled(n,bits),1<=r<=n,
+--- a/src/webp_predict.rs
++++ b/src/webp_predict.rs
+@@ -4,13 +4,17 @@
+ use crate::webp_pixels::Pixel;
+ verus! {
+ pub(super) open spec fn average(a:u8,b:u8) -> u8 {((a as int+b as int)/2) as u8}
++#[inline(always)]
+ fn avg(a:u8,b:u8) -> (r:u8) ensures r==average(a,b),{((a as u16+b as u16)/2) as u8}
+ pub(super) open spec fn clamp(a:int) -> u8 {if a<0{0u8}else if a>255{255u8}else{a as u8}}
++#[inline(always)]
+ fn clip(a:i32) -> (r:u8) ensures r==clamp(a as int),{if a<0{0}else if a>255{255}else{a as u8}}
+ pub(super) open spec fn difference(a:u8,b:u8) -> int {if a>=b{a as int-b as int}else{b as int-a as int}}
++#[inline(always)]
+ fn diff(a:u8,b:u8) -> (r:usize) ensures r==difference(a,b),r<=255,
+ {if a>=b{(a-b) as usize}else{(b-a) as usize}}
+ pub(super) open spec fn distance(a:Pixel,b:Pixel) -> int {difference(a[0],b[0])+difference(a[1],b[1])+difference(a[2],b[2])+difference(a[3],b[3])}
++#[inline(always)]
+ fn dist(a:Pixel,b:Pixel) -> (r:usize) ensures r==distance(a,b),r<=1020,
+ {diff(a[0],b[0])+diff(a[1],b[1])+diff(a[2],b[2])+diff(a[3],b[3])}
+ pub(super) open spec fn component(mode:usize,l:u8,t:u8,tl:u8,tr:u8,choose_left:bool,alpha:bool) -> u8 {
+@@ -22,6 +26,7 @@
+     else if mode==12{clamp(l as int+t as int-tl as int)}
+     else{let a=average(l,t) as int;let d=a-tl as int;clamp(a+if d<0{-((-d)/2)}else{d/2})}
+ }
++#[inline(always)]
+ fn predict_one(mode:usize,l:u8,t:u8,tl:u8,tr:u8,choose_left:bool,alpha:bool) -> (r:u8)
+     requires mode<=13,ensures r==component(mode,l,t,tl,tr,choose_left,alpha),
+ {
+@@ -38,9 +43,13 @@
+     [component(mode,l[0],t[0],tl[0],tr[0],left,false),component(mode,l[1],t[1],tl[1],tr[1],left,false),
+      component(mode,l[2],t[2],tl[2],tr[2],left,false),component(mode,l[3],t[3],tl[3],tr[3],left,true)]
+ }
++#[inline(always)]
+ pub(super) fn predict(mode:usize,l:Pixel,t:Pixel,tl:Pixel,tr:Pixel) -> (r:Pixel)
+     requires mode<=13,ensures r==prediction(mode,l,t,tl,tr),
+ {
++    if mode==0{return [0,0,0,255];}
++    if mode==1{return l;}if mode==2{return t;}if mode==3{return tr;}if mode==4{return tl;}
++    if mode==12{return [clip(l[0] as i32+t[0] as i32-tl[0] as i32),clip(l[1] as i32+t[1] as i32-tl[1] as i32),clip(l[2] as i32+t[2] as i32-tl[2] as i32),clip(l[3] as i32+t[3] as i32-tl[3] as i32)];}
+     let left=dist(t,tl)<dist(l,tl);
+     [predict_one(mode,l[0],t[0],tl[0],tr[0],left,false),predict_one(mode,l[1],t[1],tl[1],tr[1],left,false),
+      predict_one(mode,l[2],t[2],tl[2],tr[2],left,false),predict_one(mode,l[3],t[3],tl[3],tr[3],left,true)]
+@@ -49,6 +58,7 @@
+     [((a[0] as int+b[0] as int)%256) as u8,((a[1] as int+b[1] as int)%256) as u8,
+      ((a[2] as int+b[2] as int)%256) as u8,((a[3] as int+b[3] as int)%256) as u8]
+ }
++#[inline(always)]
+ pub(super) fn add_pixel(a:Pixel,b:Pixel) -> (r:Pixel) ensures r==sum(a,b),
+ {
+     [((a[0] as u16+b[0] as u16)%256) as u8,((a[1] as u16+b[1] as u16)%256) as u8,
+@@ -56,6 +66,7 @@
+ }
+ pub(super) open spec fn signed(a:u8) -> int {if a<128{a as int}else{a as int-256}}
+ pub(super) open spec fn delta(a:u8,b:u8) -> int {signed(a)*signed(b)/32}
++#[inline(always)]
+ fn color_delta(a:u8,b:u8) -> (r:i32) ensures r==delta(a,b),-512<=r<=512,
+ {
+     let x=if a<128{a as i32}else{a as i32-256};let y=if b<128{b as i32}else{b as i32-256};
+@@ -65,6 +76,7 @@
+     (p+16384)/32-512
+ }
+ pub(super) open spec fn green(p:Pixel) -> Pixel { [((p[0] as int+p[1] as int)%256) as u8,p[1],((p[2] as int+p[1] as int)%256) as u8,p[3]] }
++#[inline(always)]
+ pub(super) fn add_green(p:Pixel) -> (r:Pixel) ensures r==green(p),
+ {[((p[0] as u16+p[1] as u16)%256) as u8,p[1],((p[2] as u16+p[1] as u16)%256) as u8,p[3]]}
+ pub(super) open spec fn color(p:Pixel,m:Pixel) -> Pixel {
+@@ -72,6 +84,7 @@
+     let blue=((p[2] as int+delta(m[1],p[1])+delta(m[0],red))%256) as u8;
+     [red,p[1],blue,p[3]]
+ }
++#[inline(always)]
+ pub(super) fn inverse_color(p:Pixel,m:Pixel) -> (r:Pixel) ensures r==color(p,m),
+ {
+     let d=color_delta(m[2],p[1]);let red=((p[0] as i32+d+1024)%256) as u8;

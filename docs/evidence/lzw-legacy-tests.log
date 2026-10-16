@@ -1,0 +1,12 @@
+test_format_matrix (__main__.LegacyLzw.test_format_matrix) ... ok
+test_mixed_segments (__main__.LegacyLzw.test_mixed_segments) ... ok
+test_original_quad (__main__.LegacyLzw.test_original_quad) ... ok
+test_reject_malformed_and_hybrid_streams (__main__.LegacyLzw.test_reject_malformed_and_hybrid_streams) ... ok
+test_widths_padding_clear_and_full_table (__main__.LegacyLzw.test_widths_padding_clear_and_full_table) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.451s
+
+OK
+Legacy LZW profile matrix: 128 cases; independent pixels and live libtiff exact
+Legacy width/padding/dictionary cases: 284

@@ -1,0 +1,8 @@
+libtiff 4.7.1
+# TOTAL: 108
+# PASS:  108
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0

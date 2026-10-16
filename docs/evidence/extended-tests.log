@@ -1,0 +1,13 @@
+test_16bit_matrix (__main__.Extended.test_16bit_matrix) ... ok
+test_invalid_new_metadata (__main__.Extended.test_invalid_new_metadata) ... ok
+test_pages_and_limits (__main__.Extended.test_pages_and_limits) ... ok
+test_palette_matrix (__main__.Extended.test_palette_matrix) ... ok
+test_separate_8bit_matrix (__main__.Extended.test_separate_8bit_matrix) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 4.954s
+
+OK
+16-bit matrix: 576; native oracle=True
+palette matrix: 288; native oracle=True
+8-bit separate matrix: 324; native oracle=True

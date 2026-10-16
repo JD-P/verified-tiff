@@ -1,0 +1,80 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 769 dropped 0 interval_us 1000",
+  "samples": 769,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/017cea9a2f6e/verified-tiff/target/reader-benchmark/verified",
+    "target/reader-benchmark/inputs/lerc-float-plain.tif",
+    "native",
+    "3000",
+    "memory"
+  ],
+  "binary_sha256": "0d830657f019133d13247bf2af67408f00d9acda949806e38417abe265797f7b",
+  "input_sha256": "1636d0d5ad42a49d0adf0997fc256499f078b1414776b810d2ce670ce37862b5",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "width": 1024,
+    "height": 1024,
+    "bytes": 4194304,
+    "iterations": 88,
+    "seconds": 3.04300539,
+    "ns_per_operation": 34579606.7,
+    "peak_rss_kib": 7248,
+    "hash": "980f4e5d5cefe978"
+  },
+  "functions": [
+    {
+      "function": "libtiff.so.6::verified_tiff::lerc_image::decode_tiles",
+      "samples": 347,
+      "percent": 45.123537061118334
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::lerc_bits::decode",
+      "samples": 212,
+      "percent": 27.568270481144342
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 89,
+      "percent": 11.573472041612483
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::Handle>::lerc",
+      "samples": 82,
+      "percent": 10.663198959687906
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::lerc_planes::prepare",
+      "samples": 15,
+      "percent": 1.9505851755526658
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::lerc_header::inspect",
+      "samples": 13,
+      "percent": 1.6905071521456436
+    },
+    {
+      "function": "libc.so.6::brk@@GLIBC_2.2.5",
+      "samples": 7,
+      "percent": 0.9102730819245773
+    },
+    {
+      "function": "libc.so.6::getenv@@GLIBC_2.2.5",
+      "samples": 2,
+      "percent": 0.26007802340702213
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::lerc_samples::read",
+      "samples": 1,
+      "percent": 0.13003901170351106
+    },
+    {
+      "function": "verified::main",
+      "samples": 1,
+      "percent": 0.13003901170351106
+    }
+  ]
+}

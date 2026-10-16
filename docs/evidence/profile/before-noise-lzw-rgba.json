@@ -1,0 +1,74 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 719 dropped 0 interval_us 1000",
+  "samples": 719,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/baseline-v18/verified-tiff/target/benchmark/adapter",
+    "target/benchmark/inputs/noise-lzw.tif",
+    "rgba",
+    "2500"
+  ],
+  "binary_sha256": "4bde809050c4b3c9ac34ac25e071f17bbf3d4fadbc4c96ee895e9229c1db4da7",
+  "input_sha256": "f289894e4e541e527288290703e3254c758d821f2261fd615dceb6d0c3e5994d",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "mode": "rgba",
+    "iterations": 25,
+    "seconds": 2.63573982,
+    "ns_per_image": 105429593,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 4194304,
+    "hash": "4d2e0ec587a5bba2"
+  },
+  "functions": [
+    {
+      "function": "libtiff.so.6::<verified_tiff::LzBits>::read",
+      "samples": 353,
+      "percent": 49.09596662030598
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::decode_lz_segment",
+      "samples": 103,
+      "percent": 14.325452016689846
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::lz_validate",
+      "samples": 80,
+      "percent": 11.126564673157162
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::scatter_byte",
+      "samples": 77,
+      "percent": 10.709318497913769
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff::LzTable>::data",
+      "samples": 75,
+      "percent": 10.43115438108484
+    },
+    {
+      "function": "libtiff.so.6::<verified_tiff_capi::Handle>::rgba",
+      "samples": 25,
+      "percent": 3.477051460361613
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 4,
+      "percent": 0.5563282336578581
+    },
+    {
+      "function": "libtiff.so.6::verified_tiff::value",
+      "samples": 1,
+      "percent": 0.13908205841446453
+    },
+    {
+      "function": "adapter::main",
+      "samples": 1,
+      "percent": 0.13908205841446453
+    }
+  ]
+}

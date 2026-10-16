@@ -1,0 +1,73 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 846 dropped 0 interval_us 1000",
+  "samples": 846,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/baseline-v18/verified-tiff/target/release/examples/benchmark",
+    "target/benchmark/inputs/noise-deflate.tif",
+    "total",
+    "3000"
+  ],
+  "binary_sha256": "7e8a2b500b6904743c15ff5e287168079918534f92849dd59869e779f5c1189b",
+  "input_sha256": "03f7f3ecd33fa602722fd33301ad59c532d7147328438855e44bb190abe06676",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "engine": "rust",
+    "mode": "total",
+    "iterations": 91,
+    "seconds": 3.303693546,
+    "ns_per_image": 36304324.68131868,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 1048576,
+    "scratch_bytes": 1048576,
+    "inspect_work": 10490326,
+    "decode_work": 12587280,
+    "hash": "ba3744a0368fc2c6"
+  },
+  "functions": [
+    {
+      "function": "benchmark::<verified_tiff::deflate::Cursor>::step",
+      "samples": 596,
+      "percent": 70.44917257683215
+    },
+    {
+      "function": "benchmark::verified_tiff::scatter_byte",
+      "samples": 82,
+      "percent": 9.692671394799055
+    },
+    {
+      "function": "benchmark::<verified_tiff::raster_layout::RasterLayout>::convert",
+      "samples": 69,
+      "percent": 8.156028368794326
+    },
+    {
+      "function": "benchmark::<verified_tiff::raster_layout::RasterLayout>::index",
+      "samples": 50,
+      "percent": 5.91016548463357
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate_plane::decode",
+      "samples": 31,
+      "percent": 3.6643026004728134
+    },
+    {
+      "function": "benchmark::<verified_tiff::extended::image::ExtendedImage>::decode_with_scratch",
+      "samples": 14,
+      "percent": 1.6548463356973995
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate::validate",
+      "samples": 3,
+      "percent": 0.3546099290780142
+    },
+    {
+      "function": "benchmark::<verified_tiff::deflate_bits::Bits>::read",
+      "samples": 1,
+      "percent": 0.1182033096926714
+    }
+  ]
+}

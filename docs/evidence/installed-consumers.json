@@ -1,0 +1,677 @@
+{
+  "engines": [
+    "imagemagick",
+    "lept",
+    "gdk"
+  ],
+  "comparisons": 26,
+  "matched": 26,
+  "results": [
+    {
+      "engine": "imagemagick",
+      "fixture": "rgb",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "rgba",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "8611f4f3d20383abc3fe76f8136ae0442b9227ee538d4d06ae5d25256ea26e9b",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "8611f4f3d20383abc3fe76f8136ae0442b9227ee538d4d06ae5d25256ea26e9b",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "gray16",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "f850f099b0cad8026c8c879966fc23f8d4861c55fd128e564fdbc2cf3b1a41d5",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "f850f099b0cad8026c8c879966fc23f8d4861c55fd128e564fdbc2cf3b1a41d5",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "cmyk",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "13a4ad1cbae6316aec75c1338c391883fa010944e694cba8e6067c12a97e6dea",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "13a4ad1cbae6316aec75c1338c391883fa010944e694cba8e6067c12a97e6dea",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "lab",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "c2ee5863da21d0cbcdfd42cb7e48cb37e4fab392363ad4389c5f3aa02f8b3a46",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "c2ee5863da21d0cbcdfd42cb7e48cb37e4fab392363ad4389c5f3aa02f8b3a46",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "float32",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "8d144fdb6ff4741f24d2b13f6f2110f68edfba9575f2211c0f7d5d5ca856d4c2",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "8d144fdb6ff4741f24d2b13f6f2110f68edfba9575f2211c0f7d5d5ca856d4c2",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "float_predictor3",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "8d144fdb6ff4741f24d2b13f6f2110f68edfba9575f2211c0f7d5d5ca856d4c2",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "8d144fdb6ff4741f24d2b13f6f2110f68edfba9575f2211c0f7d5d5ca856d4c2",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "group4",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "ad95131bc0b799c0b1af477fb14fcf26a6a9f76079e48bf090acb7e8367bfd0e",
+        "length": 4
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "ad95131bc0b799c0b1af477fb14fcf26a6a9f76079e48bf090acb7e8367bfd0e",
+        "length": 4
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "rle",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "verified-tiff: Unknown field with tag 317 (0x13d) encountered. `TIFFReadDirectory' @ warning/tiff.c/TIFFWarnings/905.\n",
+        "sha256": "b9dee894dd5bf607526787191ddec1f1c7c094b8d4dcd1b5a19c97458b078979",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "b9dee894dd5bf607526787191ddec1f1c7c094b8d4dcd1b5a19c97458b078979",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "imagemagick",
+      "fixture": "largefile",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "length": 1292
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "length": 1292
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "rgb",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "4eee9c786d9ba883e73447cb6500388de323cd72c487506a3f101665fca56654",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "4eee9c786d9ba883e73447cb6500388de323cd72c487506a3f101665fca56654",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "rgba",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "4461ad1704f0a9e9f8dca0c313215fc6928a602432aaf8caf5c2854e17d790bc",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "4461ad1704f0a9e9f8dca0c313215fc6928a602432aaf8caf5c2854e17d790bc",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "gray16",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          16
+        ],
+        "sha256": "94b927004bf03d1b20d7e5d42381b72628a03f907623a53d027738349306d40e",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          16
+        ],
+        "sha256": "94b927004bf03d1b20d7e5d42381b72628a03f907623a53d027738349306d40e",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "cmyk",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "9e26cde834f67d1116907a5817b481027d408758c44205077b0a0e4ef0186dc3",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "9e26cde834f67d1116907a5817b481027d408758c44205077b0a0e4ef0186dc3",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "lab",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "ab69c95ab5d45642ffbe7da1839abb7ef891b76a2f161ec5285d1d3b5b466a12",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "ab69c95ab5d45642ffbe7da1839abb7ef891b76a2f161ec5285d1d3b5b466a12",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "group4",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          1,
+          1,
+          1
+        ],
+        "sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          1,
+          1,
+          1
+        ],
+        "sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "rle",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          1
+        ],
+        "sha256": "9aec98138a9610fa0d956c950878c6f5bfd0441974937822b6ddc9c005b6b7ce",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          1
+        ],
+        "sha256": "9aec98138a9610fa0d956c950878c6f5bfd0441974937822b6ddc9c005b6b7ce",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "lept",
+      "fixture": "largefile",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "4eee9c786d9ba883e73447cb6500388de323cd72c487506a3f101665fca56654",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          32
+        ],
+        "sha256": "4eee9c786d9ba883e73447cb6500388de323cd72c487506a3f101665fca56654",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "rgb",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "rgba",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "c9f50aa7fad3eb67ebd230e7a382c8e4ae646c53689ecd1fe1f37882598c8236",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "c9f50aa7fad3eb67ebd230e7a382c8e4ae646c53689ecd1fe1f37882598c8236",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "gray16",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "0f35380dbe907a1e8cea574ded381bb106c0fd88e8979eb54c1a8e9ca887335a",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "0f35380dbe907a1e8cea574ded381bb106c0fd88e8979eb54c1a8e9ca887335a",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "cmyk",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "54b91309230fb0f85be0e75813f116e71326b49e1a91e6c50109190337c1d026",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "54b91309230fb0f85be0e75813f116e71326b49e1a91e6c50109190337c1d026",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "lab",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "123f39fc452cfb3441a5b3e3d1f52c81e6f1848336151b328404da07cca7d97a",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "123f39fc452cfb3441a5b3e3d1f52c81e6f1848336151b328404da07cca7d97a",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "group4",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          1,
+          1,
+          4
+        ],
+        "sha256": "ad95131bc0b799c0b1af477fb14fcf26a6a9f76079e48bf090acb7e8367bfd0e",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          1,
+          1,
+          4
+        ],
+        "sha256": "ad95131bc0b799c0b1af477fb14fcf26a6a9f76079e48bf090acb7e8367bfd0e",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "rle",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "b9dee894dd5bf607526787191ddec1f1c7c094b8d4dcd1b5a19c97458b078979",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "b9dee894dd5bf607526787191ddec1f1c7c094b8d4dcd1b5a19c97458b078979",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    },
+    {
+      "engine": "gdk",
+      "fixture": "largefile",
+      "match": true,
+      "baseline": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "libtiff": [
+          "/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1"
+        ]
+      },
+      "actual": {
+        "exit": 0,
+        "stderr": "",
+        "shape": [
+          17,
+          19,
+          4
+        ],
+        "sha256": "7fcb9d041dc0afb8dd7558830c5f537448c155753325fc41f37e5b27f832cc71",
+        "libtiff": [
+          "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/compat/libtiff.so.6"
+        ]
+      }
+    }
+  ]
+}

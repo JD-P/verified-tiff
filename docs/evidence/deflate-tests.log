@@ -1,0 +1,12 @@
+test_block_kinds_history_and_window (__main__.Deflate.test_block_kinds_history_and_window) ... ok
+test_expansion_caps_and_metadata (__main__.Deflate.test_expansion_caps_and_metadata) ... ok
+test_format_matrix (__main__.Deflate.test_format_matrix) ... ok
+test_malformed_streams (__main__.Deflate.test_malformed_streams) ... ok
+test_multipage (__main__.Deflate.test_multipage) ... ok
+test_padded_final_strip (__main__.Deflate.test_padded_final_strip) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 4.259s
+
+OK
+Deflate matrix: 816; live oracle=True

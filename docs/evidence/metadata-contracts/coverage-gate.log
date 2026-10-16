@@ -1,0 +1,9 @@
+compat/logluv_api.inc lines 67/67 functions 6/6 branches 52/52
+compat/color_api.inc lines 117/117 functions 8/8 branches 184/184
+compat/reader_api.inc lines 98/98 functions 15/15 branches 165/165
+compat/writer.inc lines 21/21 functions 5/5 branches 52/52
+compat/fields.inc lines 182/182 functions 29/29 branches 354/354
+compat/tiff_compat.c lines 838/838 functions 151/151 branches 648/648
+target/metadata-coverage/stubs.c lines 28/28 functions 28/28 branches 0/0
+TOTAL lines 1351/1351 functions 242/242 branches 1455/1455
+All 198 pinned public symbols and every emitted C line/function/branch covered; no exclusions.

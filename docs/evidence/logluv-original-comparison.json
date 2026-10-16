@@ -1,0 +1,30 @@
+{
+  "file": "logluv-3c-16b.tiff",
+  "input_sha256": "a042e969b1f6ee47703e5187bdac782510023906cd99fdb81ad41e510f4c457d",
+  "pixel_sha256": "8262676937f21d3b6034030a5cbb1c632929cc7aedb7275a8c280944e44f26bb",
+  "metadata": {
+    "width": 1,
+    "height": 1,
+    "channels": 3,
+    "bits_per_sample": 16,
+    "compression": 34676,
+    "predictor": 1,
+    "sample_format": "signed_integer",
+    "color_model": "logluv16",
+    "output_byte_order": "little",
+    "source_alpha": "none",
+    "output_alpha": "none",
+    "output_bits_per_sample": 16,
+    "planar_configuration": 1,
+    "scratch_bytes": 10,
+    "output_bytes": 6,
+    "decode_work": 29,
+    "work_used": 1336
+  },
+  "native_components": [
+    0,
+    6913,
+    15544
+  ],
+  "comparison": "exact independent rational components and libtiff SGILOGDATAFMT_16BIT"
+}

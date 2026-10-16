@@ -1,0 +1,25 @@
+{
+  "utc": "2026-10-15T20:28:03.132821+00:00",
+  "reason": "Require the actual tile-span precondition diagnostic; isolate carry and source-position counterexamples and use concrete YUV lanes for color mutations. No solver-limit reports accepted.",
+  "original_receipt_sha256": "3fea3942c6bda45d130b4912fe5c1f40ac344c77b5f608a4a997c3eb17a63334",
+  "script_sha256": {
+    "scripts/reject-webp-simd.py": "8c511c1c7a15f12d5d5d93c4628ce7edefe21f6133f848360c7412298312016b",
+    "scripts/reject-webp-spans.py": "7075dd72f8dc2961f17e7ba14e9098ce04be25aa273f3bbae3ae33e12f1f70c7"
+  },
+  "results": [
+    {
+      "chunk": 23,
+      "exit_code": 0,
+      "log": "target/parallel-verification/23.log",
+      "rerun": true,
+      "tests": 8
+    },
+    {
+      "chunk": 24,
+      "exit_code": 0,
+      "log": "target/parallel-verification/24.log",
+      "rerun": true,
+      "tests": 7
+    }
+  ]
+}

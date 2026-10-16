@@ -1,0 +1,88 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 1073 dropped 0 interval_us 1000",
+  "samples": 1073,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/baseline-v18/verified-tiff/target/release/examples/benchmark",
+    "target/benchmark/inputs/gray16-deflate.tif",
+    "total",
+    "3000"
+  ],
+  "binary_sha256": "7e8a2b500b6904743c15ff5e287168079918534f92849dd59869e779f5c1189b",
+  "input_sha256": "ec0cd6e8f333f716d4a42f2fd4b2c327dd00363de3d86204e1d3fc40f21366a8",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "engine": "rust",
+    "mode": "total",
+    "iterations": 9,
+    "seconds": 3.220788581,
+    "ns_per_image": 357865397.8888889,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 2097152,
+    "scratch_bytes": 2097152,
+    "inspect_work": 20740902,
+    "decode_work": 24935008,
+    "hash": "33b079fe65a0cbc5"
+  },
+  "functions": [
+    {
+      "function": "benchmark::<verified_tiff::deflate::Cursor>::step",
+      "samples": 839,
+      "percent": 78.19198508853681
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 163,
+      "percent": 15.191053122087604
+    },
+    {
+      "function": "benchmark::verified_tiff::scatter_byte",
+      "samples": 32,
+      "percent": 2.982292637465051
+    },
+    {
+      "function": "benchmark::<verified_tiff::raster_layout::RasterLayout>::convert",
+      "samples": 16,
+      "percent": 1.4911463187325256
+    },
+    {
+      "function": "benchmark::<verified_tiff::raster_layout::RasterLayout>::index",
+      "samples": 9,
+      "percent": 0.8387698042870456
+    },
+    {
+      "function": "benchmark::<verified_tiff::extended::image::ExtendedImage>::decode_with_scratch",
+      "samples": 4,
+      "percent": 0.3727865796831314
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate::validate",
+      "samples": 3,
+      "percent": 0.27958993476234856
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate_header::dynamic",
+      "samples": 3,
+      "percent": 0.27958993476234856
+    },
+    {
+      "function": "benchmark::verified_tiff::deflate_plane::decode",
+      "samples": 2,
+      "percent": 0.1863932898415657
+    },
+    {
+      "function": "benchmark::<verified_tiff::deflate_bits::Huff>::read",
+      "samples": 1,
+      "percent": 0.09319664492078285
+    },
+    {
+      "function": "benchmark::benchmark::main",
+      "samples": 1,
+      "percent": 0.09319664492078285
+    }
+  ]
+}

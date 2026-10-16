@@ -1,0 +1,9 @@
+WebP alpha/filter/partition configurations: 12
+WebP C API: 64 layouts matched libwebp; 48 also matched libtiff (RGB-with-alpha extension checked independently)
+test_alpha_filters_and_vp8_options (__main__.WebPCompatibility.test_alpha_filters_and_vp8_options) ... ok
+test_tiff_matrix (__main__.WebPCompatibility.test_tiff_matrix) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.910s
+
+OK

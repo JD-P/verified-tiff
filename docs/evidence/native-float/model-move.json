@@ -1,0 +1,20 @@
+{
+  "unchanged_functions": [
+    "sign",
+    "finite",
+    "mantissa",
+    "exponent",
+    "rounded",
+    "sticky",
+    "top",
+    "packed",
+    "scaled",
+    "sum",
+    "less",
+    "type_size",
+    "value",
+    "narrowed",
+    "integer"
+  ],
+  "model_sha256": "5c4a71a5db64792164fda9f0ede28ca9decd5ca02c430548c7303c20a264fad6"
+}

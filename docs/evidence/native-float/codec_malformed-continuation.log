@@ -1,0 +1,9 @@
+LERC malformed: 207 truncations/checksum/ending failures rejected
+C ABI mutation smoke: seed=0x4341504954494646 iterations=2000 seeds=7 accepted=1608 native_decoded=1288
+test_lerc_corruption (__main__.CodecMalformed.test_lerc_corruption) ... ok
+test_new_codec_mutations (__main__.CodecMalformed.test_new_codec_mutations) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.779s
+
+OK

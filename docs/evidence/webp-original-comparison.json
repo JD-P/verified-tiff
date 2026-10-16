@@ -1,0 +1,28 @@
+[
+  {
+    "file": "webp_lossless_rgba_alpha_fully_opaque.tif",
+    "input_sha256": "ca79569f94dad826998157d1415dadc4ea2930d79e772f8e0be79e09c3984b97",
+    "accepted": true,
+    "metadata": {
+      "width": 20,
+      "height": 20,
+      "channels": 4,
+      "bits_per_sample": 8,
+      "compression": 50001,
+      "predictor": 1,
+      "sample_format": "unsigned_integer",
+      "color_model": "rgb",
+      "output_byte_order": "not_applicable",
+      "source_alpha": "unassociated",
+      "output_alpha": "straight",
+      "output_bits_per_sample": 8,
+      "planar_configuration": 1,
+      "scratch_bytes": 1600,
+      "output_bytes": 1600,
+      "decode_work": 5814464,
+      "work_used": 11632392
+    },
+    "pixels_match": true,
+    "pixel_sha256": "3f08979d8b3a4700e4e34b057a9197287f98a5a3d7d37cc958f34843e25257ca"
+  }
+]

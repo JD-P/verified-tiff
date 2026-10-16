@@ -1,0 +1,8 @@
+test_adopted_images (__main__.UpstreamFixtures.test_adopted_images) ... ok
+test_cyclic_requests_are_bounded (__main__.UpstreamFixtures.test_cyclic_requests_are_bounded) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 6.024s
+
+OK
+upstream fixtures: 31; live oracle=True

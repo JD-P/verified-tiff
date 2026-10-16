@@ -1,0 +1,6 @@
+patching file src/lerc_numeric.rs
+patching file src/native_stream.rs
+patching file compat/src/stream.rs
+patching file compat/tests/reader_features.py
+patching file compat/tests/reader_features.c
+Restored and built baseline; all archived core/C source hashes matched.

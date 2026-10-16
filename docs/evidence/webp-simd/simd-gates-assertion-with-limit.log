@@ -1,0 +1,8 @@
+WebP SIMD gate: rejected broken butterfly
+WebP SIMD gate: rejected broken transpose
+WebP SIMD gate: rejected broken rounding
+WebP SIMD gate: rejected broken color-rounding
+WebP SIMD gate: rejected broken color-order
+WebP SIMD gate: rejected broken color-position
+WebP SIMD gate: rejected broken color-tail
+WebP SIMD gate: rejected broken lane-range

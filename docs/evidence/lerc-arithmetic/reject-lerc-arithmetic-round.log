@@ -1,0 +1,72 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module lerc_numeric (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/lerc_numeric.rs:151:1
+    |
+151 | fn round_significand(v:u128,n:u32) -> (r:u64)
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/lerc_numeric.rs:153:13
+    |
+153 |     ensures r as u128==rounded(v,n),0x10000000000000u64<=r<=0x20000000000000u64,
+    |             ^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+165 |         return r^1u64;
+    |         ------------- at this exit
+
+error: postcondition not satisfied
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/lerc_numeric.rs:153:37
+    |
+153 |     ensures r as u128==rounded(v,n),0x10000000000000u64<=r<=0x20000000000000u64,
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+165 |         return r^1u64;
+    |         ------------- at this exit
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+   --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-lerc-arithmetic-round/lerc_numeric.rs:159:39
+    |
+159 |         let half=1u64<<(n-1);let rem=(v as u64)&((1u64<<n)-1);
+    |                                       ^
+
+verification results:: 4 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

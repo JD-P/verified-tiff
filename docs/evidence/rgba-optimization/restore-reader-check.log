@@ -1,0 +1,12 @@
+patching file src/lib.rs
+patching file src/native_rgba.rs
+patching file compat/src/decoder.rs
+patching file compat/src/storage.rs
+patching file compat/src/stream.rs
+patching file compat/tests/reader_features.c
+patching file compat/tests/reader_features.py
+patching file src/lerc_numeric.rs
+patching file src/native_stream.rs
+patching file compat/src/stream.rs
+patching file compat/tests/reader_features.py
+patching file compat/tests/reader_features.c

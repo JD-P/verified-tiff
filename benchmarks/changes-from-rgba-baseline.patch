@@ -1,0 +1,321 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -53,6 +53,7 @@
+ pub mod native_zstd;
+ pub mod native;
+ pub mod native_samples;
++pub mod native_rgba;
+ pub mod native_fp;
+ pub mod native_stream;
+ pub mod native_rle;
+--- /dev/null
++++ b/src/native_rgba.rs
+@@ -0,0 +1,105 @@
++//! Allocation-free row presentation for native unsigned 8/16-bit samples.
++//! The byte model specifies libtiff's packed ABGR word, including alpha rounding.
++use super::*;
++verus! {
++pub open spec fn value(s:Seq<u8>,i:int,wide:bool,le:bool) -> int {
++    if wide {word16(s,2*i,le)} else {s[i] as int}
++}
++pub open spec fn color(v:int,wide:bool,rgb:bool,invert:bool) -> int {
++    let x=if invert {(if wide {65535int} else {255int})-v} else {v};
++    if !wide {x} else if rgb {(x+128)/257} else {x/256}
++}
++pub open spec fn component(s:Seq<u8>,i:int,ch:usize,wide:bool,rgb:bool,invert:bool,alpha:usize,premul:bool,le:bool,c:int) -> u8 {
++    let a=if alpha<ch {color(value(s,i*ch+alpha,wide,le),wide,rgb,false)} else {255int};
++    let v=color(value(s,i*ch+(if rgb {c} else {0}),wide,le),wide,rgb,invert);
++    (if c==3 {a} else if premul {(v*a+127)/255} else {v}) as u8
++}
++pub open spec fn valid(len:int,n:usize,ch:usize,wide:bool,rgb:bool,invert:bool,alpha:usize,premul:bool,outlen:int) -> bool {
++    0<ch<=64 && (!rgb || ch>=3) && (!invert || !rgb) && alpha<=ch
++    && (alpha==ch || alpha>=(if rgb {3int} else {1int}))
++    && (!premul || rgb && alpha<ch)
++    && n as int*ch*(if wide {2int} else {1int})<=len && n as int*4<=outlen
++}
++#[inline(always)]
++fn load(s:&[u8],i:usize,wide:bool,le:bool) -> (v:u32)
++    requires (i as int+1)*(if wide {2int} else {1int})<=s.len(),
++    ensures v==value(s@,i as int,wide,le),v<=if wide {65535int} else {255int},
++{
++    if wide {
++        let a=s[2*i] as u32;let b=s[2*i+1] as u32;
++        if le {a+256*b} else {256*a+b}
++    }else{s[i] as u32}
++}
++#[inline(always)]
++fn scale(v:u32,wide:bool,rgb:bool,invert:bool) -> (b:u8)
++    requires v<=if wide {65535int} else {255int},
++    ensures b as int==color(v as int,wide,rgb,invert),
++{
++    let x=if invert {(if wide {65535u32} else {255u32})-v} else {v};
++    (if !wide {x} else if rgb {(x+128)/257} else {x/256}) as u8
++}
++#[inline(always)]
++fn associate(v:u8,a:u8,premul:bool) -> (b:u8)
++    ensures b as int==if premul {(v as int*a as int+127)/255} else {v as int},
++{
++    assert(0<=v as int*a as int<=65025) by(nonlinear_arith);
++    if premul {((v as u32*a as u32+127)/255) as u8} else {v}
++}
++/// A bounded row, optionally mirrored. Invalid arguments leave all output intact;
++/// success changes exactly 4*n bytes. Source and output lengths bound the work.
++/// Inline parameters allow the adapter to specialize common layouts once per row.
++#[inline(always)]
++pub fn row(raw:&[u8],n:usize,ch:usize,wide:bool,rgb:bool,invert:bool,alpha:usize,premul:bool,le:bool,reverse:bool,out:&mut[u8]) -> (r:Result<(),Error>)
++    ensures r.is_ok()==valid(raw.len() as int,n,ch,wide,rgb,invert,alpha,premul,old(out).len() as int),
++        final(out).len()==old(out).len(),
++        r.is_err() ==> final(out)@==old(out)@,
++        r.is_ok() ==> forall|i:int,c:int|0<=i<n && 0<=c<4 ==> #[trigger] final(out)@[4*i+c]==component(raw@,if reverse {n as int-1-i} else {i},ch,wide,rgb,invert,alpha,premul,le,if le {c} else {3-c}),
++        forall|k:int|n as int*4<=k<old(out).len() ==> final(out)@[k]==old(out)@[k],
++{
++    if ch==0||ch>64||rgb&&ch<3||invert&&rgb||alpha>ch||alpha<ch&&alpha<(if rgb {3} else {1})||premul&&(!rgb||alpha==ch){return Err(Error::Unsupported);}
++    let stride=ch*(if wide {2usize} else {1usize});
++    proof {
++        quotient_remainder(raw.len() as int,stride as int);quotient_remainder(out.len() as int,4);
++        assert((n<=raw.len()/stride)==(n as int*ch*(if wide {2int} else {1int})<=raw.len())) by(nonlinear_arith)
++            requires stride==ch*(if wide {2int} else {1int}),stride>0,
++                raw.len() as int==stride*(raw.len() as int/(stride as int))+raw.len() as int%(stride as int),
++                0<=raw.len() as int%(stride as int)<stride;
++    }
++    if n>raw.len()/stride||n>out.len()/4{return Err(Error::OutputTooSmall);}
++    let mut i=0usize;
++    while i<n
++        invariant valid(raw.len() as int,n,ch,wide,rgb,invert,alpha,premul,out.len() as int),
++            i<=n,out.len()==old(out).len(),
++            forall|p:int,c:int|0<=p<i && 0<=c<4 ==> #[trigger] out@[4*p+c]==component(raw@,if reverse {n as int-1-p} else {p},ch,wide,rgb,invert,alpha,premul,le,if le {c} else {3-c}),
++            forall|k:int|i as int*4<=k<out.len() ==> out@[k]==old(out)@[k],
++        decreases n-i,
++    {
++        let p=if reverse {n-1-i} else {i};
++        assert((p as int+1)*ch*(if wide {2int} else {1int})<=raw.len()) by(nonlinear_arith)
++            requires p<n,n as int*ch*(if wide {2int} else {1int})<=raw.len(),0<ch<=64;
++        assert(p as int*ch+ch<=raw.len()) by(nonlinear_arith)
++            requires (p as int+1)*ch*(if wide {2int} else {1int})<=raw.len(),0<ch;
++        let at=p*ch;
++        assert((at as int+ch)*(if wide {2int} else {1int})<=raw.len()) by(nonlinear_arith)
++            requires at==p as int*ch,(p as int+1)*ch*(if wide {2int} else {1int})<=raw.len();
++        proof {
++            if wide {
++                assert(2*(at as int+ch)<=raw.len());
++                assert(2*(at as int+1)<=raw.len());
++                if alpha<ch {assert(2*(at as int+alpha+1)<=raw.len());}
++                if rgb {assert(2*(at as int+3)<=raw.len());}
++            }
++        }
++        let a=if alpha<ch {scale(load(raw,at+alpha,wide,le),wide,rgb,false)} else {255u8};
++        let r=scale(load(raw,at,wide,le),wide,rgb,invert);
++        let g=if rgb {scale(load(raw,at+1,wide,le),wide,true,false)} else {r};
++        let b=if rgb {scale(load(raw,at+2,wide,le),wide,true,false)} else {r};
++        let r=associate(r,a,premul);let g=associate(g,a,premul);let b=associate(b,a,premul);
++        let d=4*i;
++        out[d]=if le {r} else {a};out[d+1]=if le {g} else {b};
++        out[d+2]=if le {b} else {g};out[d+3]=if le {a} else {r};
++        i=i+1;
++    }
++    Ok(())
++}
++}
+--- a/compat/src/decoder.rs
++++ b/compat/src/decoder.rs
+@@ -138,14 +138,28 @@
+         let bottom=y.checked_add(h).ok_or((LIMIT,"RGBA extent overflow"))?.min(height);
+         let flip=|o:usize|{let o=(o-1)%4+1;(o==2||o==3,o==3||o==4)};
+         let (sx,sy)=flip(source_orientation);let (ox,oy)=flip(orientation);let fx=sx!=ox;let fy=sy!=oy;
++        let fast=planar==1&&matches!(bits,8|16)&&photo!=3;
+         // Work in the requested region's coordinates, matching libtiff's strip
+         // and tile orientation conventions. Padding remains zero.
+         for by in y/bh..=(bottom-1)/bh{for bx in x/bw..=(right-1)/bw{
+             let left=x.max(bx*bw);let top=y.max(by*bh);let rr=right.min((bx+1)*bw);let bb=bottom.min((by+1)*bh);
+             let k=by*across+bx;
+             for plane in 0..if planar==2{channels}else{1}{
++                let segment=k+plane*per;let needed=product(row,self.meta.segment_rows(segment)?)?;
++                let complete=left==bx*bw&&rr==width.min((bx+1)*bw)&&top==by*bh&&bb==height.min((by+1)*bh);
++                let full=if complete&&self.rgba_full_segment(segment,needed)?{Some(self.native_range(segment,0,needed,&mut budget)?)}else{None};
++                let cached=if full.is_none()&&self.rgba_cached_segment(segment,needed)?{self.segment(segment,&mut budget)?;self.cache.take()}else{None};
+                 for yy in top..bb{
+-                    let data=self.native_range(k+plane*per,(yy-by*bh)*row,row,&mut budget)?;
++                    let at=(yy-by*bh)*row;
++                    let owned=if full.is_none()&&cached.is_none(){Some(self.native_range(segment,at,row,&mut budget)?)}else{None};
++                    let data=if let Some(d)=&full{&d[at..at+row]}else if let Some((_,d))=&cached{&d[at..at+row]}else{&**owned.as_ref().unwrap()};
++                    if fast{
++                        let tx=if fx{right-rr}else{left-x};let dy=yy-y;
++                        let ty=h-(bottom-y)+if fy{bottom-y-1-dy}else{dy};let dest=(ty*w+tx)*4;
++                        let start=(left-bx*bw)*channels*(bits/8);let n=rr-left;
++                        rgba_row(&data[start..],n,channels,bits,base==3,photo==0,alpha,fx,&mut result[dest..dest+n*4])?;
++                        continue;
++                    }
+                     for xx in left..rr{
+                     let dx=xx-x;let dy=yy-y;let tx=if fx{right-x-1-dx}else{dx};let ty=h-(bottom-y)+if fy{bottom-y-1-dy}else{dy};let dest=(ty*w+tx)*4;
+                     let mut rgba=if planar==2 && plane>0{unpack(&result[dest..dest+4])}else{[0,0,0,255]};
+@@ -163,9 +177,10 @@
+                     }
+                     pack(&mut result[dest..dest+4],rgba);
+                 }}
++                if cached.is_some(){self.cache=cached;}
+             }
+         }}
+-        if base==3 && alpha.is_some_and(|(_,kind)|kind==2){
++        if !fast && base==3 && alpha.is_some_and(|(_,kind)|kind==2){
+             for p in result.chunks_exact_mut(4){let mut q=unpack(p);for c in 0..3{q[c]=((q[c] as u32*q[3] as u32+127)/255) as u8;}pack(p,q);}
+         }
+         self.rendered=Some(result);Ok(())
+@@ -273,6 +288,21 @@
+         b.finish()
+     }
+ }
++fn rgba_row(raw:&[u8],n:usize,ch:usize,bits:usize,rgb:bool,invert:bool,alpha:Option<(usize,u16)>,reverse:bool,out:&mut[u8])->R<()>{
++    use verified_tiff::native_rgba::row;
++    let le=cfg!(target_endian="little");let a=alpha.map_or(ch,|(a,_)|a);let premul=rgb&&alpha.is_some_and(|(_,kind)|kind==2);
++    // Constant layout arguments specialize the hot loops; unusual extra-channel
++    // layouts use the same proved kernel with a dynamic stride.
++    let r=match (bits,ch,rgb,invert,a){
++        (8,3,true,false,3)=>row(raw,n,3,false,true,false,3,false,le,reverse,out),
++        (8,4,true,false,3)=>row(raw,n,4,false,true,false,3,premul,le,reverse,out),
++        (8,1,false,false,1)=>row(raw,n,1,false,false,false,1,false,le,reverse,out),
++        (8,1,false,true,1)=>row(raw,n,1,false,false,true,1,false,le,reverse,out),
++        (16,3,true,false,3)=>row(raw,n,3,true,true,false,3,false,le,reverse,out),
++        (16,1,false,false,1)=>row(raw,n,1,true,false,false,1,false,le,reverse,out),
++        _=>row(raw,n,ch,bits==16,rgb,invert,a,premul,le,reverse,out),
++    };r.map_err(err)
++}
+ pub fn sample(s:&[u8],row:usize,n:usize,bits:usize)->R<u32>{
+     if bits<8{let bit=n*bits;Ok(((s[row+bit/8]>>(8-bits-bit%8))&((1u8<<bits)-1)) as u32)}
+     else{ns::read_word(s,row+n*(bits/8),bits/8,cfg!(target_endian="little")).map(|v|v as u32).map_err(err)}
+--- a/compat/src/storage.rs
++++ b/compat/src/storage.rs
+@@ -5,6 +5,11 @@
+ pub struct Memory {single:usize,cumulative:usize,used:AtomicUsize}
+ pub type Mem=Arc<Memory>;
+ impl Memory {
++    /// Conservative admission check for optional scratch. Actual allocations
++    /// still claim their bytes; a failed check selects the bounded row path.
++    pub fn fits(&self,single:usize,total:usize)->bool{
++        (self.single==0||single<=self.single)&&self.used.load(Ordering::Relaxed).checked_add(total).is_some_and(|n|self.cumulative==0||n<=self.cumulative)
++    }
+     pub fn new(single:usize,cumulative:usize,base:usize)->R<Mem>{
+         let m=Arc::new(Self{single,cumulative,used:AtomicUsize::new(0)});
+         m.claim(base)?;Ok(m)
+--- a/compat/src/stream.rs
++++ b/compat/src/stream.rs
+@@ -119,6 +119,22 @@
+ }
+ pub struct Cached{pub k:usize,pub stream:Stream}
+ impl Handle{
++    /// Optional full Deflate staging is limited to 1 MiB even with unlimited
++    /// deployment limits. Larger/tightly-budgeted requests retain row replay.
++    pub fn rgba_full_segment(&mut self,k:usize,needed:usize)->R<bool>{
++        if !matches!(self.meta.compression,8|32946)||needed>1048576||needed>self.limits.max_output{return Ok(false);}
++        let count=usize::try_from(self.meta.counts.get(&mut self.source,k)?).map_err(|_|(LIMIT,"segment count overflow"))?;
++        if needed<=65536&&count<=65536{return Ok(false);}
++        let engine=std::mem::size_of::<Engine>();let window=count.min(WINDOW);
++        let copies=if self.meta.predictor==1&&self.meta.le==cfg!(target_endian="little"){1}else{3};
++        let total=product(needed,copies)?.checked_add(window).and_then(|n|n.checked_add(engine)).ok_or((LIMIT,"RGBA staging overflow"))?;
++        Ok(window<=self.source.input&&self.source.mem.fits(needed.max(window).max(engine),total))
++    }
++    pub fn rgba_cached_segment(&mut self,k:usize,needed:usize)->R<bool>{
++        if !self.streaming_codec(){return Ok(true);}
++        if self.meta.compression==1||needed>65536{return Ok(false);}
++        Ok(self.meta.counts.get(&mut self.source,k)?<=65536)
++    }
+     pub fn streaming_codec(&self)->bool{matches!(self.meta.compression,1|32773|5|8|32946)}
+     pub fn transform_native(&self,raw:Buf<u8>,row:usize)->R<Buf<u8>>{
+         let m=&self.meta;let n=raw.len();let mem=&self.source.mem;
+--- a/compat/tests/reader_features.c
++++ b/compat/tests/reader_features.c
+@@ -33,13 +33,17 @@
+   const char *mode=argv[1];
+   TIFFOpenOptions *options=TIFFOpenOptionsAlloc();assert(options);
+ #ifndef ORACLE
++  if(!strcmp(mode,"croptight")){
++    TIFFOpenOptionsSetMaxSingleMemAlloc(options,524288);TIFFOpenOptionsSetMaxCumulatedMemAlloc(options,524288);
++    assert(VTIFFOpenOptionsSetLimits(options,INT64_MAX,524288,1000000000));
++  }
+   if(!strcmp(mode,"stream")||!strcmp(mode,"lazy")||!strcmp(mode,"cropbounded")){
+     TIFFOpenOptionsSetMaxSingleMemAlloc(options,131072);TIFFOpenOptionsSetMaxCumulatedMemAlloc(options,393216);
+     assert(VTIFFOpenOptionsSetLimits(options,INT64_MAX,131072,1000000000));
+   }
+ #endif
+   TIFF *t=TIFFOpenExt(argv[2],"rOc",options);TIFFOpenOptionsFree(options);if(!t)return 3;
+-  if(!strcmp(mode,"crop")||!strcmp(mode,"cropbounded")){
++  if(!strcmp(mode,"crop")||!strcmp(mode,"cropbounded")||!strcmp(mode,"croptight")){
+     assert(argc>=7);uint32_t w=(uint32_t)strtoul(argv[4],0,10),h=(uint32_t)strtoul(argv[5],0,10);int orientation=atoi(argv[6]);
+     size_t n=(size_t)w*h*4;uint32_t *p=malloc(n+16);assert(p);memset(p,0xa5,n+16);
+     int ok;
+@@ -108,12 +112,19 @@
+     uint8_t buffer[8192];assert(TIFFReadBufferSetup(t,buffer,sizeof(buffer)));b.buffer=buffer;b.buffer_size=sizeof(buffer);b.maxread=0;
+     tmsize_t n=TIFFScanlineSize(t);uint8_t *row=malloc((size_t)n);assert(row&&TIFFReadScanline(t,row,0,0)==1&&b.reads>0);assert(b.maxread<=sizeof(buffer));free(row);
+     TIFFClose(t);assert(a.closed==0&&b.closed==1);free(bytes);save(argv[3],"ok",2);return 0;
++  }else if(!strcmp(mode,"rejectrgba")){
++    uint32_t w=0,h=0;assert(TIFFGetField(t,TIFFTAG_IMAGEWIDTH,&w)&&TIFFGetField(t,TIFFTAG_IMAGELENGTH,&h));
++    size_t size=(size_t)w*h*4;uint32_t *rgba=malloc(size+16);assert(rgba);memset(rgba,0xa5,size+16);
++    assert(!TIFFReadRGBAImageOriented(t,w,h,rgba,ORIENTATION_TOPLEFT,1));for(size_t i=0;i<size+16;i++)assert(((uint8_t*)rgba)[i]==0xa5);free(rgba);save(argv[3],"ok",2);
+   }else if(!strcmp(mode,"reject")){
+     tmsize_t n=TIFFScanlineSize(t);uint8_t *row=malloc((size_t)n+16);assert(row);memset(row,0xa5,(size_t)n+16);assert(TIFFReadScanline(t,row,0,0)==-1);for(size_t i=0;i<(size_t)n+16;i++)assert(row[i]==0xa5);free(row);
+     /* Complete reads may validate while decoding into private staging, but
+      * checksum/truncation/end errors must never expose that partial result. */
+     n=TIFFStripSize(t);assert(n>0);uint8_t *strip=malloc((size_t)n+16);assert(strip);memset(strip,0xa5,(size_t)n+16);
+-    assert(TIFFReadEncodedStrip(t,0,strip,n)==-1);for(size_t i=0;i<(size_t)n+16;i++)assert(strip[i]==0xa5);free(strip);save(argv[3],"ok",2);
++    assert(TIFFReadEncodedStrip(t,0,strip,n)==-1);for(size_t i=0;i<(size_t)n+16;i++)assert(strip[i]==0xa5);free(strip);
++    uint32_t w=0,h=0;assert(TIFFGetField(t,TIFFTAG_IMAGEWIDTH,&w)&&TIFFGetField(t,TIFFTAG_IMAGELENGTH,&h));
++    size_t size=(size_t)w*h*4;uint32_t *rgba=malloc(size+16);assert(rgba);memset(rgba,0xa5,size+16);
++    assert(!TIFFReadRGBAImageOriented(t,w,h,rgba,ORIENTATION_TOPLEFT,1));for(size_t i=0;i<size+16;i++)assert(((uint8_t*)rgba)[i]==0xa5);free(rgba);save(argv[3],"ok",2);
+   }else if(!strcmp(mode,"logcolor")){
+     FILE *f=fopen(argv[3],"wb");assert(f);
+     for(int i=0;i<4096;i++){double y[]={LogL16toY(i*17),LogL10toY(i%1024)};assert(fwrite(y,sizeof(double),2,f)==2);float xyz[3];uint8_t rgb[3];LogLuv24toXYZ((uint32_t)i*4093,xyz);assert(fwrite(xyz,4,3,f)==3);XYZtoRGB24(xyz,rgb);assert(fwrite(rgb,1,3,f)==3);LogLuv32toXYZ((uint32_t)i*104729,xyz);assert(fwrite(xyz,4,3,f)==3);double u=0,v=0;int ok=uv_decode(&u,&v,i*4);assert(fwrite(&ok,sizeof(ok),1,f)==1);assert(fwrite(&u,8,1,f)==1&&fwrite(&v,8,1,f)==1);}
+--- a/compat/tests/reader_features.py
++++ b/compat/tests/reader_features.py
+@@ -96,6 +96,53 @@
+             rows=[bytes((x*17+y*23+c*37)%256 for x in range(w) for c in range(ch)) for y in range(h)]
+             data=image(rows,w,ch=ch,photo=photo,codec=codec)
+             self.run_reader('cropbounded',data,9,7,1,3,190)
++    def test_full_deflate_rgba_rows_prediction_and_endian(self):
++        # One decoded strip >64 KiB triggers optional complete staging. The
++        # Mirrored crops exercise the bounded path as well.
++        for bits,ch,predictor,le in itertools.product([8,16],[1,3],[1,2],[False,True]):
++            w,h=257,131;mask=(1<<bits)-1;rows=[];expected=bytearray()
++            for y in range(h):
++                values=[(x*7331+y*3359+c*1777)&mask for x in range(w) for c in range(ch)]
++                for x in range(w):
++                    pixel=[values[x*ch+c] for c in range(ch)]
++                    pixel=[(v>>8) if bits==16 and ch==1 else (v*255+mask//2)//mask for v in pixel]
++                    expected.extend((pixel*3 if ch==1 else pixel)+[255])
++                encoded=[(v-(values[i-ch] if predictor==2 and i>=ch else 0))&mask for i,v in enumerate(values)]
++                rows.append(b''.join(v.to_bytes(bits//8,'little' if le else 'big') for v in encoded))
++            data=image(rows,w,bits,ch=ch,codec=8,predictor=predictor,le=le,photo=2 if ch==3 else 1)
++            self.assertEqual(self.run_reader('crop',data,w,h,1),expected)
++            for req in [2,3,4]:
++                cropped=b''.join(expected[((19+(96-yy if req in (3,4) else yy))*w+17+(102-xx if req in (2,3) else xx))*4:((19+(96-yy if req in (3,4) else yy))*w+17+(102-xx if req in (2,3) else xx))*4+4] for yy in range(97) for xx in range(103))
++                # 4.7.1 applies a byte rather than a word-scaled col_offset to
++                # these 16-bit crops. Use independent expected pixels there.
++                self.assertEqual(self.run_reader('crop',data,103,97,req,17,19,oracle=bits==8),cropped)
++    def test_rgba_extra_channel_selection_and_alpha_rounding(self):
++        for bits,photo,ch,extra in itertools.product([8,16],[0,1,2],[4,6],[(0,1),(0,2),(1,2)]):
++            # Exact independent presentation expectation, including the existing
++            # grayscale alpha convention. Unspecified channels are ignored.
++            base=3 if photo==2 else 1
++            if len(extra)>ch-base:continue
++            data,*_=scene(w=19,h=7,ch=ch,bits=bits,photo=photo,extra=[(338,3,list(extra))])
++            mask=(1<<bits)-1;expected=bytearray();aidx=ch-len(extra)+next(i for i,v in enumerate(extra) if v)
++            for y in range(7):
++                for x in range(19):
++                    values=[(x*1013+y*3137+c*9109+(mask if (x+y+c)%3==0 else 0))&mask for c in range(ch)]
++                    cv=lambda v:(v>>8) if bits==16 and base==1 else (v*255+mask//2)//mask
++                    pixel=[cv(mask-values[0] if photo==0 else values[c if base==3 else 0]) for c in range(3)]
++                    a=cv(values[aidx]);kind=extra[aidx-(ch-len(extra))]
++                    if base==3 and kind==2:pixel=[(v*a+127)//255 for v in pixel]
++                    expected.extend(pixel+[a])
++            self.assertEqual(self.run_reader('crop',data,19,7,1,oracle=False),expected)
++    def test_full_rgba_falls_back_under_cumulative_limit(self):
++        w,h=512,192
++        rows=[bytes((x*17+y*23+c*37)%256 for x in range(w) for c in range(3)) for y in range(h)]
++        data=image(rows,w,ch=3,photo=2,codec=8)
++        self.assertEqual(self.run_reader('croptight',data,w,h,1),self.run_reader('crop',data,w,h,1))
++    def test_late_rgba_segment_failure_is_atomic(self):
++        w,h=257,131;rows=[bytes((x*17+y*23)%256 for x in range(w*3)) for y in range(h)]
++        good=zlib.compress(b''.join(rows));bad=good[:-1]+bytes([good[-1]^1])
++        tags=[(256,4,[w]),(257,4,[h*2]),(258,3,[8]*3),(259,3,[8]),(262,3,[2]),(273,4,('SEG',[good,bad])),(277,3,[3]),(278,4,[h]),(279,4,[len(good),len(bad)])]
++        self.run_reader('rejectrgba',assemble([tags])[0],oracle=False)
+     def test_streamed_predictors_and_fillorder(self):
+         for bits,codec,le,fill in itertools.product([16,24,32,64],[5,8],[False,True],[1,2]):
+             width=bits//8;w,ch,h=193,2,96;native=[];rows=[]

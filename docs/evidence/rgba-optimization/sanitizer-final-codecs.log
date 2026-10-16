@@ -1,0 +1,27 @@
+test_alpha_and_float_bands (__main__.LercCompatibility.test_alpha_and_float_bands) ... ok
+test_native_matrix (__main__.LercCompatibility.test_native_matrix) ... ok
+test_shared_mask_bands (__main__.LercCompatibility.test_shared_mask_bands) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.111s
+
+OK
+LERC C API: 384 native TIFF combinations matched independent samples
+test_alpha_filters_and_vp8_options (__main__.WebPCompatibility.test_alpha_filters_and_vp8_options) ... ok
+test_tiff_matrix (__main__.WebPCompatibility.test_tiff_matrix) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.653s
+
+OK
+WebP alpha/filter/partition configurations: 12
+WebP C API: 64 layouts matched libwebp; 48 also matched libtiff (RGB-with-alpha extension checked independently)
+test_lerc_corruption (__main__.CodecMalformed.test_lerc_corruption) ... ok
+test_new_codec_mutations (__main__.CodecMalformed.test_new_codec_mutations) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.356s
+
+OK
+LERC malformed: 207 truncations/checksum/ending failures rejected
+C ABI mutation smoke: seed=0x4341504954494646 iterations=2000 seeds=7 accepted=1608 native_decoded=1288

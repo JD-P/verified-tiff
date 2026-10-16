@@ -1,0 +1,44 @@
+[
+  {
+    "binary": "target/baseline-v18/verified-tiff/target/release/examples/benchmark",
+    "binary_sha256": "7e8a2b500b6904743c15ff5e287168079918534f92849dd59869e779f5c1189b",
+    "file": "before-jpeg-idct.asm",
+    "sha256": "3978197ac10a6d273f9b8fb5597be8ee7fb9d017aca1d5b93001e62c3b7cf005",
+    "symbol": "verified_tiff::jpeg_scan::decode_blocks"
+  },
+  {
+    "binary": "target/baseline-v18/verified-tiff/target/release/examples/benchmark",
+    "binary_sha256": "7e8a2b500b6904743c15ff5e287168079918534f92849dd59869e779f5c1189b",
+    "file": "before-deflate-step.asm",
+    "sha256": "e62293e3283376600b2e97c01a2aba86175f2e9f3246331af625ed6d705ab392",
+    "symbol": "<verified_tiff::deflate::Cursor>::step"
+  },
+  {
+    "binary": "target/baseline-v18/verified-tiff/target/release/examples/benchmark",
+    "binary_sha256": "7e8a2b500b6904743c15ff5e287168079918534f92849dd59869e779f5c1189b",
+    "file": "before-logluv-scatter.asm",
+    "sha256": "1c330a4ece69dbd40bd0d4542b96c8ad303d295a5f99a429826b642c338af434",
+    "symbol": "<verified_tiff::logluv_tiff::LogluvImage>::decode_with_scratch"
+  },
+  {
+    "binary": "target/release/examples/benchmark",
+    "binary_sha256": "21bd2abd70654679e1546fd78516ff71c7ad8bb11a1c94441aae4f4715d1f086",
+    "file": "after-jpeg-idct.asm",
+    "sha256": "18b549cdace89f4e680eeb4d5dc2bd9e2ee6faff6cae21b63e930984895249b8",
+    "symbol": "verified_tiff::jpeg_scan::decode_blocks"
+  },
+  {
+    "binary": "target/release/examples/benchmark",
+    "binary_sha256": "21bd2abd70654679e1546fd78516ff71c7ad8bb11a1c94441aae4f4715d1f086",
+    "file": "after-deflate-step.asm",
+    "sha256": "91bee46a56ecfb430c973ed0ccd149a84ed31df4079a580abf2eedaebdc77767",
+    "symbol": "<verified_tiff::deflate::Cursor>::step"
+  },
+  {
+    "binary": "target/release/examples/benchmark",
+    "binary_sha256": "21bd2abd70654679e1546fd78516ff71c7ad8bb11a1c94441aae4f4715d1f086",
+    "file": "after-logluv-scatter.asm",
+    "sha256": "3611dd19614f282dee7447a2ad9cbf0b40d343a118659241e627d29b245ff3e8",
+    "symbol": "<verified_tiff::logluv_tiff::LogluvImage>::decode_with_scratch"
+  }
+]

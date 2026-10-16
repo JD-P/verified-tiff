@@ -1,0 +1,305 @@
+--- a/src/lerc_numeric.rs
++++ b/src/lerc_numeric.rs
+@@ -1,17 +1,14 @@
+-//! Integer implementation of the IEEE binary64 operations used by LERC.
+-//! The contract is relative to these explicit rounded bit operations; it does
+-//! not assume a host floating-point environment or a trusted bit cast.
+-use super::*;
++//! LERC numeric dispatch and verified software reference/fallback.
++//! Hardware primitives have explicit contracts in the trusted-float dependency.
++use super::Error;
++use vstd::prelude::*;
++use verified_tiff_float as hw;
++pub(super) use hw::model::*;
+ verus! {
+-pub(super) open spec fn sign(v:u64) -> bool {v>=0x8000000000000000u64}
+-pub(super) open spec fn finite(v:u64) -> bool {(v/0x10000000000000u64)%2048!=2047}
+-pub(super) open spec fn mantissa(v:u64) -> u128 {
+-    ((v%0x10000000000000u64) as u128+if (v/0x10000000000000u64)%2048==0{0u128}else{0x10000000000000u128}) as u128
+-}
+-pub(super) open spec fn exponent(v:u64) -> i32 {
+-    let e=(v/0x10000000000000u64)%2048;
+-    if e==0{-1074i32}else{(e as int-1075) as i32}
+-}
++
++
++
++
+ #[inline(always)]
+ pub(super) fn parts(v:u64) -> (r:(bool,u128,i32))
+     ensures r==(sign(v),mantissa(v),exponent(v)),r.1<0x20000000000000u128,-1074<=r.2<=972,
+@@ -19,13 +16,7 @@
+     let e=(v/0x10000000000000u64)%2048;
+     (v>=0x8000000000000000u64,(v%0x10000000000000u64) as u128+if e==0{0u128}else{0x10000000000000u128},if e==0{-1074i32}else{e as i32-1075})
+ }
+-pub(super) open spec fn rounded(v:u128,n:u32) -> u128 {
+-    if n==0{v}else if n>128{0}else if n==128{if v>0x80000000000000000000000000000000u128{1u128}else{0u128}}
+-    else{
+-        let q=v>>n;let half=1u128<<((n-1) as u32);let rem=v&(((1u128<<n)-1) as u128);
+-        (q+if rem>half || (rem==half && q%2==1){1u128}else{0u128}) as u128
+-    }
+-}
++
+ #[inline(always)]
+ pub(super) fn round(v:u128,n:u32) -> (r:u128)
+     ensures r==rounded(v,n),n>0 ==> r<=0x80000000000000000000000000000000u128,
+@@ -56,10 +47,7 @@
+     let rem=v&(((1u128<<n)-1) as u128);
+     q+if rem>half || (rem==half && q%2==1){1}else{0}
+ }
+-pub(super) open spec fn sticky(v:u128,n:u32) -> u128 {
+-    if n==0{v}else if n>=128{if v==0{0u128}else{1u128}}
+-    else{(v>>n)|if v&(((1u128<<n)-1) as u128)==0{0u128}else{1u128}}
+-}
++
+ #[inline(always)]
+ fn shift_sticky(v:u128,n:u32) -> (r:u128)
+     ensures r==sticky(v,n),r<=v,
+@@ -71,9 +59,7 @@
+     assert(r<=v) by(bit_vector) requires 0<n<128,r==(v>>n)|if v&(((1u128<<n)-1) as u128)==0{0u128}else{1u128};
+     r
+ }
+-pub(super) open spec fn top(v:u128,fuel:nat) -> int decreases fuel {
+-    if fuel==0 || v<2{0}else{1+top(v/2,(fuel-1) as nat)}
+-}
++
+ // Erased induction connects a chunked shift to the unchanged bit-by-bit model.
+ proof fn top_shift(v:u128,n:u32,fuel:nat)
+     requires n<128,n<fuel<=128,v>>n>0,
+@@ -128,22 +114,7 @@
+     }
+     n
+ }
+-pub(super) open spec fn packed(negative:bool,v:u128,e:i32) -> u64 {
+-    let hi=top(v,128) as int;
+-    let shift=if hi>52{hi-52}else{0int};
+-    let small=if -1074-e>shift{-1074-e}else{shift};
+-    let q=rounded(v,small as u32);
+-    let power=e+small;
+-    let hi2=top(q,128) as int;
+-    let exp=power+hi2;
+-    let sg=if negative{0x8000000000000000u64}else{0u64};
+-    if q==0{sg}else if exp>1023{sg|0x7ff0000000000000u64}
+-    else if exp< -1022{sg|((q<<((power+1074) as u32)) as u64)}
+-    else{
+-        let bits=if hi2>52{q>>(hi2-52) as u32}else{q<<(52-hi2) as u32};
+-        sg|(((exp+1023) as u64)<<52)|(bits as u64%0x10000000000000u64)
+-    }
+-}
++
+ // The normal rounder knows its leading-bit position before rounding. Rounding
+ // can only retain that position or carry once; a second leading-zero count is
+ // unnecessary. The carry is absorbed by adding the significand to the field.
+@@ -232,13 +203,11 @@
+     let bits=if hi2>52{q>>(hi2-52)}else{q<<(52-hi2)};
+     sg|(((exp+1023) as u64)<<52)|(bits as u64%0x10000000000000u64)
+ }
+-pub(super) open spec fn scaled(a:u64,q:u32) -> u64 {
+-    packed(sign(a),(mantissa(a)*q) as u128,(exponent(a)+1) as i32)
+-}
++
+ /// Rounded q * (2 * maximum error). Header validation excludes overflow of
+ /// the intermediate doubled error, matching Lerc2's binary64 evaluation.
+ #[inline(always)]
+-pub(super) fn scale(a:u64,q:u32) -> (r:u64)
++pub(super) fn scale_software(a:u64,q:u32) -> (r:u64)
+     ensures r==scaled(a,q),
+ {
+     let (sg,m,e)=parts(a);
+@@ -246,14 +215,7 @@
+         requires m<0x20000000000000u128,q<=4294967295;
+     pack(sg,m*(q as u128),e+1)
+ }
+-pub(super) open spec fn sum(a:u64,b:u64) -> u64 {
+-    let e=if exponent(a)>exponent(b){exponent(a)}else{exponent(b)};
+-    let x=sticky(mantissa(a)<<64,(e-exponent(a)) as u32);
+-    let y=sticky(mantissa(b)<<64,(e-exponent(b)) as u32);
+-    let m=if sign(a)==sign(b){x+y}else if x>=y{x-y}else{y-x};
+-    let sg=if m==0 && sign(a)!=sign(b){false}else if sign(a)==sign(b) || x>=y{sign(a)}else{sign(b)};
+-    packed(sg,m as u128,(e-64) as i32)
+-}
++
+ // As in word-based IEEE implementations, keep eight low alignment bits and
+ // summarize the discarded suffix by its nonzeroness. The proofs below relate
+ // this directly to the original 128-bit LERC model, including subtraction.
+@@ -321,7 +283,7 @@
+         requires w as u128==sticky(v,56u32),54<=n<64;
+ }
+ #[inline(always)]
+-pub(super) fn plus(a:u64,b:u64) -> (r:u64)
++pub(super) fn plus_software(a:u64,b:u64) -> (r:u64)
+     ensures r==sum(a,b),
+ {
+     let (sa,ma,ea)=parts(a);let (sb,mb,eb)=parts(b);
+@@ -370,10 +332,7 @@
+     let sg=if m==0 && sa!=sb{false}else if sa==sb || x>=y{sa}else{sb};
+     pack(sg,m,e-64)
+ }
+-pub(super) open spec fn less(a:u64,b:u64) -> bool {
+-    if a%0x8000000000000000u64==0 && b%0x8000000000000000u64==0{false}
+-    else if sign(a)!=sign(b){sign(a)}else if sign(a){a>b}else{a<b}
+-}
++
+ #[inline(always)]
+ pub(super) fn minimum(a:u64,b:u64) -> (r:u64)
+     ensures r==if less(a,b){a}else{b},
+@@ -383,22 +342,12 @@
+         else if a>=0x8000000000000000u64{a>b}else{a<b};
+     if cmp{a}else{b}
+ }
+-pub(super) open spec fn type_size(kind:usize) -> usize {if kind<2{1}else if kind<4{2}else if kind<7{4}else{8}}
++
+ pub(super) fn size(kind:usize) -> (r:usize) ensures r==type_size(kind),r==1 || r==2 || r==4 || r==8,
+ {if kind<2{1}else if kind<4{2}else if kind<7{4}else{8}}
+-pub(super) open spec fn value(v:u64,kind:usize) -> u64 {
+-    if kind==7{v}else if kind==6{
+-        let e=(v/8388608)%256;let m=v%8388608+if e==0{0int}else{8388608int};
+-        if e==255{((if v>=2147483648{0x8000000000000000u64}else{0u64})|0x7ff0000000000000u64|((v%8388608) as u64)<<29)}
+-        else{packed(v>=2147483648,m as u128,if e==0{-149i32}else{(e-150) as i32})}
+-    }else{
+-        let modulus=if kind<2{256u64}else if kind<4{65536u64}else{4294967296u64};
+-        let neg=kind%2==0 && v>=modulus/2;
+-        packed(neg,if neg{(modulus-v) as u128}else{v as u128},0)
+-    }
+-}
+-#[inline(always)]
+-pub(super) fn number(v:u64,kind:usize) -> (r:u64)
++
++#[inline(always)]
++pub(super) fn number_software(v:u64,kind:usize) -> (r:u64)
+     requires kind<8,kind<7 ==> v<if kind<2{256int}else if kind<4{65536int}else{4294967296int},
+     ensures r==value(v,kind),
+ {
+@@ -412,17 +361,9 @@
+     let neg=kind%2==0 && v>=modulus/2;
+     pack(neg,if neg{(modulus-v) as u128}else{v as u128},0)
+ }
+-pub(super) open spec fn narrowed(v:u64) -> u32 {
+-    let m=mantissa(v);let e=exponent(v);let hi=top(m,128);
+-    let shift=if hi>23{hi-23}else{0int};let n=if -149-e>shift{-149-e}else{shift};
+-    let q=rounded(m,n as u32);let hi2=top(q,128);let ex=e+n+hi2;
+-    let sg=if sign(v){0x80000000u32}else{0u32};
+-    if !finite(v){sg|0x7f800000u32|((v%0x10000000000000u64)>>29) as u32}
+-    else if q==0{sg}else if ex>127{sg|0x7f800000u32}else if ex< -126{sg|((q<<((e+n+149) as u32)) as u32)}
+-    else{sg|(((ex+127) as u32)<<23)|((if hi2>23{q>>(hi2-23) as u32}else{q<<(23-hi2) as u32}) as u32%8388608)}
+-}
+-#[inline(always)]
+-pub(super) fn narrow(v:u64) -> (r:u32) ensures r==narrowed(v),
++
++#[inline(always)]
++pub(super) fn narrow_software(v:u64) -> (r:u32) ensures r==narrowed(v),
+ {
+     let exp=((v>>52u32)&2047) as u32;
+     if 897<=exp && exp<=1150{
+@@ -470,14 +411,7 @@
+     if q==0{sg}else if ex>127{sg|0x7f800000u32}else if ex< -126{sg|((q<<((e+n as i32+149) as u32)) as u32)}
+     else{sg|(((ex+127) as u32)<<23)|((if hi2>23{q>>(hi2-23)}else{q<<(23-hi2)}) as u32%8388608)}
+ }
+-pub(super) open spec fn integer(v:u64,kind:usize) -> Option<u64> {
+-    let m=mantissa(v);let e=exponent(v);
+-    let q=if e>=0{m<<(e as u32)}else if e<= -128{0u128}else{m>>((-e) as u32)};
+-    let modulus=if kind<2{256u64}else if kind<4{65536u64}else{4294967296u64};
+-    let bound=if kind%2==0{modulus/2+if sign(v){1int}else{0int}}else{modulus as int};
+-    if !finite(v) || e>32 || q>=bound || (sign(v) && kind%2==1 && q!=0){None}
+-    else{Some(if sign(v) && q!=0{(modulus-q) as u64}else{q as u64})}
+-}
++
+ pub(super) fn to_integer(v:u64,kind:usize) -> (r:Result<u64,Error>)
+     requires kind<6,
+     ensures r.is_ok()==integer(v,kind).is_some(),r.is_ok() ==> r.unwrap()==integer(v,kind).unwrap(),
+@@ -490,4 +424,43 @@
+     if q>=bound as u128 || (sg && kind%2==1 && q!=0){return Err(Error::Invalid);}
+     Ok(if sg && q!=0{modulus-q as u64}else{q as u64})
+ }
+-}
++
++/// Finite operands use the CPU; unusual non-finite bit-model cases retain
++/// their historical software behavior, including NaN payload conventions.
++#[inline(always)]
++pub(super) fn scale(a:u64,q:u32) -> (r:u64)
++    ensures r==scaled(a,q),
++{
++    if (a/0x10000000000000u64)%2048!=2047 {hw::mul_twice_u32(a,q)}
++    else {scale_software(a,q)}
++}
++#[inline(always)]
++pub(super) fn plus(a:u64,b:u64) -> (r:u64)
++    ensures r==sum(a,b),
++{
++    if (a/0x10000000000000u64)%2048!=2047 && (b/0x10000000000000u64)%2048!=2047 {hw::add(a,b)}
++    else {plus_software(a,b)}
++}
++#[inline(always)]
++pub(super) fn narrow(v:u64) -> (r:u32)
++    ensures r==narrowed(v),
++{
++    if (v/0x10000000000000u64)%2048!=2047 {hw::narrow(v)}
++    else {narrow_software(v)}
++}
++#[inline(always)]
++pub(super) fn number(v:u64,kind:usize) -> (r:u64)
++    requires kind<8,kind<7 ==> v<if kind<2{256int}else if kind<4{65536int}else{4294967296int},
++    ensures r==value(v,kind),
++{
++    if kind==7{return v;}
++    if kind==6 {
++        if (v/8388608)%256!=255 {return hw::widen(v as u32);}
++        return number_software(v,kind);
++    }
++    let modulus=if kind<2{256u64}else if kind<4{65536u64}else{4294967296u64};
++    let neg=kind%2==0 && v>=modulus/2;
++    let mag=if neg{modulus-v}else{v};
++    hw::from_magnitude(mag as u32,neg)
++}
++}
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -22,6 +22,7 @@
+ 
+ [dependencies]
+ vstd = "=0.0.0-2026-10-04-0306"
++verified-tiff-float = { path = "trusted-float" }
+ 
+ [package.metadata.verus]
+ verify = true
+@@ -31,5 +32,5 @@
+ 
+ 
+ [workspace]
+-members = ["compat"]
++members = ["compat", "trusted-float"]
+ resolver = "2"
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -80,6 +80,7 @@
+ name = "verified-tiff"
+ version = "0.1.0"
+ dependencies = [
++ "verified-tiff-float",
+  "vstd",
+ ]
+ 
+@@ -88,6 +89,13 @@
+ version = "0.1.0"
+ dependencies = [
+  "verified-tiff",
++]
++
++[[package]]
++name = "verified-tiff-float"
++version = "0.1.0"
++dependencies = [
++ "vstd",
+ ]
+ 
+ [[package]]
+--- a/scripts/env.sh
++++ b/scripts/env.sh
+@@ -4,6 +4,6 @@
+ export CARGO_HOME="$TIFF_ROOT/.tools/cargo"
+ export RUSTUP_HOME="$TIFF_ROOT/.tools/rustup"
+ export PATH="$CARGO_HOME/bin:$PATH"
+-VERUS="$TIFF_ROOT/.tools/verus-x86-linux/verus"
++VERUS="$TIFF_ROOT/scripts/verus-core.py"
+ mkdir -p "$TIFF_ROOT/target"
+ 

@@ -1,0 +1,2913 @@
+--- a/compat/api.json
++++ b/compat/api.json
+@@ -290,89 +290,78 @@
+       "name": "TIFFFieldDataType",
+       "result": "TIFFDataType",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldIsAnonymous",
+       "result": "int",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldName",
+       "result": "const char *",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "NULL"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldPassCount",
+       "result": "int",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldReadCount",
+       "result": "int",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldSetGetCountSize",
+       "result": "int",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldSetGetSize",
+       "result": "int",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldTag",
+       "result": "uint32_t",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldWithName",
+       "result": "const TIFFField *",
+       "arguments": "TIFF *, const char *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "NULL"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldWithTag",
+       "result": "const TIFFField *",
+       "arguments": "TIFF *, uint32_t",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "NULL"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFieldWriteCount",
+       "result": "int",
+       "arguments": "const TIFFField *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFileName",
+@@ -400,9 +389,8 @@
+       "name": "TIFFFindField",
+       "result": "const TIFFField *",
+       "arguments": "TIFF *, uint32_t, TIFFDataType",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "NULL"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFFlush",
+@@ -547,17 +535,15 @@
+       "name": "TIFFGetTagListCount",
+       "result": "int",
+       "arguments": "TIFF *",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFGetTagListEntry",
+       "result": "uint32_t",
+       "arguments": "TIFF *, int tag_index",
+-      "status": "not_implemented",
+-      "implementation": "generated_stub",
+-      "failure_return": "0"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFGetUnmapFileProc",
+@@ -704,22 +690,22 @@
+       "name": "TIFFOpenOptionsSetMaxCumulatedMemAlloc",
+       "result": "void",
+       "arguments": "TIFFOpenOptions *opts, tmsize_t max_cumulated_mem_alloc",
+-      "status": "not_implemented",
+-      "implementation": "manual_stub"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFOpenOptionsSetMaxSingleMemAlloc",
+       "result": "void",
+       "arguments": "TIFFOpenOptions *opts, tmsize_t max_single_mem_alloc",
+-      "status": "not_implemented",
+-      "implementation": "manual_stub"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFOpenOptionsSetWarnAboutUnknownTags",
+       "result": "void",
+       "arguments": "TIFFOpenOptions *opts, int warn_about_unknown_tags",
+-      "status": "not_implemented",
+-      "implementation": "manual_stub"
++      "status": "implemented_or_explicitly_restricted",
++      "implementation": "manual"
+     },
+     {
+       "name": "TIFFOpenOptionsSetWarningHandlerExtR",
+--- a/compat/bridge.h
++++ b/compat/bridge.h
+@@ -3,8 +3,14 @@
+ #include "include/verified_tiff.h"
+ #include <stddef.h>
+ #include <stdint.h>
+-void *vt_open_fd(int, size_t, size_t, size_t);
+-void *vt_open_memory(const uint8_t *, size_t, size_t, size_t, size_t);
++void *vt_open_fd(int, size_t, size_t, size_t, size_t, size_t, size_t, uint32_t);
++void *vt_open_client(thandle_t, TIFFReadWriteProc, TIFFSeekProc, uint64_t, size_t, size_t, size_t, size_t, size_t, size_t, uint32_t);
++int vt_next(void *);
++const uint8_t *vt_field(void *, uint32_t, uint16_t *, size_t *);
++int vt_real(void *, uint32_t, float *);
++int vt_pair(void *, uint32_t, int, uint16_t *);
++uint32_t vt_tag(void *, size_t);
++const uint8_t *vt_region(void *,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,size_t *);
+ void vt_close(void *);
+ int vt_error_code(void);
+ const char *vt_error_message(void);
+--- /dev/null
++++ b/compat/fields.inc
+@@ -0,0 +1,122 @@
++/* Supported field descriptors follow libtiff 4.7.1 tif_dirinfo.c;
++ * upstream license is included in this directory. Unsupported registration
++ * and anonymous custom-field descriptors remain explicit ENOSYS operations. */
++struct _TIFFField {
++  uint32_t tag;
++  TIFFDataType type;
++  int read_count,write_count,pass_count,size,count_size,custom;
++  const char *name;
++};
++static const TIFFField fields[] = {
++  {TIFFTAG_SUBFILETYPE,TIFF_LONG,1,1,0,4,0,0,"SubfileType"},
++  {TIFFTAG_IMAGEWIDTH,TIFF_LONG,1,1,0,4,0,0,"ImageWidth"},
++  {TIFFTAG_IMAGELENGTH,TIFF_LONG,1,1,0,4,0,0,"ImageLength"},
++  {TIFFTAG_BITSPERSAMPLE,TIFF_SHORT,1,1,0,2,0,0,"BitsPerSample"},
++  {TIFFTAG_COMPRESSION,TIFF_SHORT,1,1,0,2,0,0,"Compression"},
++  {TIFFTAG_PHOTOMETRIC,TIFF_SHORT,1,1,0,2,0,0,"PhotometricInterpretation"},
++  {TIFFTAG_THRESHHOLDING,TIFF_SHORT,1,1,0,2,0,0,"Threshholding"},
++  {TIFFTAG_CELLWIDTH,TIFF_SHORT,1,1,0,2,0,1,"CellWidth"},
++  {TIFFTAG_CELLLENGTH,TIFF_SHORT,1,1,0,2,0,1,"CellLength"},
++  {TIFFTAG_FILLORDER,TIFF_SHORT,1,1,0,2,0,0,"FillOrder"},
++  {TIFFTAG_DOCUMENTNAME,TIFF_ASCII,-1,-1,0,1,0,1,"DocumentName"},
++  {TIFFTAG_IMAGEDESCRIPTION,TIFF_ASCII,-1,-1,0,1,0,1,"ImageDescription"},
++  {TIFFTAG_MAKE,TIFF_ASCII,-1,-1,0,1,0,1,"Make"},
++  {TIFFTAG_MODEL,TIFF_ASCII,-1,-1,0,1,0,1,"Model"},
++  {TIFFTAG_STRIPOFFSETS,TIFF_LONG8,-1,-1,0,0,0,0,"StripOffsets"},
++  {TIFFTAG_ORIENTATION,TIFF_SHORT,1,1,0,2,0,0,"Orientation"},
++  {TIFFTAG_SAMPLESPERPIXEL,TIFF_SHORT,1,1,0,2,0,0,"SamplesPerPixel"},
++  {TIFFTAG_ROWSPERSTRIP,TIFF_LONG,1,1,0,4,0,0,"RowsPerStrip"},
++  {TIFFTAG_STRIPBYTECOUNTS,TIFF_LONG8,-1,-1,0,0,0,0,"StripByteCounts"},
++  {TIFFTAG_MINSAMPLEVALUE,TIFF_SHORT,-2,-1,0,2,0,0,"MinSampleValue"},
++  {TIFFTAG_MAXSAMPLEVALUE,TIFF_SHORT,-2,-1,0,2,0,0,"MaxSampleValue"},
++  {TIFFTAG_XRESOLUTION,TIFF_RATIONAL,1,1,0,4,0,0,"XResolution"},
++  {TIFFTAG_YRESOLUTION,TIFF_RATIONAL,1,1,0,4,0,0,"YResolution"},
++  {TIFFTAG_PLANARCONFIG,TIFF_SHORT,1,1,0,2,0,0,"PlanarConfiguration"},
++  {TIFFTAG_PAGENAME,TIFF_ASCII,-1,-1,0,1,0,1,"PageName"},
++  {TIFFTAG_XPOSITION,TIFF_RATIONAL,1,1,0,4,0,0,"XPosition"},
++  {TIFFTAG_YPOSITION,TIFF_RATIONAL,1,1,0,4,0,0,"YPosition"},
++  {TIFFTAG_RESOLUTIONUNIT,TIFF_SHORT,1,1,0,2,0,0,"ResolutionUnit"},
++  {TIFFTAG_PAGENUMBER,TIFF_SHORT,2,2,0,2,0,0,"PageNumber"},
++  {TIFFTAG_SOFTWARE,TIFF_ASCII,-1,-1,0,1,0,1,"Software"},
++  {TIFFTAG_DATETIME,TIFF_ASCII,20,20,0,1,0,1,"DateTime"},
++  {TIFFTAG_ARTIST,TIFF_ASCII,-1,-1,0,1,0,1,"Artist"},
++  {TIFFTAG_HOSTCOMPUTER,TIFF_ASCII,-1,-1,0,1,0,1,"HostComputer"},
++  {TIFFTAG_COLORMAP,TIFF_SHORT,-1,-1,0,0,0,0,"ColorMap"},
++  {TIFFTAG_HALFTONEHINTS,TIFF_SHORT,2,2,0,2,0,0,"HalftoneHints"},
++  {TIFFTAG_TILEWIDTH,TIFF_LONG,1,1,0,4,0,0,"TileWidth"},
++  {TIFFTAG_TILELENGTH,TIFF_LONG,1,1,0,4,0,0,"TileLength"},
++  {TIFFTAG_TILEOFFSETS,TIFF_LONG8,-1,1,0,0,0,0,"TileOffsets"},
++  {TIFFTAG_TILEBYTECOUNTS,TIFF_LONG8,-1,1,0,0,0,0,"TileByteCounts"},
++  {TIFFTAG_SUBIFD,TIFF_IFD8,-1,-1,1,8,2,0,"SubIFD"},
++  {TIFFTAG_INKSET,TIFF_SHORT,1,1,0,2,0,1,"InkSet"},
++  {TIFFTAG_NUMBEROFINKS,TIFF_SHORT,1,1,0,2,0,0,"NumberOfInks"},
++  {TIFFTAG_DOTRANGE,TIFF_SHORT,2,2,0,2,0,1,"DotRange"},
++  {TIFFTAG_TARGETPRINTER,TIFF_ASCII,-1,-1,0,1,0,1,"TargetPrinter"},
++  {TIFFTAG_EXTRASAMPLES,TIFF_SHORT,-1,-1,1,2,2,0,"ExtraSamples"},
++  {TIFFTAG_SAMPLEFORMAT,TIFF_SHORT,-1,-1,0,2,0,0,"SampleFormat"},
++  {TIFFTAG_YCBCRSUBSAMPLING,TIFF_SHORT,2,2,0,2,0,0,"YCbCrSubsampling"},
++  {TIFFTAG_YCBCRPOSITIONING,TIFF_SHORT,1,1,0,2,0,0,"YCbCrPositioning"},
++  {TIFFTAG_XMLPACKET,TIFF_BYTE,-3,-3,1,1,4,1,"XMLPacket"},
++  {TIFFTAG_COPYRIGHT,TIFF_ASCII,-1,-1,0,1,0,1,"Copyright"},
++  {TIFFTAG_PHOTOSHOP,TIFF_BYTE,-3,-3,1,1,4,1,"Photoshop"},
++  {TIFFTAG_EXIFIFD,TIFF_IFD8,1,1,0,8,0,1,"EXIFIFDOffset"},
++  {TIFFTAG_ICCPROFILE,TIFF_UNDEFINED,-3,-3,1,1,4,1,"ICC Profile"},
++  {TIFFTAG_GPSIFD,TIFF_IFD8,1,1,0,8,0,1,"GPSIFDOffset"},
++  {TIFFTAG_GROUP3OPTIONS,TIFF_LONG,1,1,0,4,0,0,"Group3Options"},
++  {TIFFTAG_GROUP4OPTIONS,TIFF_LONG,1,1,0,4,0,0,"Group4Options"},
++  {TIFFTAG_PREDICTOR,TIFF_SHORT,1,1,0,2,0,0,"Predictor"},
++  {TIFFTAG_JPEGTABLES,TIFF_UNDEFINED,-3,-3,1,1,4,0,"JPEGTables"}
++};
++static const TIFFField *field(uint32_t tag) {
++  for (size_t i=0;i<sizeof(fields)/sizeof(fields[0]);i++)
++    if (fields[i].tag==tag) return &fields[i];
++  return NULL;
++}
++const TIFFField *TIFFFindField(TIFF *t,uint32_t tag,TIFFDataType type) {
++  if (!valid(t,__func__)) return NULL;
++  const TIFFField *f=field(tag);
++  return f && (type==TIFF_ANY || type==f->type) ? f : NULL;
++}
++const TIFFField *TIFFFieldWithTag(TIFF *t,uint32_t tag) {
++  const TIFFField *f=TIFFFindField(t,tag,TIFF_ANY);
++  if (!f) vt_not_implemented_for(t,__func__);
++  return f;
++}
++const TIFFField *TIFFFieldWithName(TIFF *t,const char *name) {
++  if (!valid(t,__func__) || !name) return NULL;
++  for (size_t i=0;i<sizeof(fields)/sizeof(fields[0]);i++)
++    if (!strcmp(fields[i].name,name)) return &fields[i];
++  vt_not_implemented_for(t,__func__); return NULL;
++}
++uint32_t TIFFFieldTag(const TIFFField *f) {return f?f->tag:0;}
++const char *TIFFFieldName(const TIFFField *f) {return f?f->name:NULL;}
++TIFFDataType TIFFFieldDataType(const TIFFField *f) {return f?f->type:TIFF_NOTYPE;}
++int TIFFFieldPassCount(const TIFFField *f) {return f?f->pass_count:0;}
++int TIFFFieldReadCount(const TIFFField *f) {return f?f->read_count:0;}
++int TIFFFieldWriteCount(const TIFFField *f) {return f?f->write_count:0;}
++int TIFFFieldSetGetSize(const TIFFField *f) {return f?f->size:0;}
++int TIFFFieldSetGetCountSize(const TIFFField *f) {return f?f->count_size:0;}
++int TIFFFieldIsAnonymous(const TIFFField *f) {(void)f;return 0;}
++/* As upstream, the tag list contains custom fields, not baseline image tags.
++ * This adapter exposes the supported custom descriptors above. */
++int TIFFGetTagListCount(TIFF *t) {
++  if (!valid(t,__func__)) return 0;
++  int count=0; size_t n=(size_t)info(t,15);
++  for (size_t i=0;i<n;i++){const TIFFField *f=field(vt_tag(t->state,i));if(f && f->custom)count++;}
++  return count;
++}
++uint32_t TIFFGetTagListEntry(TIFF *t,int index) {
++  if (!valid(t,__func__) || index<0) return (uint32_t)-1;
++  size_t n=(size_t)info(t,15);
++  for (size_t i=0;i<n;i++){uint32_t tag=vt_tag(t->state,i);const TIFFField *f=field(tag);if(f && f->custom && index--==0)return tag;}
++  return (uint32_t)-1;
++}
++static void unknown_warnings(TIFF *t) {
++  if (!t || !t->options.warn_unknown) return;
++  size_t n=(size_t)info(t,15);
++  for (size_t i=0;i<n;i++) {
++    uint32_t tag=vt_tag(t->state,i);
++    if (!field(tag) && !(tag>=512 && tag<=521) && tag!=529 && tag!=532)
++      TIFFWarningExtR(t,"TIFFReadDirectory","Unknown field with tag %u",tag);
++  }
++}
+--- a/compat/generate_stubs.py
++++ b/compat/generate_stubs.py
+@@ -26,7 +26,7 @@
+ lines=['/* Generated from the pinned public Linux header; see api.json. */','#include "bridge.h"','#include <math.h>']
+ manifest=[]
+ stub_tests=['#include <tiffio.h>','#include <verified_tiff.h>','#include <assert.h>','#include <errno.h>','#include <math.h>','int main(void){TIFFSetErrorHandler(NULL);']
+-manual_stubs={'TIFFSetFileName','TIFFOpenOptionsSetMaxSingleMemAlloc','TIFFOpenOptionsSetMaxCumulatedMemAlloc','TIFFOpenOptionsSetWarnAboutUnknownTags'}
++manual_stubs={'TIFFSetFileName'}
+ negative_int={'TIFFWriteScanline','uv_encode','uv_decode','LogL16fromY','LogL10fromY'}
+ for name,(ret,args) in sorted(prototypes.items()):
+  impl=name in implemented
+@@ -75,4 +75,4 @@
+   names+=['VTIFFLastErrorCode','VTIFFLastError','VTIFFClearError','VTIFFOpenOptionsSetLimits']
+  version_lines.append(version+' {\n'+('  global:\n'+''.join('    '+n+';\n' for n in names) if names else '')+('  local: *;\n' if version=='LIBTIFF_4.0' else '')+'}'+(' '+parent if parent else '')+';\n')
+ (out/'exports.map').write_text('\n'.join(version_lines))
+-print(f'Public API: {len(prototypes)} symbols; {sum(r["status"]!="not_implemented" for r in manifest)} implemented/restricted, {sum(r["status"]=="not_implemented" for r in manifest)} explicit ENOSYS stubs (75 generated, 4 manual)')
++print(f'Public API: {len(prototypes)} symbols; {sum(r["status"]!="not_implemented" for r in manifest)} implemented/restricted, {sum(r["status"]=="not_implemented" for r in manifest)} explicit ENOSYS stubs ({sum(r["implementation"]=="generated_stub" for r in manifest)} generated, {len(manual_stubs)} manual)')
+--- /dev/null
++++ b/compat/src/decoder.rs
+@@ -0,0 +1,253 @@
++//! Native segment orchestration and libtiff RGBA presentation (unverified ABI).
++//! Generic compression and sample transforms call verified native primitives.
++//! Older specialized codecs use a bounded, one-segment TIFF view and the
++//! original verified inspectors/decoders; never an external codec library.
++use super::*;
++use verified_tiff::{native,native_samples as ns};
++
++impl Handle{
++    pub fn native_ok(&self)->R<()>{
++        let m=&self.meta;
++        if m.photo==6 && !self.jpeg_rgb{return Err((NOTIMPL,"native subsampled YCbCr not implemented; request JPEGCOLORMODE_RGB"));}
++        if m.photo==32845 && !self.logluv16{return Err((NOTIMPL,"LogLuv conversion not implemented; request SGILOGDATAFMT_16BIT"));}
++        Ok(())
++    }
++    fn segment(&mut self,k:usize,budget:&mut Budget)->R<()>{
++        if self.cache.as_ref().is_some_and(|(i,_)|*i==k){return Ok(());}
++        self.cache=None;
++        let m=&self.meta;let rows=m.segment_rows(k)?;let row=m.row_bytes(m.bw)?;
++        let needed=product(row,rows)?;
++        if needed>self.limits.max_output{return Err((LIMIT,"native segment output limit"));}
++        let n=usize::try_from(m.counts[k]).map_err(|_|(LIMIT,"encoded segment size overflow"))?;
++        let mut encoded=self.source.read(m.offsets[k],n)?;
++        let mem=&self.source.mem;
++        let output=if matches!(m.compression,1|32773|5|8|32946){
++            if !matches!(m.bits,1|2|4|8|16|32|64) || !matches!(m.format,1|2|3|4) || (m.format==3 && !matches!(m.bits,32|64)){
++                return Err((NOTIMPL,"native sample width/format not implemented"));
++            }
++            if m.predictor!=1 && m.predictor!=2{return Err((NOTIMPL,"sample predictor not implemented"));}
++            if m.predictor==2 && (m.bits<8 || !matches!(m.compression,5|8|32946)){return Err((NOTIMPL,"horizontal prediction requires byte samples and LZW/Deflate"));}
++            if m.fill==2{ns::reverse_bits(&mut encoded);}
++            let cap=if matches!(m.compression,8|32946) && !m.tiled{product(row,m.bh)?}else{needed};
++            if cap>self.limits.max_output{return Err((LIMIT,"decoded padding limit"));}
++            let mut raw=Buf::zeros(needed,self.limits.max_output,mem)?;
++            native::decode(&encoded,m.compression,row,needed,cap,&mut raw,budget).map_err(err)?;
++            if m.bits<8 || (m.predictor==1 && (m.bits==8 || m.le==cfg!(target_endian="little"))){raw}else{
++                let mut out=Buf::zeros(needed,self.limits.max_output,mem)?;
++                ns::convert(&raw,row,if m.planar==2{1}else{m.ch},m.bits/8,m.le,m.predictor==2,cfg!(target_endian="little"),&mut out).map_err(err)?;
++                out
++            }
++        }else{self.special(k,&encoded,budget)?};
++        if output.len()!=needed{return Err((NOTIMPL,"special codec native layout mismatch"));}
++        self.cache=Some((k,output));Ok(())
++    }
++    pub fn read(&mut self,kind:u32,a:usize,b:usize,c:usize,_d:usize)->R<()>{
++        self.rendered=None;
++        let mut budget=Budget{remaining:self.work};
++        match kind{
++            0=>{
++                self.native_ok()?;
++                let m=&self.meta;if m.tiled{return Err((NOTIMPL,"scanline reads on tiled images not implemented"));}
++                if a>=m.height || (m.planar==2 && b>=m.ch) || (m.planar==1 && b!=0){return Err((INVALID,"scanline row/sample out of range"));}
++                let row=m.row_bytes(m.width)?;let idx=a/m.bh+if m.planar==2{b*m.per_plane()?}else{0};let within=(a%m.bh)*row;
++                self.segment(idx,&mut budget)?;let mut out=Buf::zeros(row,self.limits.max_output,&self.source.mem)?;
++                out.copy_from_slice(&self.cache.as_ref().unwrap().1[within..within+row]);self.rendered=Some(out);
++            }
++            1|2=>{
++                self.native_ok()?;if (kind==2)!=self.meta.tiled{return Err((INVALID,"strip/tile API does not match layout"));}
++                self.segment(a,&mut budget)?;let data=&self.cache.as_ref().unwrap().1;
++                let mut out=Buf::zeros(data.len(),self.limits.max_output,&self.source.mem)?;out.copy_from_slice(data);self.rendered=Some(out);
++            }
++            3=>{
++                let m=&self.meta;if a>=m.offsets.len(){return Err((INVALID,"segment index out of range"));}
++                let n=usize::try_from(m.counts[a]).map_err(|_|(LIMIT,"raw segment size overflow"))?;
++                self.rendered=Some(self.source.read(m.offsets[a],n)?);
++            }
++            4=>{
++                if a!=self.meta.width || b!=self.meta.height{return Err((NOTIMPL,"RGBA whole-image dimensions must match image"));}
++                self.rgba(0,0,a,b,c)?;
++            }
++            5=>{
++                let m=&self.meta;if m.tiled || a>=m.height || a%m.bh!=0{return Err((INVALID,"invalid RGBA strip row"));}
++                self.rgba(0,a,m.width,m.bh.min(m.height-a),4)?;
++            }
++            6=>{
++                let m=&self.meta;if !m.tiled || a>=m.width || b>=m.height || a%m.bw!=0 || b%m.bh!=0{return Err((INVALID,"invalid RGBA tile coordinate"));}
++                self.rgba(a,b,m.bw,m.bh,4)?;
++            }
++            _=>return Err((NOTIMPL,"read operation not implemented")),
++        }Ok(())
++    }
++    pub fn rgba_ok(&self)->R<()>{
++        let m=&self.meta;
++        if m.width==0{return Err((INVALID,"no selected image directory"));}
++        if m.format!=1 || !matches!(m.bits,1|2|4|8|16) || !matches!(m.photo,0|1|2|3|6){return Err((NOTIMPL,"RGBA sample/color conversion not implemented"));}
++        let base=if m.photo==2 || m.photo==6{3}else{1};
++        if m.ch<base || m.extra.len()>m.ch-base || (m.photo==3 && (m.ch!=1 || m.map.len()!=3*(1usize<<m.bits))){return Err((INVALID,"RGBA color/extra sample layout"));}
++        if m.extra.iter().any(|v|*v>2){return Err((NOTIMPL,"extra sample meaning not implemented"));}
++        if m.photo==6 && !matches!(m.compression,6|7){return Err((NOTIMPL,"non-JPEG YCbCr conversion not implemented"));}
++        Ok(())
++    }
++    pub fn rgba(&mut self,x:usize,y:usize,w:usize,h:usize,orientation:usize)->R<()>{
++        self.rendered=None;
++        self.rgba_ok()?;
++        let mut budget=Budget{remaining:self.work};
++        if !(1..=8).contains(&orientation) || w==0 || h==0{return Err((INVALID,"invalid RGBA dimensions/orientation"));}
++        let mut result=Buf::zeros(product(product(w,h)?,4)?,self.limits.max_output,&self.source.mem)?;
++        let m=&self.meta;let width=m.width;let height=m.height;let bw=m.bw;let bh=m.bh;let bits=m.bits;
++        let channels=m.ch;let planar=m.planar;let photo=m.photo;let source_orientation=m.orientation;
++        let base=if photo==2||photo==6{3}else{1};
++        let alpha=m.extra.iter().position(|v|*v==1||*v==2).map(|i|(channels-m.extra.len()+i,m.extra[i]));
++        let row=m.row_bytes(bw)?;let across=(width-1)/bw+1;let per=m.per_plane()?;
++        let right=x.checked_add(w).ok_or((LIMIT,"RGBA extent overflow"))?.min(width);
++        let bottom=y.checked_add(h).ok_or((LIMIT,"RGBA extent overflow"))?.min(height);
++        let flip=|o:usize|{let o=(o-1)%4+1;(o==2||o==3,o==3||o==4)};
++        let (sx,sy)=flip(source_orientation);let (ox,oy)=flip(orientation);let fx=sx!=ox;let fy=sy!=oy;
++        // Work in the requested region's coordinates, matching libtiff's strip
++        // and tile orientation conventions. Padding remains zero.
++        for by in y/bh..=(bottom-1)/bh{for bx in x/bw..=(right-1)/bw{
++            let left=x.max(bx*bw);let top=y.max(by*bh);let rr=right.min((bx+1)*bw);let bb=bottom.min((by+1)*bh);
++            let k=by*across+bx;
++            for plane in 0..if planar==2{channels}else{1}{
++                self.segment(k+plane*per,&mut budget)?;
++                let data=&self.cache.as_ref().unwrap().1;
++                for yy in top..bb{for xx in left..rr{
++                    let dx=xx-x;let dy=yy-y;let tx=if fx{right-x-1-dx}else{dx};let ty=h-(bottom-y)+if fy{bottom-y-1-dy}else{dy};let dest=(ty*w+tx)*4;
++                    let mut rgba=if planar==2 && plane>0{unpack(&result[dest..dest+4])}else{[0,0,0,255]};
++                    for c in 0..if planar==2{1}else{channels}{
++                        let ci=if planar==2{plane}else{c};
++                        let index=(xx-bx*bw)*if planar==2{1}else{channels}+c;
++                        let v=sample(data,(yy-by*bh)*row,index,bits)?;
++                        if photo==3{
++                            let n=1usize<<bits;for c in 0..3{rgba[c]=(self.meta.map[c*n+v as usize]>>8) as u8;}
++                        }else if ci<base{
++                            let max=(1u32<<bits)-1;let v=if photo==0{max-v}else{v};
++                            let b=if bits==16 && base==1{(v>>8) as u8}else{((v*255+max/2)/max) as u8};
++                            if base==1{rgba[0]=b;rgba[1]=b;rgba[2]=b;}else{rgba[ci]=b;}
++                        }else if alpha.is_some_and(|(i,_)|ci==i){rgba[3]=if bits==16{if base==3{((v+128)/257) as u8}else{(v>>8) as u8}}else{((v*255)/((1u32<<bits)-1)) as u8};}
++                    }
++                    pack(&mut result[dest..dest+4],rgba);
++                }}
++            }
++        }}
++        if base==3 && alpha.is_some_and(|(_,kind)|kind==2){
++            for p in result.chunks_exact_mut(4){let mut q=unpack(p);for c in 0..3{q[c]=((q[c] as u32*q[3] as u32+127)/255) as u8;}pack(p,q);}
++        }
++        self.rendered=Some(result);Ok(())
++    }
++    fn special(&mut self,k:usize,encoded:&[u8],budget:&mut Budget)->R<Buf<u8>>{
++        if !matches!(self.meta.compression,3|4|6|7|50001|34676){return Err((NOTIMPL,"compression not implemented"));}
++        let source=self.synthetic(k,encoded,budget)?;
++        let image=inspect_raster(&source,0,&self.limits,budget).map_err(err)?;
++        let mut pixels=Buf::zeros(image.output_len(),self.limits.max_output,&self.source.mem)?;
++        let mut scratch=Buf::zeros(image.scratch_len(),self.limits.max_output,&self.source.mem)?;
++        image.decode_with_scratch(&mut pixels,&mut scratch,budget).map_err(err)?;
++        let m=&self.meta;
++        if m.bits==1{
++            let rows=m.segment_rows(k)?;let row=m.row_bytes(m.bw)?;
++            let mut out=Buf::zeros(product(row,rows)?,self.limits.max_output,&self.source.mem)?;
++            for y in 0..rows{for x in 0..m.bw{let v=pixels[y*m.bw+x]/255;let v=if m.photo==0{1-v}else{v};out[y*row+x/8]|=v<<(7-x%8);}}Ok(out)
++        }else if m.compression==34676 && cfg!(target_endian="big"){
++            let mut out=Buf::zeros(pixels.len(),self.limits.max_output,&self.source.mem)?;
++            ns::convert(&pixels,m.row_bytes(m.bw)?,m.ch,2,true,false,false,&mut out).map_err(err)?;Ok(out)
++        }else{Ok(pixels)}
++    }
++    fn synthetic(&mut self,k:usize,encoded:&[u8],budget:&mut Budget)->R<Buf<u8>>{
++        let m=&self.meta;let rows=m.segment_rows(k)?;
++        if m.planar!=1{return Err((NOTIMPL,"special codec planar layout not implemented"));}
++        let jif=scalar(&self.data,&m.tags,513,0,m.le)?;
++        let jlen=scalar(&self.data,&m.tags,514,0,m.le)? as usize;
++        let cap=self.data.len().checked_add(encoded.len()).and_then(|n|n.checked_add(jlen)).and_then(|n|n.checked_add(8192)).ok_or((LIMIT,"segment container overflow"))?;
++        let mut b=Builder::new(cap,&self.source.mem,m.le)?;
++        b.number(256,4,m.bw as u32)?;b.number(257,4,rows as u32)?;
++        b.repeated(258,m.bits as u16,m.ch)?;b.number(259,3,m.compression as u32)?;
++        b.number(262,3,m.photo as u32)?;b.number(266,3,m.fill as u32)?;
++        b.number(274,3,1)?;b.number(277,3,m.ch as u32)?;b.number(278,4,rows as u32)?;
++        b.number(284,3,1)?;b.number(317,3,m.predictor as u32)?;
++        b.repeated(339,m.format,m.ch)?;
++        // WebP's output already carries the stored components. Suppress the
++        // old raster API's lossy unassociation; the caller owns alpha meaning.
++        if !m.extra.is_empty(){if m.compression==50001 && m.extra.len()==1{b.number(338,3,2)?;}else{b.raw_tag(&self.data,*find(&m.tags,338).as_ref().unwrap())?;}}
++        for key in [292,293,347,512,515,529,530,531,532]{if key==515 && jif!=0{continue;}if let Some(t)=find(&m.tags,key){b.raw_tag(&self.data,t)?;}}
++        for key in [519,520,521]{if jif!=0{continue;}if let Some(t)=find(&m.tags,key){
++            if t.count>3{return Err((INVALID,"OJPEG table count"));}let mut offsets=[0u32;3];
++            for i in 0..t.count{
++                let at=value(&self.data,t,i,m.le)?;
++                let n=if key==519{64}else{let counts=self.source.read(at,16)?;16+counts.iter().map(|v|*v as usize).sum::<usize>()};
++                if n>272{return Err((INVALID,"OJPEG Huffman table size"));}
++                let raw=self.source.read(at,n)?;offsets[i]=b.append(&raw)?;
++            }
++            b.longs(key,&offsets[..t.count])?;
++        }}
++        let mut renamed=None;
++        if jif!=0{
++            let raw=self.source.read(jif,jlen)?;
++            let mut shared=Buf::new(jlen.checked_add(256).ok_or((LIMIT,"shared JPEG header overflow"))?,&self.source.mem)?;
++            shared.extend(&raw)?;drop(raw);
++            // An OJPEG interchange header can stop before SOS. Its first-strip
++            // SOS is shared metadata: read only that bounded marker, not pixels.
++            if m.counts[0]>=4{
++                let first=self.source.read(m.offsets[0],4)?;
++                if first[..2]==[255,218]{let n=u16::from_be_bytes([first[2],first[3]]) as usize+2;
++                    if n>256 || n as u64>m.counts[0]{return Err((INVALID,"OJPEG scan header size"));}
++                    let scan=self.source.read(m.offsets[0],n)?;shared.extend(&scan)?;
++                }
++            }
++            let v=native::jpeg_shared(&shared,budget).map_err(err)?;
++            if v[12]!=m.bw || v[13]!=m.height || v[14]!=m.ch{return Err((INVALID,"OJPEG shared frame geometry"));}
++            let sub=find(&m.tags,530);let hs=if let Some(t)=sub{value(&self.data,t,0,m.le)? as usize}else{2};let vs=if let Some(t)=sub{value(&self.data,t,1,m.le)? as usize}else{2};
++            if m.photo==6 && (v[15]!=hs || v[16]!=vs){return Err((INVALID,"OJPEG shared sampling"));}
++            for (key,selectors,base) in [(519,20,0),(520,23,4),(521,26,8)]{
++                let mut offsets=[0u32;3];
++                if m.ch>3{return Err((INVALID,"OJPEG component count"));}
++                for c in 0..m.ch{
++                    let selector=v[selectors+c];if selector>=4{return Err((INVALID,"OJPEG table selector"));}
++                    let at=v[base+selector];
++                    let n=if key==519{64}else{let counts=shared.get(at..at.checked_add(16).ok_or((LIMIT,"OJPEG table range"))?).ok_or((INVALID,"OJPEG table range"))?;16+counts.iter().map(|x|*x as usize).sum::<usize>()};
++                    let table=shared.get(at..at.checked_add(n).ok_or((LIMIT,"OJPEG table range"))?).ok_or((INVALID,"OJPEG table range"))?;
++                    offsets[c]=b.append(table)?;
++                }
++                b.longs(key,&offsets[..m.ch])?;
++            }
++            b.number(515,3,v[29] as u32)?;
++            if encoded.len()>=2 && encoded[..2]==[255,218]{
++                let mut copy=Buf::new(encoded.len(),&self.source.mem)?;copy.extend(encoded)?;
++                let mut ids=[0u8;3];let mut selectors=[0u8;3];
++                for c in 0..m.ch{ids[c]=v[17+c] as u8;selectors[c]=(16*v[23+c]+v[26+c]) as u8;}
++                native::renumber_ojpeg_scan(&mut copy,m.ch,ids,selectors).map_err(err)?;
++                renamed=Some(copy);
++            }
++        }
++        let at=b.append(renamed.as_ref().map_or(encoded,|s|&**s))?;b.number(273,4,at)?;b.number(279,4,u32::try_from(encoded.len()).map_err(|_|(LIMIT,"special segment length"))?)?;
++        b.finish()
++    }
++}
++fn sample(s:&[u8],row:usize,n:usize,bits:usize)->R<u32>{
++    if bits<8{let bit=n*bits;Ok(((s[row+bit/8]>>(8-bits-bit%8))&((1u8<<bits)-1)) as u32)}
++    else{ns::read_word(s,row+n*(bits/8),bits/8,cfg!(target_endian="little")).map(|v|v as u32).map_err(err)}
++}
++fn pack(p:&mut[u8],v:[u8;4]){p.copy_from_slice(&u32::from_le_bytes(v).to_ne_bytes());}
++fn unpack(p:&[u8])->[u8;4]{u32::from_ne_bytes([p[0],p[1],p[2],p[3]]).to_le_bytes()}
++struct Builder{bytes:Buf<u8>,tags:[(u16,u16,u32,[u8;4]);48],n:usize,le:bool}
++impl Builder{
++    fn new(cap:usize,mem:&Mem,le:bool)->R<Self>{let mut bytes=Buf::new(cap,mem)?;bytes.extend(&[0;590])?;Ok(Self{bytes,tags:[(0,0,0,[0;4]);48],n:0,le})}
++    fn append(&mut self,s:&[u8])->R<u32>{let at=u32::try_from(self.bytes.len()).map_err(|_|(LIMIT,"synthetic segment offset"))?;self.bytes.extend(s)?;Ok(at)}
++    fn tag(&mut self,key:u16,kind:u16,count:u32,s:&[u8])->R<()>{
++        if self.n==48{return Err((LIMIT,"synthetic tag count"));}let mut v=[0;4];if s.len()<=4{v[..s.len()].copy_from_slice(s);}else{let at=self.append(s)?;v=if self.le{at.to_le_bytes()}else{at.to_be_bytes()};}
++        self.tags[self.n]=(key,kind,count,v);self.n+=1;Ok(())
++    }
++    fn number(&mut self,key:u16,kind:u16,v:u32)->R<()>{
++        if kind==3{let v=v as u16;self.tag(key,kind,1,&if self.le{v.to_le_bytes()}else{v.to_be_bytes()})}else{self.tag(key,kind,1,&if self.le{v.to_le_bytes()}else{v.to_be_bytes()})}
++    }
++    fn repeated(&mut self,key:u16,v:u16,n:usize)->R<()>{let mut s=[0u8;128];for chunk in s[..2*n].chunks_exact_mut(2){chunk.copy_from_slice(&if self.le{v.to_le_bytes()}else{v.to_be_bytes()});}self.tag(key,3,n as u32,&s[..2*n])}
++    fn longs(&mut self,key:u16,v:&[u32])->R<()>{let mut s=[0;12];for (i,v) in v.iter().enumerate(){s[4*i..4*i+4].copy_from_slice(&if self.le{v.to_le_bytes()}else{v.to_be_bytes()});}self.tag(key,4,v.len() as u32,&s[..v.len()*4])}
++    fn raw_tag(&mut self,s:&[u8],t:Tag)->R<()>{let n=product(t.count,container::field_size(t.kind))?;self.tag(t.key,t.kind,u32::try_from(t.count).map_err(|_|(LIMIT,"tag count overflow"))?,&s[t.at..t.at+n])}
++    fn finish(mut self)->R<Buf<u8>>{
++        self.tags[..self.n].sort_unstable_by_key(|t|t.0);
++        self.bytes[..8].copy_from_slice(if self.le{b"II\x2a\0\x08\0\0\0"}else{b"MM\0\x2a\0\0\0\x08"});
++        self.bytes[8..10].copy_from_slice(&if self.le{(self.n as u16).to_le_bytes()}else{(self.n as u16).to_be_bytes()});
++        for (i,(key,kind,count,v)) in self.tags[..self.n].iter().enumerate(){let p=10+12*i;
++            self.bytes[p..p+2].copy_from_slice(&if self.le{key.to_le_bytes()}else{key.to_be_bytes()});self.bytes[p+2..p+4].copy_from_slice(&if self.le{kind.to_le_bytes()}else{kind.to_be_bytes()});self.bytes[p+4..p+8].copy_from_slice(&if self.le{count.to_le_bytes()}else{count.to_be_bytes()});self.bytes[p+8..p+12].copy_from_slice(v);
++        }Ok(self.bytes)
++    }
++}
+--- /dev/null
++++ b/compat/src/directory.rs
+@@ -0,0 +1,108 @@
++//! Seekable directory assembly. Record validation is verified; allocation,
++//! tag policy, chain traversal and geometry assembly belong to the C boundary.
++use super::*;
++use verified_tiff::{container as ct,native_samples::read_word};
++
++pub fn u16at(s:&[u8],p:usize,le:bool)->R<u16>{read16(s,p,le).map_err(err)}
++pub fn u32at(s:&[u8],p:usize,le:bool)->R<u32>{read32(s,p,le).map_err(err)}
++pub fn find(tags:&[Tag],key:u16)->Option<Tag>{tags.iter().find(|t|t.key==key).copied()}
++pub fn value(s:&[u8],t:Tag,i:usize,le:bool)->R<u64>{
++    if i>=t.count{return Err((INVALID,"field index out of range"));}
++    let w=match t.kind{1=>1,3=>2,4|13=>4,16|18=>8,_=>return Err((NOTIMPL,"integer field type not implemented"))};
++    read_word(s,t.at+product(i,w)?,w,le).map_err(err)
++}
++pub fn scalar(s:&[u8],tags:&[Tag],key:u16,default:u64,le:bool)->R<u64>{match find(tags,key){Some(t)=>value(s,t,0,le),None=>Ok(default)}}
++pub fn array(s:&[u8],tags:&[Tag],key:u16,le:bool,cap:usize,mem:&Mem)->R<Buf<u64>>{
++    let t=find(tags,key);let n=t.map_or(0,|t|t.count);if n>cap{return Err((LIMIT,"metadata array limit"));}
++    let mut a=Buf::new(n,mem)?;if let Some(t)=t{for i in 0..n{a.push(value(s,t,i,le)?)?;}}Ok(a)
++}
++fn small_array(s:&[u8],tags:&[Tag],key:u16,le:bool,cap:usize,mem:&Mem)->R<Buf<u16>>{
++    let t=find(tags,key);let n=t.map_or(0,|t|t.count);if n>cap{return Err((LIMIT,"metadata array limit"));}
++    let mut a=Buf::new(n,mem)?;if let Some(t)=t{for i in 0..n{a.push(u16::try_from(value(s,t,i,le)?).map_err(|_|(INVALID,"16-bit metadata overflow"))?)?;}}Ok(a)
++}
++fn add64(a:u64,b:u64)->R<u64>{a.checked_add(b).ok_or((LIMIT,"file offset overflow"))}
++pub fn table(source:&mut Source,header:ct::Header,off:u64,l:&Limits)->R<(Buf<u8>,usize,u64)>{
++    if off==0{return Err((INVALID,"directory not found"));}
++    let cw=if header.big{8}else{2};let ew=if header.big{20}else{12};let nw=if header.big{8}else{4};
++    let b=source.read(off,cw)?;let n=read_word(&b,0,cw,header.little_endian).map_err(err)?;
++    if n>l.max_tags as u64{return Err((LIMIT,"directory tag limit"));}
++    let n=n as usize;let bytes=product(n,ew)?.checked_add(nw).ok_or((LIMIT,"directory overflow"))?;
++    let b=source.read(add64(off,cw as u64)?,bytes)?;
++    let next=read_word(&b,n*ew,nw,header.little_endian).map_err(err)?;
++    Ok((b,n,next))
++}
++pub fn page_offset(source:&mut Source,header:ct::Header,page:Option<u32>,l:&Limits)->R<(u64,u32)>{
++    if page.is_some_and(|p|p as usize>=l.max_directories){return Err((LIMIT,"directory traversal limit"));}
++    let mut off=header.first_ifd;let mut seen=Buf::new(l.max_directories,&source.mem)?;
++    while off!=0{
++        if seen.contains(&off){return Err((40,"cyclic directory chain"));}
++        if seen.len()==l.max_directories{return Err((LIMIT,"directory traversal limit"));}
++        if page==Some(seen.len() as u32){return Ok((off,seen.len() as u32));}
++        seen.push(off)?;off=table(source,header,off,l)?.2;
++    }
++    if page.is_some(){Err((INVALID,"directory not found"))}else{Ok((0,seen.len() as u32))}
++}
++pub fn metadata(source:&mut Source,header:ct::Header,off:u64,l:&Limits,chop:bool)->R<(Buf<u8>,Meta)>{
++    let mem=source.mem.clone();let le=header.little_endian;
++    let (records,n,next)=table(source,header,off,l)?;
++    let ew=if header.big{20}else{12};let cw=if header.big{8}else{2};
++    let mut entries=Buf::new(n,&mem)?;let mut total=0usize;
++    for i in 0..n{
++        if u16at(&records,i*ew,le)?==0{continue;}
++        let at=add64(off,(cw+i*ew) as u64)?;
++        let e=ct::entry(&records[i*ew..i*ew+ew],at,header.big,le,source.len).map_err(err)?;
++        if e.tag==0{continue;}
++        if entries.iter().any(|t:&ct::Entry|t.tag==e.tag){return Err((INVALID,"duplicate directory tag"));}
++        let len=usize::try_from(e.length).map_err(|_|(LIMIT,"metadata size overflow"))?;
++        total=total.checked_add(len).and_then(|v|v.checked_add(1)).ok_or((LIMIT,"metadata size overflow"))?;
++        if total>l.max_input{return Err((LIMIT,"metadata byte limit"));}entries.push(e)?;
++    }
++    let mut data=Buf::new(total,&mem)?;let mut tags=Buf::new(entries.len(),&mem)?;
++    for e in entries.iter(){
++        let at=data.len();let raw=source.read(e.offset,e.length as usize)?;
++        data.extend(&raw)?;data.push(0)?; // ASCII getters are always terminated.
++        tags.push(Tag{key:e.tag,kind:e.kind,count:e.count as usize,at})?;
++    }
++    for key in [256,257,259,262,266,274,277,278,284,317,322,323]{
++        if find(&tags,key).is_some_and(|t|t.count!=1){return Err((INVALID,"scalar image field count"));}
++    }
++    let sc=|key,default|scalar(&data,&tags,key,default,le);
++    let width=sc(256,0)? as usize;let height=sc(257,0)? as usize;
++    let ch=sc(277,1)? as usize;let bits=sc(258,1)? as usize;let format=u16::try_from(sc(339,1)?).map_err(|_|(INVALID,"SampleFormat overflow"))?;
++    let photo=sc(262,if ch==1{1}else{2})?;let planar=sc(284,1)? as usize;
++    let compression=u16::try_from(sc(259,1)?).map_err(|_|(INVALID,"Compression overflow"))?;let predictor=u16::try_from(sc(317,1)?).map_err(|_|(INVALID,"Predictor overflow"))?;
++    let orientation=sc(274,1)? as usize;let fill=u16::try_from(sc(266,1)?).map_err(|_|(INVALID,"FillOrder overflow"))?;
++    if width==0 || height==0 || width>u32::MAX as usize || height>u32::MAX as usize || ch==0 || ch>64 || bits==0 || bits>64 || !(1..=2).contains(&planar) || !(1..=8).contains(&orientation) || !(1..=2).contains(&fill){return Err((INVALID,"invalid image geometry/sample layout"));}
++    for key in [258,339]{if let Some(t)=find(&tags,key){if t.count!=1 && t.count!=ch{return Err((INVALID,"per-sample metadata count"));}for i in 1..t.count{if value(&data,t,i,le)?!=value(&data,t,0,le)?{return Err((NOTIMPL,"mixed sample widths/formats"));}}}}
++    let tiled=find(&tags,324).is_some();let rows=sc(278,u32::MAX as u64)? as usize;
++    let bw=if tiled{sc(322,0)? as usize}else{width};let bh=if tiled{sc(323,0)? as usize}else{rows.min(height)};
++    if bw==0 || bh==0 || bw>u32::MAX as usize || bh>u32::MAX as usize{return Err((INVALID,"invalid strip/tile geometry"));}
++    let per=product((width-1)/bw+1,(height-1)/bh+1)?;
++    let count=product(per,if planar==2{ch}else{1})?;
++    if count>l.max_segments{return Err((LIMIT,"segment count limit"));}
++    let offsets=array(&data,&tags,if tiled{324}else{273},le,l.max_segments,&mem)?;
++    let counts=array(&data,&tags,if tiled{325}else{279},le,l.max_segments,&mem)?;
++    if offsets.len()!=count || counts.len()!=count{return Err((INVALID,"segment array count mismatch"));}
++    // Pixel ranges and streams are deliberately checked only when requested.
++    let map=small_array(&data,&tags,320,le,3*65536,&mem)?;
++    let extra=small_array(&data,&tags,338,le,ch,&mem)?;
++    let subifds=array(&data,&tags,330,le,l.max_directories,&mem)?;
++    let mut m=Meta{tags,off,next,le,width,height,ch,bits,format,photo,planar,rows,bw,bh,tiled,offsets,counts,map,extra,subifds,compression,predictor,orientation,fill};
++    if chop && !tiled && planar==1 && compression==1 && photo!=6 && count==1{
++        let row=m.row_bytes(width)?;let newrows=(8192/row).max(1);
++        if newrows<rows{
++            let n=(height-1)/newrows+1;
++            if n>l.max_segments{return Err((LIMIT,"chopped strip count limit"));}
++            let mut offsets=Buf::new(n,&mem)?;let mut counts=Buf::new(n,&mem)?;
++            let mut pos=m.offsets[0];let mut left=m.counts[0];let stride=product(row,newrows)? as u64;
++            for _ in 0..n{offsets.push(pos)?;let size=stride.min(left);counts.push(size)?;pos=add64(pos,size)?;left-=size;}
++            m.offsets=offsets;m.counts=counts;m.rows=newrows;m.bh=newrows.min(height);
++        }
++    }
++    Ok((data,m))
++}
++impl Meta{
++    pub fn row_bytes(&self,width:usize)->R<usize>{let ch=if self.planar==2{1}else{self.ch};product(product(width,ch)?,self.bits)?.checked_add(7).map(|n|n/8).ok_or((LIMIT,"row size overflow"))}
++    pub fn per_plane(&self)->R<usize>{product((self.width-1)/self.bw+1,(self.height-1)/self.bh+1)}
++    pub fn segment_rows(&self,k:usize)->R<usize>{if k>=self.offsets.len(){return Err((INVALID,"segment index out of range"));}Ok(if self.tiled{self.bh}else{self.bh.min(self.height-(k%self.per_plane()?)*self.bh)})}
++}
+--- a/compat/src/lib.rs
++++ b/compat/src/lib.rs
+@@ -3,13 +3,12 @@
+ use std::{
+     cell::RefCell,
+     ffi::{c_char, c_void},
+-    io::{Read, Seek, SeekFrom},
+     os::fd::FromRawFd,
+     panic::{catch_unwind, AssertUnwindSafe},
+     ptr,
+ };
+ use verified_tiff::{
+-    header, inspect_raster, read16, read32, AlphaMode, Budget, Error, Limits, SampleFormat,
++    inspect_raster, read16, read32, Budget, Error, Limits,
+ };
+ type R<T> = Result<T, (i32, &'static str)>;
+ const INVALID: i32 = 22;
+@@ -57,441 +56,49 @@
+ pub extern "C" fn vt_error_message() -> *const c_char {
+     ERROR.with(|a| a.borrow().1.as_ptr().cast())
+ }
+-fn zeros(n: usize, cap: usize) -> R<Vec<u8>> {
+-    if n > cap || n > isize::MAX as usize {
+-        return Err((LIMIT, "adapter allocation limit"));
+-    }
+-    let mut v = Vec::new();
+-    v.try_reserve_exact(n)
+-        .map_err(|_| (NOMEM, "allocation failed"))?;
+-    v.resize(n, 0);
+-    Ok(v)
+-}
+-fn reserve<T>(v: &mut Vec<T>, n: usize) -> R<()> {
+-    v.try_reserve_exact(n)
+-        .map_err(|_| (NOMEM, "allocation failed"))
+-}
+ fn product(a: usize, b: usize) -> R<usize> {
+     a.checked_mul(b).ok_or((LIMIT, "size overflow"))
+ }
+-#[derive(Clone, Copy)]
+-struct Tag {
+-    key: u16,
+-    kind: u16,
+-    count: usize,
+-    at: usize,
+-}
+-struct Meta {
+-    tags: Vec<Tag>,
+-    off: usize,
+-    next: usize,
+-    le: bool,
+-    width: usize,
+-    height: usize,
+-    ch: usize,
+-    bits: usize,
+-    outbits: usize,
+-    format: SampleFormat,
+-    alpha: AlphaMode,
+-    photo: u64,
+-    planar: usize,
+-    rows: usize,
+-    bw: usize,
+-    bh: usize,
+-    tiled: bool,
+-    offsets: Vec<u64>,
+-    counts: Vec<u64>,
+-    map: Vec<u16>,
+-    extra: Vec<u16>,
+-}
+-struct Handle {
+-    data: Vec<u8>,
+-    meta: Meta,
+-    page: u32,
+-    limits: Limits,
+-    work: usize,
+-    decoded: Vec<u8>,
+-    rendered: Vec<u8>,
+-    jpeg_rgb: bool,
+-    logluv16: bool,
+-}
+-fn u16at(s: &[u8], p: usize, le: bool) -> R<u16> {
+-    read16(s, p, le).map_err(err)
+-}
+-fn u32at(s: &[u8], p: usize, le: bool) -> R<u32> {
+-    read32(s, p, le).map_err(err)
+-}
+-fn directory(s: &[u8], off: usize, le: bool, l: &Limits) -> R<(Vec<Tag>, usize)> {
+-    let n = u16at(s, off, le)? as usize;
+-    if n > l.max_tags {
+-        return Err((LIMIT, "directory tag limit"));
+-    }
+-    let end = off
+-        .checked_add(2 + 12 * n)
+-        .ok_or((LIMIT, "directory overflow"))?;
+-    let next = u32at(s, end, le)? as usize;
+-    let mut tags = Vec::new();
+-    reserve(&mut tags, n)?;
+-    for i in 0..n {
+-        let p = off + 2 + 12 * i;
+-        let key = u16at(s, p, le)?;
+-        if key == 0 {
+-            continue;
+-        }
+-        let kind = u16at(s, p + 2, le)?;
+-        let count = u32at(s, p + 4, le)? as usize;
+-        let size = match kind {
+-            1 | 2 | 6 | 7 => 1,
+-            3 | 8 => 2,
+-            4 | 9 | 11 | 13 => 4,
+-            5 | 10 | 12 => 8,
+-            _ => return Err((NOTIMPL, "field type not implemented")),
+-        };
+-        let len = product(count, size)?;
+-        let at = if len <= 4 {
+-            p + 8
+-        } else {
+-            u32at(s, p + 8, le)? as usize
+-        };
+-        if at > s.len() || len > s.len() - at {
+-            return Err((INVALID, "field outside input"));
+-        }
+-        tags.push(Tag {
+-            key,
+-            kind,
+-            count,
+-            at,
+-        });
+-    }
+-    Ok((tags, next))
+-}
+-fn value(s: &[u8], t: Tag, i: usize, le: bool) -> R<u64> {
+-    if i >= t.count {
+-        return Err((INVALID, "field index out of range"));
+-    }
+-    match t.kind {
+-        1 => Ok(s[t.at + i] as u64),
+-        3 => Ok(u16at(s, t.at + 2 * i, le)? as u64),
+-        4 | 13 => Ok(u32at(s, t.at + 4 * i, le)? as u64),
+-        _ => Err((NOTIMPL, "field value type not implemented")),
+-    }
+-}
+-fn find(tags: &[Tag], key: u16) -> Option<Tag> {
+-    tags.iter().find(|t| t.key == key).copied()
+-}
+-fn scalar(s: &[u8], tags: &[Tag], key: u16, default: u64, le: bool) -> R<u64> {
+-    match find(tags, key) {
+-        Some(t) => value(s, t, 0, le),
+-        None => Ok(default),
+-    }
+-}
+-fn array(s: &[u8], tags: &[Tag], key: u16, le: bool, cap: usize) -> R<Vec<u64>> {
+-    let Some(t) = find(tags, key) else {
+-        return Ok(Vec::new());
+-    };
+-    if t.count > cap {
+-        return Err((LIMIT, "metadata array limit"));
+-    }
+-    let mut a = Vec::new();
+-    reserve(&mut a, t.count)?;
+-    for i in 0..t.count {
+-        a.push(value(s, t, i, le)?);
+-    }
+-    Ok(a)
+-}
+-fn small_array(s: &[u8], tags: &[Tag], key: u16, le: bool, cap: usize) -> R<Vec<u16>> {
+-    let a = array(s, tags, key, le, cap)?;
+-    let mut b = Vec::new();
+-    reserve(&mut b, a.len())?;
+-    for v in a {
+-        b.push(u16::try_from(v).map_err(|_| (INVALID, "16-bit metadata overflow"))?);
+-    }
+-    Ok(b)
+-}
+-fn metadata(data: &[u8], page: u32, l: &Limits, work: usize) -> R<Meta> {
+-    let mut budget = Budget { remaining: work };
+-    let image = inspect_raster(data, page as usize, l, &mut budget).map_err(err)?;
+-    let header = header(data).map_err(err)?;
+-    let le = header.little_endian;
+-    let mut off = header.first_ifd;
+-    if page as usize >= l.max_directories {
+-        return Err((LIMIT, "directory traversal limit"));
+-    }
+-    for _ in 0..page {
+-        let (_, next) = directory(data, off, le, l)?;
+-        off = next;
+-    }
+-    let (tags, next) = directory(data, off, le, l)?;
+-    let tiled = find(&tags, 324).is_some();
+-    let width = image.width();
+-    let height = image.height();
+-    let rows = scalar(data, &tags, 278, u32::MAX as u64, le)? as usize;
+-    let bw = if tiled {
+-        scalar(data, &tags, 322, 0, le)? as usize
+-    } else {
+-        width
+-    };
+-    let bh = if tiled {
+-        scalar(data, &tags, 323, 0, le)? as usize
+-    } else {
+-        rows.min(height)
+-    };
+-    let offsets = array(
+-        data,
+-        &tags,
+-        if tiled { 324 } else { 273 },
+-        le,
+-        l.max_segments,
+-    )?;
+-    let counts = array(
+-        data,
+-        &tags,
+-        if tiled { 325 } else { 279 },
+-        le,
+-        l.max_segments,
+-    )?;
+-    let map = small_array(data, &tags, 320, le, 768)?;
+-    let extra = small_array(data, &tags, 338, le, 4)?;
+-    let photo = scalar(data, &tags, 262, 1, le)?;
+-    let planar = scalar(data, &tags, 284, 1, le)? as usize;
+-    Ok(Meta {
+-        tags,
+-        off,
+-        next,
+-        le,
+-        width,
+-        height,
+-        ch: image.channels(),
+-        bits: image.bits_per_sample(),
+-        outbits: image.output_bits_per_sample(),
+-        format: image.sample_format(),
+-        alpha: image.alpha_mode(),
+-        photo,
+-        planar,
+-        rows,
+-        bw,
+-        bh,
+-        tiled,
+-        offsets,
+-        counts,
+-        map,
+-        extra,
+-    })
+-}
+-impl Handle {
+-    fn open(data: Vec<u8>, input: usize, output: usize, work: usize) -> R<Self> {
+-        let limits = Limits {
+-            max_input: input,
+-            max_output: output,
+-            ..Limits::conservative()
+-        };
+-        let meta = metadata(&data, 0, &limits, work)?;
+-        Ok(Self {
+-            data,
+-            meta,
+-            page: 0,
+-            limits,
+-            work,
+-            decoded: Vec::new(),
+-            rendered: Vec::new(),
+-            jpeg_rgb: false,
+-            logluv16: false,
+-        })
+-    }
+-    fn decode(&mut self) -> R<()> {
+-        if !self.decoded.is_empty() {
+-            return Ok(());
+-        }
+-        let mut b = Budget {
+-            remaining: self.work,
+-        };
+-        let image =
+-            inspect_raster(&self.data, self.page as usize, &self.limits, &mut b).map_err(err)?;
+-        let mut out = zeros(image.output_len(), self.limits.max_output)?;
+-        let mut scratch = zeros(image.scratch_len(), self.limits.max_output)?;
+-        image
+-            .decode_with_scratch(&mut out, &mut scratch, &mut b)
+-            .map_err(err)?;
+-        self.decoded = out;
+-        Ok(())
+-    }
+-    fn source_channels(&self) -> R<usize> {
+-        Ok(scalar(&self.data, &self.meta.tags, 277, 1, self.meta.le)? as usize)
+-    }
+-    fn raw_row(&self, w: usize) -> R<usize> {
+-        let m = &self.meta;
+-        if m.photo == 6 && !self.jpeg_rgb {
+-            return Err((
+-                NOTIMPL,
+-                "native subsampled YCbCr not implemented; request JPEGCOLORMODE_RGB",
+-            ));
+-        }
+-        let ch = if m.planar == 2 {
+-            1
+-        } else {
+-            self.source_channels()?
+-        };
+-        let n = product(product(w, ch)?, m.bits)?;
+-        Ok(n.checked_add(7).ok_or((LIMIT, "row size overflow"))? / 8)
+-    }
+-    fn native_ok(&self) -> R<()> {
+-        let m = &self.meta;
+-        if m.photo == 3 {
+-            return Err((
+-                NOTIMPL,
+-                "native palette indices not exposed by decoder; use RGBA reads",
+-            ));
+-        }
+-        if m.alpha == AlphaMode::Associated {
+-            return Err((
+-                NOTIMPL,
+-                "original associated-alpha samples not exposed by decoder",
+-            ));
+-        }
+-        if m.photo == 6 && !self.jpeg_rgb {
+-            return Err((
+-                NOTIMPL,
+-                "native YCbCr not implemented; request JPEGCOLORMODE_RGB",
+-            ));
+-        }
+-        if m.photo == 32845 && !self.logluv16 {
+-            return Err((
+-                NOTIMPL,
+-                "LogLuv conversion not implemented; request SGILOGDATAFMT_16BIT",
+-            ));
+-        }
+-        Ok(())
+-    }
+-    fn native(&mut self, x: usize, y: usize, w: usize, h: usize, sample: usize) -> R<()> {
+-        self.native_ok()?;
+-        let m = &self.meta;
+-        let sc = self.source_channels()?;
+-        if (m.planar == 2 && sample >= sc) || (m.planar != 2 && sample != 0) {
+-            return Err((INVALID, "sample plane out of range"));
+-        }
+-        if x > m.width || w > m.width - x || y > m.height || h > m.height - y {
+-            return Err((NOTIMPL, "native edge-tile padding not exposed by decoder"));
+-        }
+-        let row = self.raw_row(w)?;
+-        let mut result = zeros(product(row, h)?, self.limits.max_output)?;
+-        self.decode()?;
+-        let m = &self.meta;
+-        let ch = if m.planar == 2 { 1 } else { sc };
+-        for dy in 0..h {
+-            for dx in 0..w {
+-                for c in 0..ch {
+-                    let a = if m.planar == 2 { sample } else { c };
+-                    let pi = ((y + dy) * m.width + x + dx) * m.ch + a;
+-                    if m.bits == 1 {
+-                        let v = self.decoded[pi] / 255;
+-                        let bit = if m.photo == 0 { 1 - v } else { v };
+-                        result[dy * row + dx / 8] |= bit << (7 - dx % 8);
+-                    } else {
+-                        let bytes = m.outbits / 8;
+-                        let start = pi * bytes;
+-                        let dest = dy * row + (dx * ch + c) * bytes;
+-                        if bytes == 1 {
+-                            let v = self.decoded[start];
+-                            result[dest] = if m.photo == 0 && a == 0 { 255 - v } else { v };
+-                        } else if bytes == 2 {
+-                            let raw = [self.decoded[start], self.decoded[start + 1]];
+-                            let mut v = if m.format == SampleFormat::UnsignedInteger {
+-                                u16::from_be_bytes(raw)
+-                            } else {
+-                                u16::from_le_bytes(raw)
+-                            };
+-                            if m.photo == 0 {
+-                                v = !v;
+-                            }
+-                            result[dest..dest + 2].copy_from_slice(&v.to_ne_bytes());
+-                        } else if bytes == 8 {
+-                            let mut raw = [0; 8];
+-                            raw.copy_from_slice(&self.decoded[start..start + 8]);
+-                            result[dest..dest + 8]
+-                                .copy_from_slice(&u64::from_le_bytes(raw).to_ne_bytes());
+-                        } else {
+-                            return Err((NOTIMPL, "sample width not implemented"));
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-        self.rendered = result;
+-        Ok(())
+-    }
+-    fn rgba_ok(&self) -> R<()> {
+-        if self.meta.format != SampleFormat::UnsignedInteger {
+-            return Err((NOTIMPL, "floating/LogLuv RGBA conversion not implemented"));
+-        }
+-        if self.meta.alpha == AlphaMode::Associated {
+-            return Err((
+-                NOTIMPL,
+-                "exact associated-alpha RGBA output not exposed by decoder",
+-            ));
+-        }
+-        Ok(())
+-    }
+-    fn rgba(&mut self, x: usize, y: usize, w: usize, h: usize, orientation: usize) -> R<()> {
+-        self.rgba_ok()?;
+-        if !(1..=4).contains(&orientation) {
+-            return Err((NOTIMPL, "rotated RGBA orientation not implemented"));
+-        }
+-        let mut result = zeros(product(product(w, h)?, 4)?, self.limits.max_output)?;
+-        self.decode()?;
+-        let m = &self.meta;
+-        for dy in 0..h {
+-            for dx in 0..w {
+-                if x + dx >= m.width || y + dy >= m.height {
+-                    continue;
+-                }
+-                let at = ((y + dy) * m.width + x + dx) * m.ch * (m.outbits / 8);
+-                let channels = if m.ch <= 2 { 1 } else { 3 };
+-                let mut rgb = [0u8; 3];
+-                for c in 0..3 {
+-                    let ci = if channels == 1 { 0 } else { c };
+-                    let offset = at + ci * (m.outbits / 8);
+-                    rgb[c] = if m.outbits == 8 {
+-                        self.decoded[offset]
+-                    } else if channels == 1 {
+-                        self.decoded[offset]
+-                    } else {
+-                        let v = u16::from_be_bytes([self.decoded[offset], self.decoded[offset + 1]])
+-                            as u32;
+-                        ((v * 255 + 32767) / 65535) as u8
+-                    };
+-                }
+-                let a = if m.alpha == AlphaMode::Unassociated {
+-                    self.decoded[at + m.ch - 1]
+-                } else {
+-                    255
+-                };
+-
+-                if channels == 3 {
+-                    for c in &mut rgb {
+-                        *c = ((u32::from(*c) * u32::from(a) + 127) / 255) as u8;
+-                    }
+-                }
+-                let ox = if orientation == 2 || orientation == 3 {
+-                    w - 1 - dx
+-                } else {
+-                    dx
+-                };
+-                let oy = if orientation == 3 || orientation == 4 {
+-                    h - 1 - dy
+-                } else {
+-                    dy
+-                };
+-                let dest = (oy * w + ox) * 4;
+-                let word = u32::from(rgb[0])
+-                    | (u32::from(rgb[1]) << 8)
+-                    | (u32::from(rgb[2]) << 16)
+-                    | (u32::from(a) << 24);
+-                result[dest..dest + 4].copy_from_slice(&word.to_ne_bytes());
+-            }
+-        }
+-        self.rendered = result;
+-        Ok(())
+-    }
++mod storage;
++mod directory;
++mod decoder;
++use storage::{Buf,Mem,Memory,Source,Backend,ReadProc,SeekProc};
++use directory::*;
++use verified_tiff::container;
++#[derive(Clone,Copy)]
++struct Tag{key:u16,kind:u16,count:usize,at:usize}
++struct Meta{
++    tags:Buf<Tag>,off:u64,next:u64,le:bool,width:usize,height:usize,ch:usize,bits:usize,
++    format:u16,photo:u64,planar:usize,rows:usize,bw:usize,bh:usize,tiled:bool,
++    offsets:Buf<u64>,counts:Buf<u64>,map:Buf<u16>,extra:Buf<u16>,subifds:Buf<u64>,
++    compression:u16,predictor:u16,orientation:usize,fill:u16,
++}
++struct Handle{
++    source:Source,header:container::Header,data:Buf<u8>,meta:Meta,page:u32,limits:Limits,
++    work:usize,chain_steps:usize,cache:Option<(usize,Buf<u8>)>,rendered:Option<Buf<u8>>,jpeg_rgb:bool,logluv16:bool,chop:bool,
++}
++impl Handle{
++    fn open(mut source:Source,output:usize,work:usize,flags:u32)->R<Self>{
++        if source.len>source.input as u64{return Err((LIMIT,"input byte limit"));}
++        let b=source.read(0,source.len.min(16) as usize)?;
++        let header=container::header(&b).map_err(err)?;drop(b);
++        let limits=Limits{max_input:source.input,max_output:output,..Limits::conservative()};
++        let chop=flags&1!=0;
++        let (data,meta)=if flags&2!=0{empty_metadata(&source.mem,header)?}else{metadata(&mut source,header,header.first_ifd,&limits,chop)?};
++        Ok(Self{source,header,data,meta,page:0,limits,work,chain_steps:0,cache:None,rendered:None,jpeg_rgb:false,logluv16:false,chop})
++    }
++    fn set_offset(&mut self,off:u64,page:u32)->R<()>{
++        let (data,meta)=metadata(&mut self.source,self.header,off,&self.limits,self.chop)?;
++        self.data=data;self.meta=meta;self.page=page;self.chain_steps=0;self.cache=None;self.rendered=None;self.jpeg_rgb=false;self.logluv16=false;Ok(())
++    }
++    fn source_channels(&self)->R<usize>{Ok(self.meta.ch)}
++    fn raw_row(&self,w:usize)->R<usize>{
++        if self.meta.photo==6 && !self.jpeg_rgb{return Err((NOTIMPL,"native subsampled YCbCr not implemented; request JPEGCOLORMODE_RGB"));}
++        self.meta.row_bytes(w)
++    }
++}
++fn empty_metadata(mem:&Mem,header:container::Header)->R<(Buf<u8>,Meta)>{
++    Ok((Buf::new(0,mem)?,Meta{tags:Buf::new(0,mem)?,off:0,next:header.first_ifd,le:header.little_endian,width:0,height:0,ch:1,bits:1,format:1,photo:1,planar:1,rows:0,bw:0,bh:0,tiled:false,offsets:Buf::new(0,mem)?,counts:Buf::new(0,mem)?,map:Buf::new(0,mem)?,extra:Buf::new(0,mem)?,subifds:Buf::new(0,mem)?,compression:1,predictor:1,orientation:1,fill:1}))
+ }
+ // Safety: only the C shim can call these hidden exports. A live handle must
+ // be exclusively accessed for the duration of a call; C owns its lifetime.
+@@ -503,60 +110,22 @@
+     }
+ }
+ #[no_mangle]
+-pub unsafe extern "C" fn vt_open_fd(
+-    fd: i32,
+-    input: usize,
+-    output: usize,
+-    work: usize,
+-) -> *mut c_void {
+-    guard(ptr::null_mut(), || {
+-        if fd < 0 {
+-            return Err((INVALID, "invalid file descriptor"));
+-        }
+-        // Borrow the descriptor: C closes it only after a successful open.
+-        // Failed opens must not close a caller-owned descriptor.
+-        let mut file = std::mem::ManuallyDrop::new(std::fs::File::from_raw_fd(fd));
+-        file.seek(SeekFrom::Start(0))
+-            .map_err(|_| (5, "input seek failed"))?;
+-        let mut data = Vec::new();
+-        let mut chunk = [0; 65536];
+-        loop {
+-            let n = file
+-                .read(&mut chunk)
+-                .map_err(|_| (5, "input read failed"))?;
+-            if n == 0 {
+-                break;
+-            }
+-            if data.len() > input || n > input - data.len() {
+-                return Err((LIMIT, "input byte limit"));
+-            }
+-            reserve(&mut data, n)?;
+-            data.extend_from_slice(&chunk[..n]);
+-        }
+-        let h = Handle::open(data, input, output, work)?;
+-        Ok(Box::into_raw(Box::new(h)).cast())
+-    })
+-}
+-#[no_mangle]
+-pub unsafe extern "C" fn vt_open_memory(
+-    data: *const u8,
+-    len: usize,
+-    input: usize,
+-    output: usize,
+-    work: usize,
+-) -> *mut c_void {
+-    guard(ptr::null_mut(), || {
+-        if len > input {
+-            return Err((LIMIT, "input byte limit"));
+-        }
+-        if len > isize::MAX as usize || (len > 0 && data.is_null()) {
+-            return Err((INVALID, "invalid input buffer"));
+-        }
+-        let mut v = zeros(len, input)?;
+-        if len > 0 {
+-            v.copy_from_slice(std::slice::from_raw_parts(data, len));
+-        }
+-        Ok(Box::into_raw(Box::new(Handle::open(v, input, output, work)?)).cast())
++pub unsafe extern "C" fn vt_open_fd(fd:i32,input:usize,output:usize,work:usize,single:usize,cumulative:usize,base:usize,flags:u32)->*mut c_void{
++    guard(ptr::null_mut(),||{
++        if fd<0{return Err((INVALID,"invalid file descriptor"));}
++        let file=std::mem::ManuallyDrop::new(std::fs::File::from_raw_fd(fd));
++        let len=file.metadata().map_err(|_|(5,"input stat failed"))?.len();
++        let mem=Memory::new(single,cumulative,base.checked_add(std::mem::size_of::<Handle>()).ok_or((LIMIT,"handle size overflow"))?)?;
++        let source=Source{backend:Backend::Fd(fd),len,mem,input};
++        Ok(Box::into_raw(Box::new(Handle::open(source,output,work,flags)?)).cast())
++    })
++}
++#[no_mangle]
++pub unsafe extern "C" fn vt_open_client(client:*mut c_void,read:ReadProc,seek:SeekProc,len:u64,input:usize,output:usize,work:usize,single:usize,cumulative:usize,base:usize,flags:u32)->*mut c_void{
++    guard(ptr::null_mut(),||{
++        let mem=Memory::new(single,cumulative,base.checked_add(std::mem::size_of::<Handle>()).ok_or((LIMIT,"handle size overflow"))?)?;
++        let source=Source{backend:Backend::Client{client,read,seek},len,mem,input};
++        Ok(Box::into_raw(Box::new(Handle::open(source,output,work,flags)?)).cast())
+     })
+ }
+ #[no_mangle]
+@@ -572,13 +141,8 @@
+ pub unsafe extern "C" fn vt_select(p: *mut c_void, page: u32) -> i32 {
+     guard(0, || {
+         let h = handle(p)?;
+-        let m = metadata(&h.data, page, &h.limits, h.work)?;
+-        h.meta = m;
+-        h.page = page;
+-        h.decoded = Vec::new();
+-        h.rendered = Vec::new();
+-        h.jpeg_rgb = false;
+-        h.logluv16 = false;
++        let off=page_offset(&mut h.source,h.header,Some(page),&h.limits)?.0;
++        h.set_offset(off,page)?;
+         Ok(1)
+     })
+ }
+@@ -592,9 +156,11 @@
+         }
+         let m = &h.meta;
+         let def = match key {
+-            258 | 266 | 274 | 277 | 284 | 317 | 339 | 259 => Some(1),
++            258 | 266 | 274 | 277 | 284 | 317 | 339 | 259 | 263 | 332 | 531 => Some(1),
+             296 => Some(2),
+-            292 | 293 => Some(0),
++            292 | 293 | 254 | 280 => Some(0),
++            281 => Some((1u64 << m.bits.min(16))-1),
++            334 => Some(4),
+             278 => Some(u32::MAX as u64),
+             _ => None,
+         };
+@@ -606,7 +172,7 @@
+             } else {
+                 0
+             }
+-        } else {
++        } else if key==278 && m.rows>0 {m.rows as u64} else {
+             let Some(t) = find(&m.tags, key as u16) else {
+                 if defaulted != 0 {
+                     if let Some(v) = def {
+@@ -642,6 +208,8 @@
+             11 => m.planar as u64,
+             12 => h.source_channels()? as u64,
+             13 => h.limits.max_output as u64,
++            14 => h.header.big as u64,
++            15 => h.meta.tags.len() as u64,
+             _ => return Err((INVALID, "unknown adapter info")),
+         })
+     })
+@@ -659,6 +227,7 @@
+             279 | 325 => (m.counts.as_ptr().cast(), m.counts.len()),
+             320 => (m.map.as_ptr().cast(), m.map.len()),
+             338 => (m.extra.as_ptr().cast(), m.extra.len()),
++            330 => (m.subifds.as_ptr().cast(),m.subifds.len()),
+             _ => return Err((NOTIMPL, "metadata array not implemented")),
+         };
+         *len = n;
+@@ -669,45 +238,15 @@
+ pub unsafe extern "C" fn vt_count_dirs(p: *mut c_void) -> u32 {
+     guard(0, || {
+         let h = handle(p)?;
+-        let mut off = header(&h.data).map_err(err)?.first_ifd;
+-        let mut seen = Vec::new();
+-        reserve(&mut seen, h.limits.max_directories)?;
+-        while off != 0 {
+-            if seen.contains(&off) {
+-                return Err((40, "cyclic directory chain"));
+-            }
+-            if seen.len() == h.limits.max_directories {
+-                return Err((LIMIT, "directory traversal limit"));
+-            }
+-            seen.push(off);
+-            let (_, next) = directory(&h.data, off, h.meta.le, &h.limits)?;
+-            off = next;
+-        }
+-        Ok(seen.len() as u32)
++        Ok(page_offset(&mut h.source,h.header,None,&h.limits)?.1)
+     })
+ }
+ #[no_mangle]
+ pub unsafe extern "C" fn vt_set_offset(p: *mut c_void, offset: u64) -> i32 {
+     guard(0, || {
+         let h = handle(p)?;
+-        let mut off = header(&h.data).map_err(err)?.first_ifd;
+-        for page in 0..h.limits.max_directories {
+-            if off == 0 {
+-                break;
+-            }
+-            if off as u64 == offset {
+-                let m = metadata(&h.data, page as u32, &h.limits, h.work)?;
+-                h.meta = m;
+-                h.page = page as u32;
+-                h.decoded = Vec::new();
+-                h.rendered = Vec::new();
+-                h.jpeg_rgb = false;
+-                h.logluv16 = false;
+-                return Ok(1);
+-            }
+-            off = directory(&h.data, off, h.meta.le, &h.limits)?.1;
+-        }
+-        Err((NOTIMPL, "offset is not a supported main directory"))
++        h.set_offset(offset,u32::MAX)?;
++        Ok(1)
+     })
+ }
+ #[no_mangle]
+@@ -715,6 +254,7 @@
+     guard(-1, || {
+         let h = handle(p)?;
+         let m = &h.meta;
++        if h.meta.width==0 {return Err((INVALID,"no selected image directory"));}
+         if kind > 3 {
+             return Err((INVALID, "invalid size operation"));
+         }
+@@ -744,6 +284,7 @@
+ pub unsafe extern "C" fn vt_mode(p: *mut c_void, tag: u32, v: i32) -> i32 {
+     guard(0, || {
+         let h = handle(p)?;
++        h.cache=None;
+         match tag {
+             65538 if h.meta.photo == 6 && (v == 0 || v == 1) => h.jpeg_rgb = v == 1,
+             65560 if h.meta.photo == 32845 && v == 1 => h.logluv16 = true,
+@@ -760,98 +301,43 @@
+         Ok(1)
+     })
+ }
+-// kinds: 0 scanline, 1 native strip, 2 native tile, 3 raw strip/tile,
+-// 4 RGBA whole, 5 RGBA strip, 6 RGBA tile. Full success before caller copy.
+-#[no_mangle]
+-pub unsafe extern "C" fn vt_read(
+-    p: *mut c_void,
+-    kind: u32,
+-    a: u32,
+-    b: u32,
+-    c: u32,
+-    d: u32,
+-    len: *mut usize,
+-) -> *const u8 {
+-    guard(ptr::null(), || {
+-        let h = handle(p)?;
+-        if len.is_null() {
+-            return Err((INVALID, "null length output"));
+-        }
+-        match kind {
+-            0 => {
+-                if a as usize >= h.meta.height {
+-                    return Err((INVALID, "scanline row out of range"));
+-                }
+-                if h.meta.tiled {
+-                    return Err((NOTIMPL, "scanline reads on tiled images not implemented"));
+-                }
+-                h.native(0, a as usize, h.meta.width, 1, b as usize)?;
+-            }
+-            1 | 2 => {
+-                let m = &h.meta;
+-                if (kind == 2) != m.tiled {
+-                    return Err((INVALID, "strip/tile API does not match layout"));
+-                }
+-                let across = (m.width - 1) / m.bw + 1;
+-                let per = across * ((m.height - 1) / m.bh + 1);
+-                let idx = a as usize;
+-                if idx >= m.offsets.len() {
+-                    return Err((INVALID, "segment index out of range"));
+-                }
+-                let sample = if m.planar == 2 { idx / per } else { 0 };
+-                let k = idx % per;
+-                let x = (k % across) * m.bw;
+-                let y = (k / across) * m.bh;
+-                let height = if m.tiled {
+-                    m.bh
+-                } else {
+-                    m.bh.min(m.height - y)
+-                };
+-                h.native(x, y, m.bw, height, sample)?;
+-            }
+-            3 => {
+-                let i = a as usize;
+-                if i >= h.meta.offsets.len() {
+-                    return Err((INVALID, "segment index out of range"));
+-                }
+-                let off = h.meta.offsets[i] as usize;
+-                let n = h.meta.counts[i] as usize;
+-                let src = h
+-                    .data
+-                    .get(off..off.checked_add(n).ok_or((LIMIT, "segment overflow"))?)
+-                    .ok_or((INVALID, "raw segment outside input"))?;
+-                *len = src.len();
+-                return Ok(src.as_ptr());
+-            }
+-            4 => {
+-                if a as usize != h.meta.width || b as usize != h.meta.height {
+-                    return Err((NOTIMPL, "RGBA raster resizing not implemented"));
+-                }
+-                h.rgba(0, 0, a as usize, b as usize, c as usize)?;
+-            }
+-            5 => {
+-                let m = &h.meta;
+-                if m.tiled || a as usize >= m.height || (a as usize) % m.bh != 0 {
+-                    return Err((INVALID, "invalid RGBA strip row"));
+-                }
+-                h.rgba(0, a as usize, m.width, m.bh.min(m.height - a as usize), 4)?;
+-            }
+-            6 => {
+-                let m = &h.meta;
+-                if !m.tiled
+-                    || a as usize >= m.width
+-                    || b as usize >= m.height
+-                    || (a as usize) % m.bw != 0
+-                    || (b as usize) % m.bh != 0
+-                {
+-                    return Err((INVALID, "invalid RGBA tile coordinates"));
+-                }
+-                h.rgba(a as usize, b as usize, m.bw, m.bh, 4)?;
+-            }
+-            _ => return Err((NOTIMPL, "read operation not implemented")),
+-        }
+-        let _ = d;
+-        *len = h.rendered.len();
+-        Ok(h.rendered.as_ptr())
+-    })
+-}
++// Output lives until the next mutating operation. C copies only after success.
++#[no_mangle]
++pub unsafe extern "C" fn vt_read(p:*mut c_void,kind:u32,a:u32,b:u32,c:u32,d:u32,len:*mut usize)->*const u8{
++    guard(ptr::null(),||{
++        let h=handle(p)?;if len.is_null(){return Err((INVALID,"null length output"));}
++        if h.meta.width==0{return Err((INVALID,"no selected image directory"));}
++        h.read(kind,a as usize,b as usize,c as usize,d as usize)?;
++        let result=h.rendered.as_ref().ok_or((5,"missing output"))?;
++        *len=result.len();Ok(result.as_ptr())
++    })
++}
++#[no_mangle]
++pub unsafe extern "C" fn vt_next(p:*mut c_void)->i32{
++    guard(0,||{let h=handle(p)?;let off=h.meta.next;if off==0{return Ok(0);}
++        if off==h.meta.off{return Err((40,"cyclic directory chain"));}
++        let steps=h.chain_steps+1;if steps>h.limits.max_directories{return Err((LIMIT,"directory traversal limit"));}
++        let page=if h.meta.off==0{0}else{h.page.saturating_add(1)};h.set_offset(off,page)?;h.chain_steps=steps;Ok(1)})
++}
++#[no_mangle]
++pub unsafe extern "C" fn vt_field(p:*mut c_void,key:u32,kind:*mut u16,count:*mut usize)->*const u8{
++    guard(ptr::null(),||{let h=handle(p)?;if kind.is_null()||count.is_null(){return Err((INVALID,"null metadata output"));}let Some(t)=find(&h.meta.tags,key as u16) else{return Ok(ptr::null());};*kind=t.kind;*count=t.count;Ok(h.data.as_ptr().add(t.at))})
++}
++#[no_mangle]
++pub unsafe extern "C" fn vt_real(p:*mut c_void,key:u32,out:*mut f32)->i32{
++    guard(-1,||{let h=handle(p)?;if out.is_null(){return Err((INVALID,"null metadata output"));}let Some(t)=find(&h.meta.tags,key as u16) else{return Ok(0);};if t.count!=1{return Err((INVALID,"scalar real field count"));}
++        let v=match t.kind{5=>{let a=u32at(&h.data,t.at,h.meta.le)?;let b=u32at(&h.data,t.at+4,h.meta.le)?;if b==0{return Err((INVALID,"zero rational denominator"));}a as f32/b as f32},11=>f32::from_bits(u32at(&h.data,t.at,h.meta.le)?),12=>f64::from_bits(verified_tiff::native_samples::read_word(&h.data,t.at,8,h.meta.le).map_err(err)?) as f32,_=>return Err((NOTIMPL,"real field type not implemented"))};*out=v;Ok(1)})
++}
++#[no_mangle]
++pub unsafe extern "C" fn vt_tag(p:*mut c_void,index:usize)->u32{guard(u32::MAX,||{let h=handle(p)?;Ok(h.meta.tags.get(index).ok_or((INVALID,"tag index out of range"))?.key as u32)})}
++#[no_mangle]
++pub unsafe extern "C" fn vt_region(p:*mut c_void,x:u32,y:u32,w:u32,ht:u32,orientation:u32,len:*mut usize)->*const u8{
++    guard(ptr::null(),||{let h=handle(p)?;if len.is_null(){return Err((INVALID,"null length"));}if x as usize>=h.meta.width||y as usize>=h.meta.height||w as usize>h.meta.width-x as usize||ht as usize>h.meta.height-y as usize{return Err((INVALID,"RGBA region outside image"));}h.rgba(x as usize,y as usize,w as usize,ht as usize,orientation as usize)?;let b=h.rendered.as_ref().ok_or((5,"missing RGBA output"))?;*len=b.len();Ok(b.as_ptr())})
++}
++
++#[no_mangle]
++pub unsafe extern "C" fn vt_pair(p:*mut c_void,key:u32,defaulted:i32,out:*mut u16)->i32{
++    guard(-1,||{let h=handle(p)?;if out.is_null(){return Err((INVALID,"null pair output"));}
++        let pair=if let Some(t)=find(&h.meta.tags,key as u16){if t.count!=2{return Err((INVALID,"pair field count"));}[u16::try_from(value(&h.data,t,0,h.meta.le)?).map_err(|_|(INVALID,"pair overflow"))?,u16::try_from(value(&h.data,t,1,h.meta.le)?).map_err(|_|(INVALID,"pair overflow"))?]}else if defaulted!=0 && key==530{[2,2]}else{return Ok(0);};
++        *out=pair[0];*out.add(1)=pair[1];Ok(1)})
++}
+--- /dev/null
++++ b/compat/src/storage.rs
+@@ -0,0 +1,64 @@
++//! Unverified seekable I/O and per-handle requested-allocation accounting.
++use super::*;
++use std::{ops::{Deref,DerefMut},sync::{Arc,atomic::{AtomicUsize,Ordering}},os::unix::fs::FileExt};
++
++pub struct Memory {single:usize,cumulative:usize,used:AtomicUsize}
++pub type Mem=Arc<Memory>;
++impl Memory {
++    pub fn new(single:usize,cumulative:usize,base:usize)->R<Mem>{
++        let m=Arc::new(Self{single,cumulative,used:AtomicUsize::new(0)});
++        m.claim(base)?;Ok(m)
++    }
++    fn claim(&self,n:usize)->R<()> {
++        if self.single!=0 && n>self.single {return Err((LIMIT,"maximum single allocation"));}
++        let old=self.used.load(Ordering::Relaxed);
++        let new=old.checked_add(n).ok_or((LIMIT,"allocation accounting overflow"))?;
++        if self.cumulative!=0 && new>self.cumulative {return Err((LIMIT,"maximum cumulative allocation"));}
++        self.used.store(new,Ordering::Relaxed);Ok(())
++    }
++    fn release(&self,n:usize){self.used.fetch_sub(n,Ordering::Relaxed);}
++}
++pub struct Buf<T>{v:Vec<T>,mem:Mem,charge:usize,capacity:usize}
++impl<T> Buf<T>{
++    pub fn new(n:usize,mem:&Mem)->R<Self>{
++        let charge=product(n,std::mem::size_of::<T>())?;
++        if charge>isize::MAX as usize{return Err((LIMIT,"allocation too large"));}
++        mem.claim(charge)?;
++        let mut v=Vec::new();
++        if v.try_reserve_exact(n).is_err(){mem.release(charge);return Err((NOMEM,"allocation failed"));}
++        Ok(Self{v,mem:mem.clone(),charge,capacity:n})
++    }
++    pub fn push(&mut self,value:T)->R<()>{if self.v.len()==self.capacity{return Err((LIMIT,"buffer capacity"));}self.v.push(value);Ok(())}
++}
++impl<T:Clone> Buf<T>{pub fn extend(&mut self,s:&[T])->R<()>{if s.len()>self.capacity-self.v.len(){return Err((LIMIT,"buffer capacity"));}self.v.extend_from_slice(s);Ok(())}}
++impl Buf<u8>{pub fn zeros(n:usize,cap:usize,mem:&Mem)->R<Self>{if n>cap{return Err((LIMIT,"buffer byte limit"));}let mut b=Self::new(n,mem)?;b.v.resize(n,0);Ok(b)}}
++impl<T> Deref for Buf<T>{type Target=[T];fn deref(&self)->&[T]{&self.v}}
++impl<T> DerefMut for Buf<T>{fn deref_mut(&mut self)->&mut[T]{&mut self.v}}
++impl<T> Drop for Buf<T>{fn drop(&mut self){self.mem.release(self.charge);}}
++pub type ReadProc=unsafe extern "C" fn(*mut c_void,*mut c_void,isize)->isize;
++pub type SeekProc=unsafe extern "C" fn(*mut c_void,u64,i32)->u64;
++pub enum Backend{Fd(i32),Client{client:*mut c_void,read:ReadProc,seek:SeekProc}}
++pub struct Source{pub backend:Backend,pub len:u64,pub mem:Mem,pub input:usize}
++impl Source{
++    pub fn read(&mut self,off:u64,n:usize)->R<Buf<u8>>{
++        if off>self.len || n as u64>self.len-off{return Err((INVALID,"read outside input"));}
++        let mut out=Buf::zeros(n,self.input,&self.mem)?;
++        match &self.backend{
++            Backend::Fd(fd)=>{
++                let file=std::mem::ManuallyDrop::new(unsafe{std::fs::File::from_raw_fd(*fd)});
++                file.read_exact_at(&mut out,off).map_err(|_|(5,"input read failed"))?;
++            }
++            Backend::Client{client,read,seek}=>unsafe{
++                if seek(*client,off,0)!=off{return Err((5,"callback seek failed"));}
++                let mut at=0;
++                while at<n{
++                    let want=(n-at).min(65536);
++                    let got=read(*client,out.as_mut_ptr().add(at).cast(),want as isize);
++                    if got<=0 || got as usize>want{return Err((5,"short/invalid callback read"));}
++                    at+=got as usize;
++                }
++            }
++        }
++        Ok(out)
++    }
++}
+--- a/compat/tests/api.c
++++ b/compat/tests/api.c
+@@ -116,6 +116,9 @@
+   for (size_t i = 0; i < (size_t)n + 16; i++)
+     assert(buf[i] == 0xa5);
+   assert(TIFFReadEncodedStrip(t, 0, buf, -2) == -1);
++  assert(TIFFReadEncodedStrip(t, UINT32_MAX, NULL, 0) == -1);
++  assert(TIFFReadEncodedTile(t, 0, NULL, 0) == -1);
++  assert(TIFFReadEncodedStrip(t, 0, NULL, 0) == 0);
+   assert(TIFFReadEncodedStrip(t, 0, buf, 1) == 1);
+   for (size_t i = 1; i < (size_t)n + 16; i++)
+     assert(buf[i] == 0xa5);
+@@ -148,7 +151,8 @@
+   assert(raster);
+   assert(TIFFRGBAImageGet(&image, raster, w, h));
+   image.row_offset = 1;
+-  assert(!TIFFRGBAImageGet(&image, raster, w, h) && errno == ENOSYS);
++  assert(TIFFRGBAImageGet(&image, raster, w, h-1));
++  assert(!TIFFRGBAImageGet(&image, raster, w, h) && errno == EINVAL);
+   TIFFRGBAImageEnd(&image);
+   assert(!image.tif);
+   free(raster);
+@@ -176,19 +180,20 @@
+   assert(buf);
+   memset(buf, 0xa5, tn + 16);
+   uint32_t last = TIFFNumberOfTiles(t) - 1;
+-  assert(TIFFReadEncodedTile(t, last, buf, (tmsize_t)tn) == -1);
+-  assert(errno == ENOSYS);
+-  for (size_t i = 0; i < tn + 16; i++)
+-    assert(buf[i] == 0xa5);
++  assert(TIFFReadEncodedTile(t, last, buf, (tmsize_t)tn) == (tmsize_t)tn);
++  for (size_t i = tn; i < tn + 16; i++)
++    assert(buf[i] == 0xa5);
++  assert(TIFFReadEncodedTile(t, 1, buf, (tmsize_t)tn) == (tmsize_t)tn);
++  assert(TIFFCurrentRow(t) == 0);
+   free(buf);
+   TIFFClose(t);
+   t = TIFFOpen(alpha, "r");
+   assert(t);
+-  buf = malloc((size_t)TIFFScanlineSize(t));
++  buf = malloc((size_t)TIFFTileSize(t));
+   assert(buf);
+-  assert(TIFFReadScanline(t, buf, 0, 0) == -1 && errno == ENOSYS);
++  assert(TIFFReadEncodedTile(t, 0, buf, -1) == TIFFTileSize(t));
+   char msg[1024];
+-  assert(!TIFFRGBAImageOK(t, msg) && msg[0]);
++  assert(TIFFRGBAImageOK(t, msg) && !msg[0]);
+   free(buf);
+   TIFFClose(t);
+   t = TIFFOpen(logluv, "r");
+@@ -224,8 +229,7 @@
+   TIFFOpenOptionsFree(opt);
+   opt = TIFFOpenOptionsAlloc();
+   TIFFOpenOptionsSetMaxSingleMemAlloc(opt, 100);
+-  assert(errno == ENOSYS);
+-  assert(!TIFFOpenExt(gray, "r", opt) && errno == ENOSYS);
++  assert(!TIFFOpenExt(gray, "r", opt) && errno == EFBIG);
+   TIFFOpenOptionsFree(opt);
+   FILE *file = fopen(gray, "rb");
+   assert(file);
+--- /dev/null
++++ b/compat/tests/coverage.c
+@@ -0,0 +1,105 @@
++#define _POSIX_C_SOURCE 200809L
++#include <tiffio.h>
++#include <verified_tiff.h>
++#include <assert.h>
++#include <stdint.h>
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++static int warnings;
++static int warning(TIFF *t,void *u,const char *m,const char *f,va_list ap){(void)t;(void)u;(void)m;(void)f;(void)ap;warnings++;return 1;}
++struct memory{unsigned char *p;size_t n,at,pixels,reads,bytes;int closed;};
++static tmsize_t rd(thandle_t v,void *p,tmsize_t n){
++  struct memory *m=v;assert(n>=0 && (size_t)n<=m->n-m->at);
++  if(m->at>=m->pixels){m->reads++;m->bytes+=(size_t)n;}
++  memcpy(p,m->p+m->at,(size_t)n);m->at+=(size_t)n;return n;
++}
++static toff_t sk(thandle_t v,toff_t n,int whence){struct memory *m=v;if(whence!=SEEK_SET||n>m->n)return (toff_t)-1;m->at=(size_t)n;return n;}
++static toff_t sz(thandle_t v){return ((struct memory *)v)->n;}
++static int cl(thandle_t v){((struct memory *)v)->closed++;return 0;}
++static TIFFOpenOptions *limits(uint64_t in,uint64_t out,uint64_t work,size_t single,size_t cumulative){
++  TIFFOpenOptions *o=TIFFOpenOptionsAlloc();assert(o);assert(VTIFFOpenOptionsSetLimits(o,in,out,work));
++  TIFFOpenOptionsSetMaxSingleMemAlloc(o,(tmsize_t)single);TIFFOpenOptionsSetMaxCumulatedMemAlloc(o,(tmsize_t)cumulative);return o;
++}
++static void unchanged(const unsigned char *b,size_t n){for(size_t i=0;i<n;i++)assert(b[i]==0xa5);}
++int main(int argc,char **argv){
++  assert(argc>=3);const char *mode=argv[1],*path=argv[2];TIFFSetErrorHandler(NULL);TIFFSetWarningHandler(NULL);
++  if(!strcmp(mode,"bad")){assert(!TIFFOpen(path,"rc"));return 0;}
++  if(!strcmp(mode,"seek")){
++    FILE *f=fopen(path,"rb");assert(f);assert(!fseek(f,0,SEEK_END));long n=ftell(f);assert(n>0);rewind(f);
++    struct memory m={0};m.n=(size_t)n;m.p=malloc(m.n);assert(m.p);assert(fread(m.p,1,m.n,f)==m.n);fclose(f);m.pixels=strtoull(argv[3],NULL,10);
++    TIFFOpenOptions *o=limits(1<<22,8192,100000,1<<17,1<<19);
++    TIFF *t=TIFFClientOpenExt("tracked","rOc",&m,rd,NULL,sk,cl,sz,NULL,NULL,o);assert(t);assert(m.reads==0);
++    assert(TIFFNumberOfStrips(t)==8192);unsigned char out[4112];memset(out,0xa5,sizeof(out));
++    assert(TIFFReadEncodedStrip(t,0,out,-1)==4096);assert(m.reads==1 && m.bytes<100);
++    for(size_t i=0;i<4096;i++)assert(out[i]==57);
++    unchanged(out+4096,16);
++    size_t reads=m.reads;assert(TIFFReadScanline(t,out,0,0)==1);assert(m.reads==reads);
++    memset(out,0xa5,sizeof(out));assert(TIFFReadEncodedStrip(t,8191,out,-1)==-1);unchanged(out,sizeof(out));
++    assert(TIFFReadScanline(t,out,0,0)==1);TIFFClose(t);assert(m.closed==1);TIFFOpenOptionsFree(o);free(m.p);return 0;
++  }
++  if(!strcmp(mode,"limits")){
++    unsigned char out[12304];
++    for(int kind=0;kind<2;kind++){
++      TIFFOpenOptions *o=limits(1<<20,1<<20,1000000,kind?20000:8000,kind?22000:0);
++      TIFF *t=TIFFOpenExt(path,"rc",o);assert(t);memset(out,0xa5,sizeof(out));
++      assert(TIFFReadEncodedStrip(t,0,out,-1)==-1);assert(errno==EFBIG);unchanged(out,sizeof(out));
++      TIFFClose(t);TIFFOpenOptionsFree(o);
++    }
++    TIFFOpenOptions *o=limits(1<<20,1<<20,1000000,0,0);TIFF *t=TIFFOpenExt(path,"rc",o);assert(t);
++    assert(TIFFReadEncodedStrip(t,0,out,-1)==12288);TIFFClose(t);TIFFOpenOptionsFree(o);return 0;
++  }
++  if(!strcmp(mode,"work")){
++    TIFFOpenOptions *o=limits(1<<20,1<<20,strtoull(argv[3],NULL,10),0,0);
++    TIFF *t=TIFFOpenExt(path,"rc",o);assert(t);unsigned char out[156];memset(out,0xa5,sizeof(out));
++    assert(!TIFFReadRGBAImageOriented(t,7,5,(uint32_t *)out,1,1));assert(errno==EFBIG);unchanged(out,sizeof(out));
++    assert(TIFFReadEncodedStrip(t,0,out,-1)==63);assert(TIFFReadEncodedStrip(t,1,out,-1)==42);
++    TIFFClose(t);TIFFOpenOptionsFree(o);return 0;
++  }
++  if(!strcmp(mode,"sparse")){
++    TIFFOpenOptions *o=limits(UINT64_C(1)<<34,1<<20,1000000,1<<20,1<<22);
++    TIFF *t=TIFFOpenExt(path,"rc",o);assert(t && TIFFIsBigTIFF(t));assert(TIFFCurrentDirOffset(t)>UINT32_MAX);
++    assert(TIFFGetStrileOffset(t,0)>UINT32_MAX);unsigned char out[1024];
++    for(uint32_t i=0;i<TIFFNumberOfStrips(t);i++){tmsize_t n=TIFFReadEncodedStrip(t,i,out,-1);assert(n>0 && n<=1024);assert(fwrite(out,1,(size_t)n,stdout)==(size_t)n);}
++    TIFFClose(t);TIFFOpenOptionsFree(o);return 0;
++  }
++  if(!strcmp(mode,"metadata")){
++    TIFFOpenOptions *o=TIFFOpenOptionsAlloc();assert(o);TIFFOpenOptionsSetWarningHandlerExtR(o,warning,NULL);TIFFOpenOptionsSetWarnAboutUnknownTags(o,1);
++    TIFF *t=TIFFOpenExt(path,"rC",o);assert(t);assert(warnings==1);assert(TIFFIsBigTIFF(t)==atoi(argv[3]));
++    float x=0,y=0;assert(TIFFGetField(t,TIFFTAG_XRESOLUTION,&x)&&x==300);assert(TIFFGetField(t,TIFFTAG_YRESOLUTION,&y)&&y==288);
++    char *s=NULL;assert(TIFFGetField(t,TIFFTAG_IMAGEDESCRIPTION,&s)&&!strcmp(s,"Image description"));
++    assert(TIFFGetField(t,TIFFTAG_SOFTWARE,&s)&&!strcmp(s,"Verified TIFF tests"));assert(TIFFGetField(t,TIFFTAG_ARTIST,&s)&&!strcmp(s,"Author"));
++    uint32_t n=0;void *p=NULL;const unsigned char icc[]={0,'I','C','C',255,0,'p','r','o','f','i','l','e'};
++    assert(TIFFGetField(t,TIFFTAG_ICCPROFILE,&n,&p)&&n==sizeof(icc)&&!memcmp(p,icc,n));
++    assert(TIFFGetField(t,TIFFTAG_XMLPACKET,&n,&p)&&n==6&&!memcmp(p,"<xmp/>",6));
++    uint16_t a=0,b=0;assert(TIFFGetField(t,TIFFTAG_PAGENUMBER,&a,&b)&&a==7&&b==12);
++    assert(TIFFGetFieldDefaulted(t,TIFFTAG_YCBCRSUBSAMPLING,&a,&b)&&a==2&&b==2);
++    const TIFFField *field=TIFFFieldWithTag(t,TIFFTAG_ICCPROFILE);assert(field);
++    assert(TIFFFieldTag(field)==TIFFTAG_ICCPROFILE&&TIFFFieldDataType(field)==TIFF_UNDEFINED&&TIFFFieldPassCount(field)==1);
++    assert(TIFFFieldReadCount(field)==TIFF_VARIABLE2&&TIFFFieldSetGetCountSize(field)==4&&TIFFFieldSetGetSize(field)==1&&!TIFFFieldIsAnonymous(field));
++    assert(TIFFFieldWithName(t,"ICC Profile")==field);assert(TIFFGetTagListCount(t)==5);
++    int found=0;for(int i=0;i<TIFFGetTagListCount(t);i++)found+=TIFFGetTagListEntry(t,i)==TIFFTAG_ICCPROFILE;assert(found==1);
++    TIFFClose(t);TIFFOpenOptionsFree(o);
++    for(const char **m=(const char *[]){"r","rb","rc","rC","rm","rM","rD","rO","rB",NULL};*m;m++){t=TIFFOpen(path,*m);assert(t);TIFFClose(t);}
++    t=TIFFOpen(path,"rh");assert(t && TIFFCurrentDirOffset(t)==0);uint32_t w=77;assert(!TIFFGetField(t,256,&w)&&w==77);assert(TIFFReadDirectory(t));assert(TIFFGetField(t,256,&w)&&w==7);TIFFClose(t);return 0;
++  }
++  if(!strcmp(mode,"chop")){
++    TIFF *t=TIFFOpen(path,"rc");assert(t && TIFFNumberOfStrips(t)==1);TIFFClose(t);
++    t=TIFFOpen(path,"rC");assert(t && TIFFNumberOfStrips(t)==5);uint32_t rows;assert(TIFFGetField(t,278,&rows)&&rows==2);
++    unsigned char out[8192];for(uint32_t i=0;i<5;i++){assert(TIFFReadEncodedStrip(t,i,out,-1)==8192);for(size_t j=0;j<8192;j++)assert(out[j]==(unsigned char)j);}TIFFClose(t);return 0;
++  }
++  TIFF *t=TIFFOpen(path,"rc");assert(t);
++  if(!strcmp(mode,"subifd")){
++    assert(TIFFIsBigTIFF(t)==atoi(argv[3]));assert(TIFFNumberOfDirectories(t)==1);uint16_t n;uint64_t *offs;
++    assert(TIFFGetField(t,TIFFTAG_SUBIFD,&n,&offs)&&n==1);uint64_t child=offs[0];
++    assert(TIFFSetSubDirectory(t,child));uint32_t w;assert(TIFFGetField(t,256,&w)&&w==3);unsigned char row[16];assert(TIFFReadScanline(t,row,0,0)==1);
++    assert(!TIFFSetSubDirectory(t,UINT64_MAX));assert(TIFFCurrentDirOffset(t)==child);assert(TIFFGetField(t,256,&w)&&w==3);
++    assert(TIFFSetDirectory(t,0));assert(TIFFGetField(t,256,&w)&&w==7);
++  }else if(!strcmp(mode,"cycle")){
++    assert(TIFFNumberOfDirectories(t)==0 && errno==ELOOP);uint64_t off=TIFFCurrentDirOffset(t);
++    assert(!TIFFSetDirectory(t,2));assert(TIFFCurrentDirOffset(t)==off);
++    assert(!TIFFReadDirectory(t) && errno==ELOOP);
++  }else assert(0);
++  TIFFClose(t);return 0;
++}
+--- /dev/null
++++ b/compat/tests/coverage.py
+@@ -0,0 +1,209 @@
++"""Independent native samples, BigTIFF/SubIFDs, seekable I/O and options.
++Generated with Python struct/zlib and independent TIFF LZW/PackBits encoders;
++never encoded by the implementation under test. Native bytes also compared
++against pinned libtiff 4.7.1 where its format/predictor supports them.
++"""
++import itertools,pathlib,struct,subprocess,sys,tempfile,unittest,zlib,os
++ROOT=pathlib.Path(__file__).resolve().parents[2]
++sys.path.insert(0,str(ROOT/'tests'))
++from fixtures import lzw_encode,packbits_row
++from extended import pixels
++OUT=pathlib.Path(os.environ.get('VTIFF_COMPAT_OUTPUT',ROOT/'target/compat')).resolve()
++WIDTHS={1:1,2:1,3:2,4:4,5:8,7:1,11:4,12:8,13:4,16:8,17:8,18:8}
++def assemble(pages,big=False,le=True,main_next=None,origin=0,dedup=False):
++ e='<' if le else '>';hs=16 if big else 8;cw=8 if big else 2;ew=20 if big else 12;slot=8 if big else 4
++ q='Q' if big else 'I';dirs=[];at=hs
++ for tags in pages:dirs.append(at+origin);at+=cw+ew*len(tags)+slot
++ out=bytearray(at);out[:2]=b'II' if le else b'MM'
++ struct.pack_into(e+'H',out,2,43 if big else 42)
++ if big:struct.pack_into(e+'HHQ',out,4,8,0,dirs[0])
++ else:struct.pack_into(e+'I',out,4,dirs[0])
++ patches=[];locations={};encoded_positions=[]
++ for pi,tags in enumerate(pages):
++  off=dirs[pi]-origin;struct.pack_into(e+('Q' if big else 'H'),out,off,len(tags))
++  nxt=main_next[pi] if main_next else None
++  struct.pack_into(e+q,out,off+cw+ew*len(tags),dirs[nxt] if nxt is not None else 0)
++  for i,(key,ty,vals) in enumerate(sorted(tags)):
++   if isinstance(vals,tuple) and vals[0]=='SUB': vals=[dirs[n] for n in vals[1]]
++   segs=vals[1] if isinstance(vals,tuple) and vals[0]=='SEG' else None
++   if segs is not None: vals=[0]*len(segs)
++   if isinstance(vals,bytes):raw=vals;n=len(raw)//WIDTHS[ty]
++   else:
++    n=len(vals);fmt={1:'B',3:'H',4:'I',13:'I',16:'Q',17:'q',18:'Q'}[ty];raw=struct.pack(e+str(n)+fmt,*vals)
++   p=off+cw+ew*i;struct.pack_into(e+'HH'+q,out,p,key,ty,n)
++   loc=p+ew-slot
++   if len(raw)>slot:
++    loc=len(out);struct.pack_into(e+q,out,p+ew-slot,loc+origin);out.extend(raw)
++   else:out[loc:loc+len(raw)]=raw
++   locations[(pi,key)]=(loc,ty,n)
++   if segs is not None:patches.append((loc,ty,segs))
++ cache={}
++ for loc,ty,segs in patches:
++  for i,seg in enumerate(segs):
++   if dedup and seg in cache:pos=cache[seg]
++   else:pos=len(out)+origin;out.extend(seg);cache[seg]=pos
++   struct.pack_into(e+('Q' if ty==16 else 'I'),out,loc+i*WIDTHS[ty],pos);encoded_positions.append(pos)
++ return bytes(out),locations,encoded_positions
++
++def scene(w=7,h=5,ch=3,bits=8,fmt=1,codec=1,predict=1,le=True,big=False,tiled=False,separate=False,alpha=0,orientation=1,photo=None,extra=(),origin=0,fill=1):
++ e='<' if le else '>';mask=(1<<bits)-1;bw=16 if tiled else w;bh=16 if tiled else 3
++ across=(w+bw-1)//bw;down=(h+bh-1)//bh
++ def val(x,y,c):
++  if fmt==3:
++   p=[0,1<<(bits-1), ((1<<(bits-1))-1), (0x7fc01234 if bits==32 else 0x7ff812345678abcd), (0x3f800000 if bits==32 else 0x3ff0000000000000)]
++   return p[(x+3*y+c)%len(p)]
++  return (x*1013+y*3137+c*9109+(mask if (x+y+c)%3==0 else 0))&mask
++ segments=[];native=[];scan=[]
++ for plane in range(ch if separate else 1):
++  for by in range(down):
++   for bx in range(across):
++    rr=bh if tiled else min(bh,h-by*bh);rows=[];host=[]
++    for yy in range(rr):
++     words=[val(bx*bw+x,by*bh+yy,plane if separate else c) for x in range(bw) for c in range(1 if separate else ch)]
++     nc=1 if separate else ch
++     if bits<8:
++      raw=bytearray((len(words)*bits+7)//8)
++      for i,v in enumerate(words):raw[i*bits//8]|=v<<(8-bits-(i*bits)%8)
++      # Deliberately nonzero unused bits, preserved by native APIs.
++      if len(words)*bits%8:raw[-1]|=(1<<(8-len(words)*bits%8))-1
++      host.append(bytes(raw));rows.append(bytes(raw))
++     else:
++      host.append(b''.join(v.to_bytes(bits//8,sys.byteorder) for v in words))
++      delta=[(v-(words[i-nc] if i>=nc else 0))&mask for i,v in enumerate(words)] if predict==2 else words
++      rows.append(b''.join(v.to_bytes(bits//8,'little' if le else 'big') for v in delta))
++    native.append(b''.join(host));raw=b''.join(rows)
++    encoded=raw if codec==1 else b''.join(packbits_row(r) for r in rows) if codec==32773 else lzw_encode(raw) if codec==5 else zlib.compress(raw)
++    if fill==2:encoded=bytes(int(f'{v:08b}'[::-1],2) for v in encoded)
++    segments.append(encoded)
++  if not tiled:scan.extend(native[plane*down:(plane+1)*down])
++ photo=(2 if ch>=3 else 1) if photo is None else photo
++ ot=16 if big else 4
++ tags=[(256,4,[w]),(257,4,[h]),(258,3,[bits]*ch),(259,3,[codec]),(262,3,[photo]),(266,3,[fill]),(274,3,[orientation]),(277,3,[ch]),(284,3,[2 if separate else 1]),(317,3,[predict]),(339,3,[fmt]*ch),((324 if tiled else 273),ot,('SEG',segments)),((325 if tiled else 279),ot,list(map(len,segments)))]
++ tags+= [(322,4,[bw]),(323,4,[bh])] if tiled else [(278,4,[bh])]
++ if alpha:tags.append((338,3,[alpha]))
++ tags+=list(extra)
++ blob,loc,pos=assemble([tags],big,le,origin=origin)
++ return blob,b''.join(native),b''.join(scan),tags,loc,pos
++
++class Coverage(unittest.TestCase):
++ def setUp(self):self.tmp=tempfile.TemporaryDirectory();self.path=pathlib.Path(self.tmp.name)
++ def tearDown(self):self.tmp.cleanup()
++ def runapp(self,name,*args):return subprocess.run([str(OUT/name),*map(str,args)],capture_output=True,timeout=60)
++ def compare(self,blob,mode,expected,oracle=True,orientation=1):
++  p=self.path/'in.tif';p.write_bytes(blob);a=self.path/'a.bin';b=self.path/'b.bin'
++  r=self.runapp('dump',p,mode,a,0,orientation);self.assertEqual(r.returncode,0,r.stderr);self.assertEqual(a.read_bytes(),expected)
++  if oracle:
++   q=self.runapp('dump-libtiff',p,mode,b,0,orientation);self.assertEqual(q.returncode,0,q.stderr);self.assertEqual(b.read_bytes(),expected)
++ def contract(self,mode,blob,*args):
++  p=self.path/'contract.tif';p.write_bytes(blob);r=self.runapp('coverage-test',mode,p,*args);self.assertEqual(r.returncode,0,r.stderr)
++ def test_native_word_formats_prediction_alpha_and_edges(self):
++  cases=0;oracle_cases=0
++  for bits,fmt,ch,alpha in [(8,2,1,0),(16,2,3,0),(32,2,1,0),(64,2,3,0),(32,3,1,0),(64,3,3,0),(16,1,4,1),(16,1,4,2),(32,1,4,1),(64,1,4,2)]:
++   for le,big,separate,tiled,codec in itertools.product([False,True],[False,True],[False,True],[False,True],[1,32773,5,8]):
++    pred=2 if codec in (5,8) else 1
++    blob,native,scan,*_=scene(w=17,h=19,ch=ch,bits=bits,fmt=fmt,alpha=alpha,le=le,big=big,separate=separate,tiled=tiled,codec=codec,predict=pred)
++    # libtiff Predictor 2 rejects 64-bit words; bitwise modular transport is
++    # covered by an independent source expectation and the Verus theorem.
++    oracle=not (bits==64 and pred==2)
++    with self.subTest(bits=bits,fmt=fmt,ch=ch,le=le,big=big,separate=separate,tiled=tiled,codec=codec):
++     self.compare(blob,'native',native,oracle)
++     if not tiled:self.compare(blob,'scan',scan,oracle)
++    cases+=1;oracle_cases+=oracle
++  print(f'Broader native samples: {cases} independent files, {oracle_cases} pinned-oracle files')
++ def test_all_source_and_output_orientations(self):
++  for source,out in itertools.product(range(1,9),repeat=2):
++   blob,native,*_=scene(w=7,h=5,ch=3,orientation=source,codec=8,predict=2)
++   pixels=[native[i:i+3]+b'\xff' for i in range(0,len(native),3)]
++   def f(o):o=(o-1)%4+1;return o in (2,3),o in (3,4)
++   a,b=f(source),f(out);expected=[b'']*35
++   for y in range(5):
++    for x in range(7):expected[(4-y if a[1]!=b[1] else y)*7+(6-x if a[0]!=b[0] else x)]=pixels[y*7+x]
++   expected=b''.join(struct.pack('=I',int.from_bytes(p,'little')) for p in expected)
++   self.compare(blob,'rgba',expected,orientation=out)
++ def test_rgba16_alpha_scaling(self):
++  for le,big,separate,tiled,alpha in itertools.product([False,True],[False,True],[False,True],[False,True],[1,2]):
++   blob,*_=scene(w=17,h=19,ch=4,bits=16,alpha=alpha,le=le,big=big,separate=separate,tiled=tiled,codec=8,predict=2)
++   expected=bytearray()
++   for y in range(19):
++    for x in range(17):
++     v=[((x*1013+y*3137+c*9109+(65535 if (x+y+c)%3==0 else 0))&65535) for c in range(4)]
++     rgba=[(a+128)//257 for a in v]
++     if alpha==2:rgba[:3]=[(a*rgba[3]+127)//255 for a in rgba[:3]]
++     expected.extend(struct.pack('=I',int.from_bytes(bytes(rgba),'little')))
++   self.compare(blob,'rgba',bytes(expected))
++ def test_segment_source_orientations_and_edge_padding(self):
++  for tiled,orientation in itertools.product([False,True],range(1,9)):
++   blob,native,*_=scene(w=17,h=19,ch=3,tiled=tiled,orientation=orientation,codec=8)
++   bw,bh=(16,16) if tiled else (17,3);at=0;expected=bytearray();o=(orientation-1)%4+1;fx=o in (2,3);fy=o not in (3,4)
++   for y in range(0,19,bh):
++    for x in range(0,17,bw):
++     hh=bh if tiled else min(bh,19-y);ww=min(bw,17-x);rh=min(hh,19-y);block=native[at:at+bw*hh*3];at+=len(block);out=bytearray(bw*hh*4)
++     for dy in range(rh):
++      for dx in range(ww):
++       tx=ww-1-dx if fx else dx;ty=hh-rh+(rh-1-dy if fy else dy);p=block[(dy*bw+dx)*3:(dy*bw+dx)*3+3]+b'\xff';out[(ty*bw+tx)*4:(ty*bw+tx)*4+4]=struct.pack('=I',int.from_bytes(p,'little'))
++     expected.extend(out)
++   self.compare(blob,'rgba-segments',bytes(expected))
++ def test_packed_fill_order(self):
++  for bits,fill,codec in itertools.product([1,2,4],[1,2],[1,32773,5,8]):
++   blob,native,scan,*_=scene(bits=bits,ch=1,fill=fill,codec=codec,w=17)
++   self.compare(blob,'native',native);self.compare(blob,'scan',scan)
++ def test_common_metadata_and_read_modes(self):
++  for le,big in itertools.product([False,True],[False,True]):
++   e='<' if le else '>'
++   extra=[(282,5,struct.pack(e+'II',300,1)),(283,5,struct.pack(e+'II',1440,5)),(296,3,[2]),(297,3,[7,12]),(270,2,b'Image description\0'),(305,2,b'Verified TIFF tests\0'),(315,2,b'Author\0'),(34675,7,b'\0ICC\xff\0profile'),(700,1,b'<xmp/>'),(65000,2,b'unknown\0')]
++   self.contract('metadata',scene(ch=1,extra=extra,le=le,big=big)[0],int(big))
++  blob,*_=scene(w=4096,h=10,ch=1)
++  # Explicit single strip for chopping (32 rows, 4-byte rows -> 128 bytes)
++  tags=scene(w=4096,h=2,ch=1)[3];tags=[t for t in tags if t[0] not in (257,278,273,279)]+[(257,4,[10]),(278,4,[10]),(273,4,('SEG',[bytes(range(256))*160])),(279,4,[40960])]
++  blob=assemble([tags])[0];self.contract('chop',blob)
++ def test_lazy_callbacks_and_bounded_memory(self):
++  tags=scene(w=4096,h=3,ch=1,codec=8)[3];good=zlib.compress(bytes([57])*4096);bad=b'bad!'
++  tags=[t for t in tags if t[0] not in (257,278,273,279)]+[(257,4,[8192]),(278,4,[1]),(273,4,('SEG',[good]+[bad]*8191)),(279,4,[len(good)]+[len(bad)]*8191)]
++  blob,_,pos=assemble([tags],dedup=True)
++  self.contract('seek',blob,min(pos))
++  blob,*_=scene(w=4096,h=3,ch=1,codec=1);self.contract('limits',blob)
++ def test_work_budget_is_shared_across_rgba_segments(self):
++  blob,_,_,tags,*_=scene(codec=8,predict=2)
++  counts=next(v for key,_,v in tags if key==279)
++  work=sum(8*n+3*63+64 for n in counts)-1
++  self.contract('work',blob,work)
++ def test_bigtiff_subifds_and_sparse_offsets(self):
++  for big,le in itertools.product([False,True],[False,True]):
++   tags=scene(ch=1,big=big,le=le)[3];child=scene(w=3,h=2,ch=1,big=big,le=le)[3]
++   tags=tags+[(330,18 if big else 13,('SUB',[1]))]
++   blob,_,_=assemble([tags,child],big,le);self.contract('subifd',blob,int(big))
++  for le in [False,True]:
++   origin=(1<<32)+4096;blob,native,*_=scene(ch=1,big=True,le=le,origin=origin)
++   p=self.path/'sparse.tif'
++   with p.open('wb') as f:f.write(blob[:16]);f.seek(origin+16);f.write(blob[16:])
++   r=self.runapp('coverage-test','sparse',p);self.assertEqual(r.returncode,0,r.stderr)
++   self.assertEqual(r.stdout,native)
++ def test_malformed_bigtiff_and_directory_rollback(self):
++  blob,_,_,tags,loc,_=scene(big=True,ch=1)
++  for at,fmt,v in [(4,'H',4),(6,'H',1),(8,'Q',(1<<64)-8),(16,'Q',(1<<64)-1)]:
++   bad=bytearray(blob);struct.pack_into('<'+fmt,bad,at,v);self.contract('bad',bad)
++  # Huge LONG8 payload length and range overflow in a real directory record.
++  off=16+8;bad=bytearray(blob);struct.pack_into('<HHQQ',bad,off,256,16,(1<<64)-1,(1<<64)-16);self.contract('bad',bad)
++  cyclic=bytearray(blob);struct.pack_into('<Q',cyclic,16+8+20*len(tags),16);self.contract('cycle',cyclic)
++ def test_special_codecs_originals_remain_segment_readable(self):
++  names=['ojpeg_single_strip_no_rowsperstrip.tiff','ojpeg_zackthecat_subsamp22_single_strip.tiff','ojpeg_chewey_subsamp21_multi_strip.tiff','quad-tile.jpg.tiff','webp_lossless_rgba_alpha_fully_opaque.tif','logluv-3c-16b.tiff']
++  # Lossy original JPEGs are compared with the already tested Rust raster's
++  # specified transform elsewhere. Here require all individual segments work.
++  for name in names:
++   p=ROOT/'tests/upstream'/name;r=self.runapp('dump',p,'native',self.path/'native.bin');self.assertEqual(r.returncode,0,(name,r.stderr))
++   if name.startswith('ojpeg'):
++    q=subprocess.run([str(ROOT/'target/debug/verified-tiff'),str(p),str(self.path/'core.pnm')],capture_output=True,timeout=60)
++    self.assertEqual(q.returncode,0,q.stderr)
++    actual=(self.path/'native.bin').read_bytes()
++    data=p.read_bytes();e='<' if data[:2]==b'II' else '>';off=struct.unpack_from(e+'I',data,4)[0];tags={}
++    for i in range(struct.unpack_from(e+'H',data,off)[0]):
++     at=off+2+i*12;key,ty,count=struct.unpack_from(e+'HHI',data,at)
++     if count==1 and ty in (3,4):tags[key]=struct.unpack_from(e+('H' if ty==3 else 'I'),data,at+8)[0]
++    if 322 in tags:
++     w,h,bw,bh=tags[256],tags[257],tags[322],tags[323];across=(w+bw-1)//bw;out=bytearray(w*h*3)
++     for y in range(h):
++      for x in range(w):
++       k=(y//bh)*across+x//bw;at=(k*bw*bh+(y%bh)*bw+x%bw)*3;out[(y*w+x)*3:(y*w+x)*3+3]=actual[at:at+3]
++     actual=bytes(out)
++    self.assertEqual(actual,pixels(self.path/'core.pnm'),name)
++if __name__=='__main__':unittest.main(verbosity=2)
+--- /dev/null
++++ b/compat/tests/pillow_smoke.py
+@@ -0,0 +1,37 @@
++#!/usr/bin/env python3
++"""Optional real-consumer smoke test; uses an already installed Pillow.
++Force Pillow's libtiff decoder and interpose only in isolated subprocesses.
++LD_DEBUG confirms TIFFClientOpen/Ext resolves to our compatibility library.
++No system files, packages or loader settings are changed.
++"""
++import json,os,pathlib,subprocess,sys,tempfile
++ROOT=pathlib.Path(__file__).resolve().parents[2]
++sys.path.insert(0,str(ROOT/'tests'))
++from extended import make_extended
++import PIL
++OUT=pathlib.Path(os.environ.get('VTIFF_COMPAT_OUTPUT',ROOT/'target/compat')).resolve()
++child='''from PIL import Image,TiffImagePlugin
++import sys,json
++TiffImagePlugin.READ_LIBTIFF=True
++with Image.open(sys.argv[1]) as im:
++ im.load()
++ open(sys.argv[2],"wb").write(im.tobytes())
++ print(json.dumps(dict(mode=im.mode,size=im.size)))
++'''
++with tempfile.TemporaryDirectory() as d:
++ p=pathlib.Path(d);cases=0;bound=False
++ for opt in [dict(ch=1,bits=8),dict(ch=3,bits=8),dict(ch=4,bits=8,alpha=2),dict(ch=4,bits=8,alpha=1),dict(ch=1,bits=4,palette=True),dict(ch=1,bits=16)]:
++  for tiled in [False,True]:
++   src=p/'input.tif';src.write_bytes(make_extended(w=17,h=19,le=True,tiled=tiled,compression=5,**opt)[0])
++   env=os.environ.copy();env.pop('LD_PRELOAD',None);env.pop('LD_DEBUG',None)
++   a=subprocess.run([sys.executable,'-c',child,str(src),str(p/'reference.raw')],env=env,capture_output=True,timeout=30)
++   assert a.returncode==0,a.stderr
++   env['LD_PRELOAD']=str(OUT/'libtiff.so.6');env['LD_DEBUG']='bindings'
++   b=subprocess.run([sys.executable,'-c',child,str(src),str(p/'ours.raw')],env=env,capture_output=True,timeout=30)
++   assert b.returncode==0,(opt,tiled,b.stderr.decode()[-6000:])
++   assert a.stdout==b.stdout,(a.stdout,b.stdout)
++   assert (p/'reference.raw').read_bytes()==(p/'ours.raw').read_bytes(),(opt,tiled)
++   bindings=[line for line in b.stderr.decode().splitlines() if 'symbol `TIFF' in line and str(OUT/'libtiff.so.6') in line]
++   assert any('TIFFClientOpen' in line for line in bindings),bindings
++   bound=True;cases+=1
++ print(json.dumps(dict(pillow_version=PIL.__version__,forced_libtiff=True,loader_binding_confirmed=bound,exact_files=cases)))
+--- a/compat/tests/test.py
++++ b/compat/tests/test.py
+@@ -79,8 +79,16 @@
+    data,_,_=make_extended(w=17,h=19,ch=3,bits=16,le=le,tiled=tiled,compression=5,pages=2)
+    self.compare(data,'raw',page=page)
+   data=(ROOT/'tests/upstream/logluv-3c-16b.tiff').read_bytes();self.compare(data,'native',struct.pack('=hhh',0,6913,15544));self.compare(data,'scan',struct.pack('=hhh',0,6913,15544))
++ def test_preserved_native_samples(self):
++  for opts in [dict(ch=1,bits=4,palette=True),dict(ch=4,bits=8,alpha=1),dict(ch=2,bits=8,alpha=1)]:
++   for le,tiled,codec in itertools.product([False,True],[False,True],[1,32773,5,8]):
++    data,_,_=make_extended(w=17,h=19,le=le,tiled=tiled,compression=codec,**opts)
++    self.compare(data,'native')
++    if not tiled:self.compare(data,'scan')
++    self.compare(data,'rgba',oracle=not (tiled and opts['ch']==2))
++  print('Native palette, associated alpha and padded edge tiles: 48 files')
+  def test_expected_unsupported_cases(self):
+-  cases=[(make_extended(ch=1,bits=4,palette=True)[0],'scan'),(make_extended(ch=4,bits=8,alpha=1)[0],'rgba'),(make_extended(ch=3,bits=64)[0],'rgba'),(make_extended(w=17,h=19,tiled=True)[0],'native')]
++  cases=[(make_extended(ch=3,bits=64)[0],'rgba')]
+   for data,mode in cases:
+    src=self.path/'bad.tif';src.write_bytes(data);p=self.run_app('dump',src,mode,self.path/'bad.raw');self.assertNotEqual(p.returncode,0);self.assertGreater(p.returncode,0,p.stderr)
+  def test_rgba_segments(self):
+--- a/compat/tiff_compat.c
++++ b/compat/tiff_compat.c
+@@ -13,7 +13,8 @@
+ _Static_assert(sizeof(void *) == 8 && sizeof(tmsize_t) == 8,
+                "Linux LP64 ABI required");
+ struct TIFFOpenOptions {
+-  size_t input, output, work;
++  size_t input, output, work, single, cumulative;
++  int warn_unknown;
+   int unsupported;
+   TIFFErrorHandlerExtR error, warning;
+   void *error_data, *warning_data;
+@@ -30,7 +31,7 @@
+   TIFFMapFileProc map;
+   TIFFUnmapFileProc unmap;
+   struct TIFFOpenOptions options;
+-  uint32_t row, strip, tile;
++  uint32_t row, strip, tile, flags;
+ };
+ static _Thread_local int last_code;
+ static _Thread_local char last_message[512];
+@@ -202,36 +203,39 @@
+   o->warning = h;
+   o->warning_data = u;
+ }
+-/* These libtiff allocation-accounting controls cannot honestly be emulated by
+- * the Rust allocator. Mark options unusable, so callers cannot miss a void
+- * setter's failure and then open with their requested security limit ignored.
+- */
++/* Limits count requested, live per-handle heap buffers. Zero disables a
++ * standard allocation limit; extension input/output/work zero remains zero. */
+ void TIFFOpenOptionsSetMaxSingleMemAlloc(TIFFOpenOptions *o, tmsize_t n) {
+-  (void)n;
+-  if (o)
+-    o->unsupported = 1;
+-  vt_not_implemented(__func__);
++  if (!o || n < 0) { if (o) o->unsupported=1; fail(NULL, EINVAL, __func__, "invalid allocation limit"); return; }
++  o->single=(size_t)n;
+ }
+ void TIFFOpenOptionsSetMaxCumulatedMemAlloc(TIFFOpenOptions *o, tmsize_t n) {
+-  (void)n;
+-  if (o)
+-    o->unsupported = 1;
+-  vt_not_implemented(__func__);
++  if (!o || n < 0) { if (o) o->unsupported=1; fail(NULL, EINVAL, __func__, "invalid allocation limit"); return; }
++  o->cumulative=(size_t)n;
+ }
+ void TIFFOpenOptionsSetWarnAboutUnknownTags(TIFFOpenOptions *o, int n) {
+-  (void)n;
+-  if (o)
+-    o->unsupported = 1;
+-  vt_not_implemented(__func__);
++  if (!o) { fail(NULL, EINVAL, __func__, "null options"); return; }
++  o->warn_unknown=n!=0;
+ }
+ static int readmode(const char *mode) {
+-  return mode &&
+-         (!strcmp(mode, "r") || !strcmp(mode, "rb") || !strcmp(mode, "rm"));
+-}
++  if (!mode || *mode!='r') return 0;
++  for (const char *p=mode+1;*p;p++) if (!strchr("bcCmMBDOh",*p)) return 0;
++  return 1;
++}
++static uint32_t modeflags(const char *mode) {
++  uint32_t flags=1; /* upstream's usual strip-chopping default */
++  for (const char *p=mode+1;*p;p++) {
++    if (*p=='C') flags|=1;
++    if (*p=='c') flags&=~1u;
++    if (*p=='h') flags|=2;
++  }
++  return flags;
++}
++static void unknown_warnings(TIFF *t);
+ static TIFF *new_handle(const char *name, const char *mode,
+                         TIFFOpenOptions *options) {
+   if (!readmode(mode)) {
+-    vt_not_implemented("TIFFOpen mode (only r/rb/rm)");
++    vt_not_implemented("TIFFOpen unsupported read/write mode");
+     return NULL;
+   }
+   if (options && options->unsupported) {
+@@ -241,6 +245,13 @@
+   if (!name) {
+     fail(NULL, EINVAL, "TIFFOpen", "null name");
+     return NULL;
++  }
++  struct TIFFOpenOptions limits = options ? *options : defaults();
++  size_t namelen = strlen(name)+1;
++  if ((limits.single && (sizeof(TIFF)>limits.single || namelen>limits.single)) ||
++      namelen>SIZE_MAX-sizeof(TIFF) || (limits.cumulative && sizeof(TIFF)+namelen>limits.cumulative)) {
++    TIFF temporary = {0}; temporary.options=limits;
++    fail(&temporary, EFBIG, "TIFFOpen", "handle allocation limit"); return NULL;
+   }
+   TIFF *t = calloc(1, sizeof(*t));
+   if (!t) {
+@@ -255,6 +266,7 @@
+   }
+   t->options = options ? *options : defaults();
+   t->fd = -1;
++  t->flags=modeflags(mode);
+   t->row = t->strip = t->tile = UINT32_MAX;
+   return t;
+ }
+@@ -271,13 +283,14 @@
+   if (!t)
+     return NULL;
+   t->state =
+-      vt_open_fd(fd, t->options.input, t->options.output, t->options.work);
++      vt_open_fd(fd, t->options.input, t->options.output, t->options.work, t->options.single, t->options.cumulative, sizeof(*t)+strlen(t->name)+1, t->flags);
+   if (!t->state) {
+     bridge_fail(t, __func__);
+     destroy(t);
+     return NULL;
+   }
+   t->fd = fd;
++  unknown_warnings(t);
+   return t;
+ }
+ TIFF *TIFFFdOpen(int fd, const char *name, const char *mode) {
+@@ -286,7 +299,7 @@
+ TIFF *TIFFOpenExt(const char *name, const char *mode,
+                   TIFFOpenOptions *options) {
+   if (!readmode(mode)) {
+-    vt_not_implemented("TIFFOpen mode (only r/rb/rm)");
++    vt_not_implemented("TIFFOpen unsupported read/write mode");
+     return NULL;
+   }
+   if (!name) {
+@@ -336,39 +349,15 @@
+     destroy(t);
+     return NULL;
+   }
+-  if (seek(client, 0, SEEK_SET) != 0) {
+-    fail(t, EIO, __func__, "callback seek failed");
+-    destroy(t);
+-    return NULL;
+-  }
+-  uint8_t *data = malloc(n ? n : 1);
+-  if (!data) {
+-    fail(t, ENOMEM, __func__, "allocation failed");
+-    destroy(t);
+-    return NULL;
+-  }
+-  size_t at = 0;
+-  while (at < n) {
+-    tmsize_t want = (tmsize_t)(n - at);
+-    if (want > 65536)
+-      want = 65536;
+-    tmsize_t got = read(client, data + at, want);
+-    if (got <= 0 || got > want) {
+-      fail(t, EIO, __func__, "short/invalid callback read");
+-      free(data);
+-      destroy(t);
+-      return NULL;
+-    }
+-    at += (size_t)got;
+-  }
+-  t->state = vt_open_memory(data, (size_t)n, t->options.input,
+-                            t->options.output, t->options.work);
+-  free(data);
++  t->state=vt_open_client(client, read, seek, n, t->options.input,
++      t->options.output, t->options.work, t->options.single, t->options.cumulative,
++      sizeof(*t)+strlen(t->name)+1, t->flags);
+   if (!t->state) {
+     bridge_fail(t, __func__);
+     destroy(t);
+     return NULL;
+   }
++  unknown_warnings(t);
+   return t;
+ }
+ TIFF *TIFFClientOpen(const char *n, const char *m, thandle_t c,
+@@ -422,11 +411,7 @@
+   return valid(t, __func__) ? (TIFFIsBigEndian(t) != HOST_BIGENDIAN) : 0;
+ }
+ int TIFFIsMSB2LSB(TIFF *t) { return valid(t, __func__) ? 1 : 0; }
+-int TIFFIsBigTIFF(TIFF *t) {
+-  if (!valid(t, __func__))
+-    return 0;
+-  return 0;
+-}
++int TIFFIsBigTIFF(TIFF *t) { return (int)info(t, 14); }
+ int TIFFIsUpSampled(TIFF *t) {
+   uint64_t photo = 0, rgb = 0;
+   return valid(t, __func__) && vt_scalar(t->state, 262, 1, &photo) == 1 &&
+@@ -454,12 +439,16 @@
+     return 0;
+   }
+   t->row = t->strip = t->tile = UINT32_MAX;
++  unknown_warnings(t);
+   return 1;
+ }
+ int TIFFReadDirectory(TIFF *t) {
+   if (!valid(t, __func__) || TIFFLastDirectory(t))
+     return 0;
+-  return TIFFSetDirectory(t, TIFFCurrentDirectory(t) + 1);
++  if (!vt_next(t->state)) { bridge_fail(t, __func__); return 0; }
++  t->row=t->strip=t->tile=UINT32_MAX;
++  unknown_warnings(t);
++  return 1;
+ }
+ int TIFFSetSubDirectory(TIFF *t, uint64_t off) {
+   if (!valid(t, __func__))
+@@ -469,6 +458,7 @@
+     return 0;
+   }
+   t->row = t->strip = t->tile = UINT32_MAX;
++  unknown_warnings(t);
+   return 1;
+ }
+ static int getfield(TIFF *t, uint32_t tag, va_list ap, int def) {
+@@ -477,6 +467,7 @@
+   uint64_t v = 0;
+   int kind = 0;
+   switch (tag) {
++  case 254:
+   case 256:
+   case 257:
+   case 278:
+@@ -486,6 +477,14 @@
+   case 293:
+     kind = 32;
+     break;
++  case 263:
++  case 264:
++  case 265:
++  case 280:
++  case 281:
++  case 332:
++  case 334:
++  case 531:
+   case 258:
+   case 259:
+   case 262:
+@@ -545,9 +544,49 @@
+     *b = (uint16_t *)p + 2 * n / 3;
+     return 1;
+   }
+-  case TIFFTAG_YCBCRSUBSAMPLING:
+-    vt_not_implemented_for(t, "TIFFGetField YCbCrSubsampling");
+-    return 0;
++  case TIFFTAG_SUBIFD: {
++    size_t n=0; const void *p=vt_array(t->state,tag,&n);
++    if (!n) return 0;
++    uint16_t *count=va_arg(ap,uint16_t *); uint64_t **out=va_arg(ap,uint64_t **);
++    if (!count || !out || n>UINT16_MAX) goto bad;
++    *count=(uint16_t)n; *out=(uint64_t *)p; return 1;
++  }
++  case TIFFTAG_XRESOLUTION: case TIFFTAG_YRESOLUTION:
++  case TIFFTAG_XPOSITION: case TIFFTAG_YPOSITION: {
++    float value; int ok=vt_real(t->state,tag,&value);
++    if (ok<0) { bridge_fail(t,"TIFFGetField"); return 0; } if (!ok) return 0;
++    float *out=va_arg(ap,float *); if (!out) goto bad;
++    *out=value; return 1;
++  }
++  case TIFFTAG_YCBCRSUBSAMPLING: case TIFFTAG_PAGENUMBER:
++  case TIFFTAG_HALFTONEHINTS: case TIFFTAG_DOTRANGE: {
++    uint16_t values[2]; int ok=vt_pair(t->state,tag,def,values);
++    if (ok<0) { bridge_fail(t,"TIFFGetField"); return 0; } if (!ok) return 0;
++    uint16_t *a=va_arg(ap,uint16_t *), *b=va_arg(ap,uint16_t *);
++    if (!a || !b) goto bad;
++    *a=values[0]; *b=values[1]; return 1;
++  }
++  case TIFFTAG_EXIFIFD: case TIFFTAG_GPSIFD:
++    kind=64; break;
++  case TIFFTAG_DOCUMENTNAME: case TIFFTAG_IMAGEDESCRIPTION:
++  case TIFFTAG_MAKE: case TIFFTAG_MODEL: case TIFFTAG_PAGENAME:
++  case TIFFTAG_SOFTWARE: case TIFFTAG_DATETIME: case TIFFTAG_ARTIST:
++  case TIFFTAG_HOSTCOMPUTER: case TIFFTAG_COPYRIGHT: case TIFFTAG_TARGETPRINTER: {
++    uint16_t type=0; size_t n=0; const uint8_t *p=vt_field(t->state,tag,&type,&n);
++    if (!p) return 0;
++    if (type!=TIFF_ASCII) goto bad;
++    char **out=va_arg(ap,char **); if (!out) goto bad;
++    *out=(char *)p; return 1;
++  }
++  case TIFFTAG_ICCPROFILE: case TIFFTAG_XMLPACKET: case TIFFTAG_PHOTOSHOP:
++  case TIFFTAG_JPEGTABLES: {
++    uint16_t type=0; size_t n=0; const uint8_t *p=vt_field(t->state,tag,&type,&n);
++    if (!p) return 0;
++    if ((type!=TIFF_BYTE && type!=TIFF_UNDEFINED) || n>UINT32_MAX) goto bad;
++    uint32_t *count=va_arg(ap,uint32_t *); void **out=va_arg(ap,void **);
++    if (!count || !out) goto bad;
++    *count=(uint32_t)n; *out=(void *)p; return 1;
++  }
+   default:
+     vt_not_implemented_for(t, "TIFFGetField tag");
+     return 0;
+@@ -566,6 +605,9 @@
+     if (!out || v > UINT16_MAX)
+       goto bad;
+     *out = (uint16_t)v;
++  } else if (kind == 64) {
++    uint64_t *out=va_arg(ap,uint64_t *); if (!out) goto bad;
++    *out=v;
+   } else if (kind == -32) {
+     int *out = va_arg(ap, int *);
+     if (!out || v > INT_MAX)
+@@ -736,6 +778,12 @@
+     fail(t, EINVAL, "TIFF read", "invalid destination/size");
+     return -1;
+   }
++  if (size==0) {
++    if (a>=info(t,7) || (kind==1 && TIFFIsTiled(t)) || (kind==2 && !TIFFIsTiled(t))) {
++      fail(t,EINVAL,"TIFF read","invalid segment/layout"); return -1;
++    }
++    return 0;
++  }
+   size_t n = 0;
+   const uint8_t *p = vt_read(t->state, kind, a, b, 0, 0, &n);
+   if (!p) {
+@@ -774,7 +822,8 @@
+   if (r >= 0) {
+     t->tile = k;
+     uint64_t across = (info(t, 0) - 1) / info(t, 8) + 1;
+-    t->row = (uint32_t)((k % across) * info(t, 9));
++    uint64_t down = (info(t, 1) - 1) / info(t, 9) + 1;
++    t->row = (uint32_t)(((k / across) % down) * info(t, 9));
+   }
+   return r;
+ }
+@@ -863,7 +912,7 @@
+   img->width = (uint32_t)info(t, 0);
+   img->height = (uint32_t)info(t, 1);
+   img->stoponerr = stop;
+-  img->orientation = 1;
++  TIFFGetFieldDefaulted(t, TIFFTAG_ORIENTATION, &img->orientation);
+   img->req_orientation = 4;
+   img->isContig = info(t, 11) == 1;
+   img->get = TIFFRGBAImageGet;
+@@ -884,13 +933,16 @@
+     fail(NULL, EINVAL, __func__, "null RGBA state");
+     return 0;
+   }
+-  if (img->row_offset || img->col_offset || img->put.any ||
+-      img->get != TIFFRGBAImageGet) {
+-    vt_not_implemented_for(img->tif, "custom TIFFRGBAImage callbacks/offsets");
+-    return 0;
+-  }
+-  return TIFFReadRGBAImageOriented(img->tif, w, h, out, img->req_orientation,
+-                                   img->stoponerr);
++  if (img->put.any || img->get != TIFFRGBAImageGet) {
++    vt_not_implemented_for(img->tif, "custom TIFFRGBAImage callbacks");
++    return 0;
++  }
++  if (!valid(img->tif,__func__) || !out || img->row_offset<0 || img->col_offset<0) {
++    fail(img->tif,EINVAL,__func__,"invalid RGBA region/output"); return 0;
++  }
++  size_t n=0; const uint8_t *p=vt_region(img->tif->state,(uint32_t)img->col_offset,
++      (uint32_t)img->row_offset,w,h,img->req_orientation,&n);
++  if (!p) {bridge_fail(img->tif,__func__); return 0;} memcpy(out,p,n); return 1;
+ }
+ void TIFFRGBAImageEnd(TIFFRGBAImage *img) {
+   if (img)
+@@ -1070,3 +1122,5 @@
+     return 0;
+   }
+ }
++
++#include "fields.inc"
+--- /dev/null
++++ b/scripts/reject-native-check.py
+@@ -0,0 +1,29 @@
++#!/usr/bin/env python3
++"""Negative semantic/acceptance checks for the native and BigTIFF primitives."""
++import pathlib,shutil,subprocess,os
++root=pathlib.Path(__file__).resolve().parents[1]
++changes={
++ 'predictor':('native_samples.rs','let b=if first {0u64} else {previous[c]};','let b=0u64;','native_samples','convert','assertion failed'),
++ 'bigoffset':('container.rs','Ok(Header {little_endian:le,big,first_ifd})','Ok(Header {little_endian:le,big,first_ifd:0})','container','header','postcondition not satisfied'),
++ 'sos-selector':('native.rs','s[9]=2;s[10]=34;','s[9]=2;s[10]=17;','native','renumber_ojpeg_scan','postcondition not satisfied'),
++}
++for name,(file,before,after,module,function,reason) in changes.items():
++ dest=root/'target'/('reject-native-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)
++ p=dest/file;s=p.read_text();assert s.count(before)==1,name;p.write_text(s.replace(before,after))
++ log=root/'target'/('reject-native-'+name+'.log')
++ with log.open('w') as f:r=subprocess.run([os.environ['VERUS'],'--crate-type','lib','--no-cheating','--triggers-mode','silent','--rlimit','100','--verify-only-module',module,'--verify-function',function,str(dest/'lib.rs')],cwd=root,stdout=f,stderr=subprocess.STDOUT)
++ assert r.returncode!=0 and reason in log.read_text(),(name,log.read_text())
++ print('Native semantic gate: rejected broken '+name,flush=True)
++# Removing all successful native decoding must violate its exact acceptance.
++dest=root/'target/reject-native-acceptance';shutil.copytree(root/'src',dest,dirs_exist_ok=True)
++p=dest/'native.rs';s=p.read_text();a=s.index('pub fn decode(');a=s.index('\n{',a);depth=0
++for b in range(a+1,len(s)):
++ if s[b]=='{':depth+=1
++ elif s[b]=='}':
++  depth-=1
++  if depth==0:break
++p.write_text(s[:a]+'\n{reveal(accepted); Err(Error::Invalid)}'+s[b+1:])
++log=root/'target/reject-native-acceptance.log'
++with log.open('w') as f:r=subprocess.run([os.environ['VERUS'],'--crate-type','lib','--no-cheating','--triggers-mode','silent','--rlimit','100','--verify-only-module','native','--verify-function','decode',str(dest/'lib.rs')],cwd=root,stdout=f,stderr=subprocess.STDOUT)
++assert r.returncode!=0 and 'postcondition not satisfied' in log.read_text(),log.read_text()
++print('Native acceptance gate: rejected always-error native decoder',flush=True)
+--- a/scripts/test-compat.sh
++++ b/scripts/test-compat.sh
+@@ -16,4 +16,6 @@
+ # the system shared library; only its loader path changes during the test.
+ "$compiler" -std=c11 -O2 -g "${extra[@]}" -I.tools/tiff-4.7.1/libtiff compat/tests/dump.c -Wl,-l:libtiff.so.6 -o "$output/prelinked-dump"
+ "$compiler" -std=c11 -O2 -g -Wall -Wextra -Werror "${extra[@]}" -Icompat/include compat/tests/mutate.c -L"$output" -Wl,-rpath,"$output" -ltiff -o "$output/mutate-test"
++"$compiler" -std=c11 -O2 -g -Wall -Wextra -Werror "${extra[@]}" -Icompat/include compat/tests/coverage.c -L"$output" -Wl,-rpath,"$output" -ltiff -o "$output/coverage-test"
+ python3 compat/tests/test.py
++python3 compat/tests/coverage.py
+--- a/scripts/verify-parallel.py
++++ b/scripts/verify-parallel.py
+@@ -11,7 +11,7 @@
+     a=p.parse_args();assert 1<=a.jobs<=4
+     source=(ROOT/'scripts/verify.sh').read_text()
+     starts=[m.start() for m in re.finditer(r'(?m)^(?:python3 scripts/reject-|VERUS="\$VERUS" python3 scripts/reject-)',source)]
+-    assert len(starts)==13, 'verify.sh gate structure changed; review chunk boundaries'
++    assert len(starts)==14, 'verify.sh gate structure changed; review chunk boundaries'
+     cuts=[0,*starts,len(source)];folder=ROOT/'target/parallel-verification';folder.mkdir(exist_ok=True)
+     chunks=[]
+     for i,(b,e) in enumerate(zip(cuts,cuts[1:])):
+--- a/scripts/verify.sh
++++ b/scripts/verify.sh
+@@ -208,3 +208,5 @@
+ done
+ 
+ VERUS="$VERUS" python3 scripts/reject-throughput-check.py
++
++VERUS="$VERUS" python3 scripts/reject-native-check.py
+--- /dev/null
++++ b/src/container.rs
+@@ -0,0 +1,78 @@
++//! Local Classic TIFF/BigTIFF header and directory-entry contracts for seekable I/O.
++//! The caller supplies only the requested record, plus its actual file offset.
++use super::*;
++use crate::native_samples::read_word;
++verus! {
++use crate::native_samples as ns;
++#[derive(Clone,Copy,Debug)]
++pub struct Header {pub little_endian:bool,pub big:bool,pub first_ifd:u64}
++pub closed spec fn header_valid(s:Seq<u8>) -> bool {
++    &&& s.len()>=8
++    &&& (s[0]==73 && s[1]==73 || s[0]==77 && s[1]==77)
++    &&& if word16(s,2,s[0]==73)==42 {true}
++        else {s.len()>=16 && word16(s,2,s[0]==73)==43 && word16(s,4,s[0]==73)==8 && word16(s,6,s[0]==73)==0}
++}
++pub fn header(s:&[u8]) -> (r:Result<Header,Error>)
++    ensures r.is_ok()==header_valid(s@),
++        r.is_ok() ==> r.unwrap().little_endian==(s@[0]==73),
++        r.is_ok() ==> r.unwrap().big==(word16(s@,2,s@[0]==73)==43),
++        r.is_ok() ==> r.unwrap().first_ifd==ns::word(s@,if r.unwrap().big {8int} else {4int},if r.unwrap().big {8usize} else {4usize},r.unwrap().little_endian),
++{
++    reveal(header_valid);
++    if s.len()<8 {return Err(Error::Truncated);}
++    let le=if s[0]==73 && s[1]==73 {true} else if s[0]==77 && s[1]==77 {false} else {return Err(Error::Invalid);};
++    let magic=read16(s,2,le)?;
++    let big=if magic==42 {false} else if magic==43 {
++        if s.len()<16 || read16(s,4,le)?!=8 || read16(s,6,le)?!=0 {return Err(Error::Invalid);}
++        true
++    } else {return Err(Error::Unsupported);};
++    let first_ifd=read_word(s,if big {8} else {4},if big {8} else {4},le)?;
++    Ok(Header {little_endian:le,big,first_ifd})
++}
++pub open spec fn field_width(kind:u16) -> int {
++    if kind==1 || kind==2 || kind==6 || kind==7 {1}
++    else if kind==3 || kind==8 {2}
++    else if kind==4 || kind==9 || kind==11 || kind==13 {4}
++    else if kind==5 || kind==10 || kind==12 || kind==16 || kind==17 || kind==18 {8}
++    else {0}
++}
++pub fn field_size(kind:u16) -> (r:usize) ensures r==field_width(kind) {
++    if kind==1 || kind==2 || kind==6 || kind==7 {1}
++    else if kind==3 || kind==8 {2}
++    else if kind==4 || kind==9 || kind==11 || kind==13 {4}
++    else if kind==5 || kind==10 || kind==12 || kind==16 || kind==17 || kind==18 {8}
++    else {0}
++}
++#[derive(Clone,Copy,Debug)]
++pub struct Entry {pub tag:u16,pub kind:u16,pub count:u64,pub offset:u64,pub length:u64,pub inline:bool}
++pub closed spec fn entry_valid(s:Seq<u8>,at:u64,big:bool,le:bool,file_len:u64) -> bool {
++    let size=if big {20int} else {12int};let slot=if big {8usize} else {4usize};
++    let kind=word16(s,2,le);let count=ns::word(s,4,slot,le);let len=count*field_width(kind as u16);
++    let off=if len<=slot {at as int+size-slot} else {ns::word(s,size-slot,slot,le)};
++    &&& s.len()>=size && at as int+size<=file_len
++    &&& field_width(kind as u16)>0 && 0<=len<=u64::MAX
++    &&& 0<=off<=file_len && off+len<=file_len
++}
++pub fn entry(s:&[u8],at:u64,big:bool,le:bool,file_len:u64) -> (r:Result<Entry,Error>)
++    ensures r.is_ok()==entry_valid(s@,at,big,le,file_len),
++        r.is_ok() ==> r.unwrap().tag==word16(s@,0,le) && r.unwrap().kind==word16(s@,2,le),
++        r.is_ok() ==> r.unwrap().count==ns::word(s@,4,if big {8usize} else {4usize},le),
++        r.is_ok() ==> r.unwrap().length as int==r.unwrap().count as int*field_width(r.unwrap().kind),
++        r.is_ok() ==> r.unwrap().offset as int+r.unwrap().length<=file_len,
++        r.is_ok() ==> r.unwrap().inline==(r.unwrap().length<=if big {8u64} else {4u64}),
++        r.is_ok() ==> r.unwrap().offset as int==(if r.unwrap().inline {at as int+if big {12int} else {8int}} else {ns::word(s@,if big {12int} else {8int},if big {8usize} else {4usize},le)}),
++{
++    reveal(entry_valid);
++    let size=if big {20usize} else {12usize};let slot=if big {8usize} else {4usize};
++    if s.len()<size || at>file_len || size as u64>file_len-at {return Err(Error::Truncated);}
++    let tag=read16(s,0,le)?;let kind=read16(s,2,le)?;let width=field_size(kind);
++    if width==0 {return Err(Error::Unsupported);}
++    let count=read_word(s,4,slot,le)?;
++    let length=count as u128*width as u128;
++    if length>u64::MAX as u128 {return Err(Error::Limit);}
++    let length=length as u64;let inline=length<=slot as u64;
++    let offset=if inline {at+(size-slot) as u64} else {read_word(s,size-slot,slot,le)?};
++    if offset>file_len || length>file_len-offset {return Err(Error::Truncated);}
++    Ok(Entry {tag,kind,count,offset,length,inline})
++}
++}
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,5 +1,9 @@
+ #![forbid(unsafe_code)]
+ use vstd::prelude::*;
++
++pub mod native;
++pub mod native_samples;
++pub mod container;
+ 
+ mod logluv;
+ mod logluv_format;
+--- /dev/null
++++ b/src/native.rs
+@@ -0,0 +1,140 @@
++//! Container-independent native strip/tile decoding. No color normalization.
++use super::*;
++verus! {
++
++pub open spec fn work_bound(count:int,cap:int) -> int {8*count+3*cap+64}
++pub fn work_limit(count:usize,cap:usize) -> (r:Result<usize,Error>)
++    ensures r.is_ok()==(work_bound(count as int,cap as int)<=usize::MAX),
++        r.is_ok() ==> r.unwrap()==work_bound(count as int,cap as int),
++{add(add(mul(count,8)?,mul(cap,3)?)?,64)}
++
++pub closed spec fn accepted(s:Seq<u8>,codec:u16,stride:usize,needed:usize,cap:usize) -> bool {
++    &&& stride>0 && 0<needed<=cap
++    &&& work_bound(s.len() as int,cap as int)<=usize::MAX
++    &&& if codec==1 {needed<=s.len()}
++        else if codec==32773 {pb_valid(s,0,s.len() as int,stride as int,needed as int)}
++        else if codec==5 {lzw_valid(s,0,s.len() as int,needed as int)}
++        else if codec==8 || codec==32946 {
++            let v=deflate::result(s,0,s.len() as int,cap as int,(8*s.len()+2*cap+64) as nat);
++            v.is_some() && needed<=v.unwrap().len()
++        } else {false}
++}
++pub closed spec fn decoded_byte(s:Seq<u8>,codec:u16,cap:usize,k:int) -> u8 {
++    if codec==1 {s[k]} else if codec==32773 {pb_byte(s,0,s.len() as int,k)}
++    else if codec==5 {lzw_byte(s,0,s.len() as int,k)}
++    else {deflate::result(s,0,s.len() as int,cap as int,(8*s.len()+2*cap+64) as nat).unwrap()[k]}
++}
++
++/// Writes exactly `needed` native bytes; Deflate may validate bounded final-strip
++/// padding up to `cap`. Failure may change this prefix, never its suffix.
++/// Callers requiring atomic output use a temporary segment buffer.
++pub fn decode(s:&[u8],codec:u16,stride:usize,needed:usize,cap:usize,
++    output:&mut [u8],budget:&mut Budget) -> (r:Result<(),Error>)
++    ensures final(output).len()==old(output).len(),
++        final(budget).remaining<=old(budget).remaining,
++        r.is_ok()==(accepted(s@,codec,stride,needed,cap) && old(output).len()>=needed
++            && old(budget).remaining as int>=work_bound(s.len() as int,cap as int)),
++        r.is_ok() ==> final(budget).remaining as int+work_bound(s.len() as int,cap as int)==old(budget).remaining,
++        r.is_ok() ==> forall|k:int| 0<=k<needed ==> final(output)@[k]==decoded_byte(s@,codec,cap,k),
++        forall|k:int| needed<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
++{
++    reveal(accepted);reveal(decoded_byte);
++    if stride==0 || needed==0 || needed>cap {return Err(Error::Invalid);}
++    if output.len()<needed {return Err(Error::OutputTooSmall);}
++    let quota=work_limit(s.len(),cap)?;
++    spend(budget,quota)?;
++    if codec==1 {
++        if s.len()<needed {return Err(Error::Truncated);}
++        copy_byte_run(s,0,output,0,needed,false);
++        assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {
++            assert(output@[0int+k]==s@[0int+k]);
++        }
++    } else if codec==32773 {
++        let mut probe=Budget {remaining:s.len()};
++        pb_validate(s,0,s.len(),stride,needed,&mut probe)?;
++        let mut cursor=PbCursor::new(s,0,s.len(),stride,needed);
++        let mut i=0usize;
++        while i<needed
++            invariant i<=needed,needed<=output.len(),output.len()==old(output).len(),
++                cursor.valid(s@),cursor._start==0,cursor.end==s.len(),cursor._stride==stride,
++                cursor._needed==needed,cursor.emitted==i,
++                forall|k:int| 0<=k<i ==> output@[k]==pb_byte(s@,0,s.len() as int,k),
++                forall|k:int| needed<=k<output.len() ==> output@[k]==old(output)@[k],
++            decreases needed-i,
++        {let byte=cursor.next(s);output[i]=byte;i=i+1;}
++        assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {}
++    } else if codec==5 {
++        let mut probe=Budget {remaining:s.len()};
++        lz_validate(s,0,s.len(),needed,&mut probe)?;
++        let mut cursor=LzCursor::new(s,0,s.len(),needed);
++        let mut i=0usize;
++        while i<needed
++            invariant i<=needed,needed<=output.len(),output.len()==old(output).len(),
++                cursor.valid(s@),cursor._start==0,cursor.bits.end==s.len(),
++                cursor._needed==needed,cursor.emitted==i,
++                forall|k:int| 0<=k<i ==> output@[k]==lzw_byte(s@,0,s.len() as int,k),
++                forall|k:int| needed<=k<output.len() ==> output@[k]==old(output)@[k],
++            decreases needed-i,
++        {let byte=cursor.next(s);output[i]=byte;i=i+1;}
++        assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {}
++    } else if codec==8 || codec==32946 {
++        let fuel=quota-cap;
++        let n=deflate::process(s,0,s.len(),cap,fuel,output,needed)?;
++        if n<needed {return Err(Error::Truncated);}
++        assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {}
++    } else {return Err(Error::Unsupported);}
++    Ok(())
++}
++/// Legacy JPEG tables and scan selectors from a bounded shared header.
++/// No entropy stream is decoded by this helper.
++pub closed spec fn jpeg_shared_model(s:Seq<u8>) -> Option<Seq<usize>> {
++    let h=crate::jpeg_container::header_model(s,0,s.len() as int,Seq::new(32,|i:int|0usize));
++    if h.is_some() && h.unwrap().v[31]==1 {Some(h.unwrap().v)} else {None}
++}
++pub fn jpeg_shared(s:&[u8],budget:&mut Budget) -> (r:Result<[usize;32],Error>)
++    ensures r.is_ok()==(jpeg_shared_model(s@).is_some() && old(budget).remaining as int>=2*s.len()+1),
++        r.is_ok() ==> r.unwrap()@==jpeg_shared_model(s@).unwrap(),
++        r.is_ok() ==> final(budget).remaining as int+2*s.len()+1==old(budget).remaining,
++        final(budget).remaining<=old(budget).remaining,
++{
++    reveal(jpeg_shared_model);
++    let quota=add(mul(s.len(),2)?,1)?;spend(budget,quota)?;
++    let z=crate::jpeg::empty();
++    assert(z@ =~= Seq::new(32,|i:int|0usize));
++    assert(crate::jpeg_header::shape(z@) && crate::jpeg_header::tables_ok(s@,z@));
++    let h=crate::jpeg_container::read_header(s,0,s.len(),z)?;
++    if h.v[31]!=1 {return Err(Error::Unsupported);}
++    Ok(h.v)
++}
++
++pub closed spec fn ojpeg_scan_valid(s:Seq<u8>,ch:usize,ids:[u8;3],selectors:[u8;3]) -> bool {
++    &&& (ch==1 || ch==3) && s.len()>=8+2*ch
++    &&& s[0]==255 && s[1]==218 && word16(s,2,false)==6+2*ch && s[4]==ch
++    &&& s[5]==ids[0] && s[6]==selectors[0]
++    &&& (ch==3 ==> s[7]==ids[1] && s[8]==selectors[1] && s[9]==ids[2] && s[10]==selectors[2])
++    &&& s[5+2*ch]==0 && s[6+2*ch]==63 && s[7+2*ch]==0
++}
++pub closed spec fn ojpeg_renumbered(s:Seq<u8>,ch:usize) -> Seq<u8> {
++    let a=s.update(5,0).update(6,0);
++    if ch==3 {a.update(7,1).update(8,17).update(9,2).update(10,34)} else {a}
++}
++/// Relabel a baseline SOS to the per-component copies of its shared tables.
++/// Every source selector is checked; entropy bytes and all other bytes remain.
++pub fn renumber_ojpeg_scan(s:&mut [u8],ch:usize,ids:[u8;3],selectors:[u8;3]) -> (r:Result<(),Error>)
++    ensures r.is_ok()==ojpeg_scan_valid(old(s)@,ch,ids,selectors),
++        r.is_ok() ==> final(s)@==ojpeg_renumbered(old(s)@,ch),
++        r.is_err() ==> final(s)@==old(s)@,
++{
++    reveal(ojpeg_scan_valid);reveal(ojpeg_renumbered);
++    if ch!=1 && ch!=3 {return Err(Error::Unsupported);}
++    if s.len()<8+2*ch {return Err(Error::Truncated);}
++    if s[0]!=255 || s[1]!=218 || read16(s,2,false)? as usize!=6+2*ch || s[4] as usize!=ch ||
++        s[5]!=ids[0] || s[6]!=selectors[0] ||
++        (ch==3 && (s[7]!=ids[1] || s[8]!=selectors[1] || s[9]!=ids[2] || s[10]!=selectors[2])) ||
++        s[5+2*ch]!=0 || s[6+2*ch]!=63 || s[7+2*ch]!=0 {return Err(Error::Invalid);}
++    s[5]=0;s[6]=0;
++    if ch==3 {s[7]=1;s[8]=17;s[9]=2;s[10]=34;}
++    Ok(())
++}
++
++}
+--- /dev/null
++++ b/src/native_samples.rs
+@@ -0,0 +1,149 @@
++//! Exact native sample words and modular horizontal prediction for 8/16/32/64 bits.
++//! Signed and floating samples are transported as bits, never numerically narrowed.
++use super::*;
++verus! {
++use crate::float64 as f64model;
++pub open spec fn width_ok(bytes:usize) -> bool {bytes==1 || bytes==2 || bytes==4 || bytes==8}
++pub open spec fn modulus(bytes:usize) -> int {
++    if bytes==1 {256} else if bytes==2 {65536} else if bytes==4 {4294967296} else {18446744073709551616}
++}
++pub closed spec fn word(s:Seq<u8>,at:int,bytes:usize,le:bool) -> int {
++    if bytes==1 {s[at] as int} else if bytes==2 {word16(s,at,le)}
++    else if bytes==4 {word32(s,at,le)}
++    else if le {word32(s,at,true)+4294967296*word32(s,at+4,true)}
++    else {4294967296*word32(s,at,false)+word32(s,at+4,false)}
++}
++pub fn read_word(s:&[u8],at:usize,bytes:usize,le:bool) -> (r:Result<u64,Error>)
++    ensures r.is_ok()==(width_ok(bytes) && range_ok(s.len() as int,at as int,bytes as int)),
++        r.is_ok() ==> r.unwrap()==word(s@,at as int,bytes,le) && r.unwrap()<modulus(bytes),
++{
++    reveal(word);
++    if !width_ok_exec(bytes) {return Err(Error::Unsupported);}
++    if !checked_range(s.len(),at,bytes) {return Err(Error::Truncated);}
++    if bytes==1 {Ok(s[at] as u64)}
++    else if bytes==2 {Ok(read16(s,at,le)? as u64)}
++    else if bytes==4 {Ok(read32(s,at,le)? as u64)}
++    else {
++        let a=read32(s,at,le)? as u64;let b=read32(s,at+4,le)? as u64;
++        Ok(if le {a+4294967296*b} else {4294967296*a+b})
++    }
++}
++fn width_ok_exec(bytes:usize) -> (r:bool) ensures r==width_ok(bytes) {bytes==1 || bytes==2 || bytes==4 || bytes==8}
++fn divisor(j:usize) -> (r:u64) requires j<8,ensures r==f64model::scale(j as int),r>0,
++{if j==0 {1} else if j==1 {256} else if j==2 {65536} else if j==3 {16777216} else if j==4 {4294967296} else if j==5 {1099511627776} else if j==6 {281474976710656} else {72057594037927936}}
++fn store(out:&mut [u8],at:usize,bytes:usize,le:bool,v:u64)
++    requires width_ok(bytes),at as int+bytes<=old(out).len(),
++    ensures final(out).len()==old(out).len(),
++        forall|j:int| 0<=j<bytes ==> #[trigger] final(out)@[at as int+j]==f64model::digit(v as int,if le {j} else {bytes as int-1-j}),
++        forall|k:int| 0<=k<old(out).len() && !(at<=k<at as int+bytes) ==> final(out)@[k]==old(out)@[k],
++{
++    let mut j=0usize;
++    while j<bytes
++        invariant width_ok(bytes),j<=bytes,at as int+bytes<=out.len(),out.len()==old(out).len(),
++            forall|k:int| 0<=k<j ==> #[trigger] out@[at as int+k]==f64model::digit(v as int,if le {k} else {bytes as int-1-k}),
++            forall|k:int| 0<=k<out.len() && !(at<=k<at as int+bytes) ==> out@[k]==old(out)@[k],
++        decreases bytes-j,
++    {let p=if le {j} else {bytes-1-j};out[at+j]=((v/divisor(p))%256) as u8;j=j+1;}
++}
++#[verifier::opaque]
++pub closed spec fn sample(s:Seq<u8>,row:usize,ch:usize,bytes:usize,le:bool,predict:bool,n:int) -> int
++    decreases n,
++{
++    let first=!predict || row==0 || ch==0 || n<ch || n%(row as int)<ch;
++    (word(s,n*bytes,bytes,le)+(if first {0int} else {sample(s,row,ch,bytes,le,predict,n-ch)}))%modulus(bytes)
++}
++pub closed spec fn converted(s:Seq<u8>,row:usize,ch:usize,bytes:usize,le:bool,predict:bool,out_le:bool,k:int) -> u8 {
++    f64model::digit(sample(s,row,ch,bytes,le,predict,k/(bytes as int)),if out_le {k%(bytes as int)} else {bytes as int-1-k%(bytes as int)})
++}
++pub open spec fn valid(s:Seq<u8>,row_bytes:usize,ch:usize,bytes:usize) -> bool {
++    width_ok(bytes) && 0<ch<=64 && row_bytes>0 && (row_bytes as int)%(ch as int*bytes)==0 && (s.len() as int)%(row_bytes as int)==0
++}
++/// Input/output are separate caller buffers. All source bits and row padding
++/// survive; prediction resets once per row and independently for each channel.
++pub fn convert(raw:&[u8],row_bytes:usize,ch:usize,bytes:usize,le:bool,predict:bool,out_le:bool,out:&mut [u8]) -> (r:Result<(),Error>)
++    ensures r.is_ok()==(valid(raw@,row_bytes,ch,bytes) && old(out).len()>=raw.len()),
++        final(out).len()==old(out).len(),
++        r.is_ok() ==> forall|k:int| 0<=k<raw.len() ==> final(out)@[k]==converted(raw@,row_bytes/bytes,ch,bytes,le,predict,out_le,k),
++        forall|k:int| raw.len()<=k<old(out).len() ==> final(out)@[k]==old(out)@[k],
++{
++    reveal(converted);
++    if !width_ok_exec(bytes) || ch==0 || ch>64 || row_bytes==0 {return Err(Error::Unsupported);}
++    let step=ch*bytes;
++    if row_bytes%step!=0 || raw.len()%row_bytes!=0 {return Err(Error::Invalid);}
++    if out.len()<raw.len() {return Err(Error::OutputTooSmall);}
++    let row=row_bytes/bytes;
++    proof {
++        quotient_remainder(row_bytes as int, step as int);
++        let q=(row_bytes as int)/(step as int);
++        assert(row_bytes as int==bytes*(q*ch)) by(nonlinear_arith)
++            requires row_bytes as int==step*q,step==ch*bytes;
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(row_bytes as int,bytes as int,q*ch,0);
++        quotient_remainder(raw.len() as int,row_bytes as int);
++        let q2=(raw.len() as int)/(row_bytes as int);
++        assert(raw.len() as int==bytes*(q2*(row_bytes as int/(bytes as int)))) by(nonlinear_arith)
++            requires raw.len() as int==row_bytes*q2,row_bytes as int==bytes*(row_bytes as int/(bytes as int));
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(raw.len() as int,bytes as int,q2*(row_bytes as int/(bytes as int)),0);
++        assert(row>=ch) by(nonlinear_arith) requires row_bytes>0,row_bytes%step==0,step==ch*bytes,bytes>0,ch>0,row==row_bytes/bytes;
++    }
++    let modulo=if bytes==1 {256u128} else if bytes==2 {65536u128} else if bytes==4 {4294967296u128} else {18446744073709551616u128};
++    let mut previous=[0u64;64];let mut n=0usize;
++    while n<raw.len()/bytes
++        invariant valid(raw@,row_bytes,ch,bytes),row==row_bytes/bytes,row>=ch,raw.len()%bytes==0,
++            modulo==modulus(bytes),0<modulo<=18446744073709551616,
++            out.len()==old(out).len(),out.len()>=raw.len(),n<=raw.len()/bytes,
++            forall|k:int| 0<=k<n as int*bytes ==> out@[k]==converted(raw@,row,ch,bytes,le,predict,out_le,k),
++            forall|k:int| raw.len()<=k<out.len() ==> out@[k]==old(out)@[k],
++            forall|j:int| 0<=j<n && n as int-ch<=j ==> previous@[j%(ch as int)]==sample(raw@,row,ch,bytes,le,predict,j),
++        decreases raw.len()/bytes-n,
++    {
++        let c=n%ch;let first=!predict || n%row<ch || n<ch;
++        assert(n as int*bytes+bytes<=raw.len()) by(nonlinear_arith) requires n<raw.len()/bytes,bytes>0;
++        let a=read_word(raw,n*bytes,bytes,le)?;
++        let b=if first {0u64} else {previous[c]};
++        proof {
++            if !first {
++                vstd::arithmetic::div_mod::lemma_mod_sub_multiples_vanish(n as int,ch as int);
++                assert(previous@[c as int]==sample(raw@,row,ch,bytes,le,predict,n as int-ch));
++            }
++            reveal_with_fuel(sample,1);
++        }
++        let value=((a as u128+b as u128)%modulo) as u64;
++        assert(value as int==sample(raw@,row,ch,bytes,le,predict,n as int));
++        store(out,n*bytes,bytes,out_le,value);
++        assert forall|k:int| 0<=k<(n as int+1)*bytes implies out@[k]==converted(raw@,row,ch,bytes,le,predict,out_le,k) by {
++            if k>=n as int*bytes {
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,bytes as int,n as int,k-n as int*bytes);
++            }
++        }
++        previous[c]=value;
++        assert forall|j:int| 0<=j<n as int+1 && n as int+1-ch<=j implies previous@[j%(ch as int)]==sample(raw@,row,ch,bytes,le,predict,j) by {
++            if j<n {
++                quotient_remainder(j,ch as int);quotient_remainder(n as int,ch as int);
++                assert(j%(ch as int)!=c) by(nonlinear_arith)
++                    requires j<n,n as int-ch<j,ch>0,j==ch*(j/(ch as int))+j%(ch as int),n==ch*((n as int)/(ch as int))+c;
++            }
++        }
++        n=n+1;
++    }
++    Ok(())
++}
++pub open spec fn reversed(v:u8) -> u8 {
++    (((v as int)/128)%2+2*((v as int)/64%2)+4*((v as int)/32%2)+8*((v as int)/16%2)+16*((v as int)/8%2)+32*((v as int)/4%2)+64*((v as int)/2%2)+128*(v as int%2)) as u8
++}
++pub fn reverse_bits(s:&mut [u8])
++    ensures final(s).len()==old(s).len(),forall|k:int|0<=k<old(s).len() ==> final(s)@[k]==reversed(old(s)@[k]),
++{
++    let mut i=0usize;
++    while i<s.len()
++        invariant i<=s.len(),s.len()==old(s).len(),
++            forall|k:int|0<=k<i ==> s@[k]==reversed(old(s)@[k]),
++            forall|k:int|i<=k<s.len() ==> s@[k]==old(s)@[k],
++        decreases s.len()-i,
++    {
++        let v=s[i] as u16;
++        let r=(v/128)%2+2*(v/64%2)+4*(v/32%2)+8*(v/16%2)+16*(v/8%2)+32*(v/4%2)+64*(v/2%2)+128*(v%2);
++        s[i]=r as u8;i=i+1;
++    }
++}
++
++}
+--- /dev/null
++++ b/tests/native_api.rs
+@@ -0,0 +1,55 @@
++use verified_tiff::{container,native,native_samples as ns,Budget,Error};
++#[test]
++fn exact_native_words_prediction_rows_channels_and_frames(){
++    for bytes in [1,2,4,8]{for ch in [1,2,3,4,8,64]{for le in [false,true]{for out_le in [false,true]{
++        let max=if bytes==8{u64::MAX}else{(1u64<<(8*bytes))-1};
++        let mut source=Vec::new();let mut expected=Vec::new();
++        for y in 0..3{let mut previous=vec![0u64;ch];for x in 0..7{for c in 0..ch{
++            let v=(if x%2==0{max}else{0}).wrapping_add((y*57+x*373+c*997) as u64)&max;
++            let delta=v.wrapping_sub(previous[c])&max;previous[c]=v;
++            for j in 0..bytes{source.push((delta>>(8*if le{j}else{bytes-1-j})) as u8);expected.push((v>>(8*if out_le{j}else{bytes-1-j})) as u8);}
++        }}}
++        let mut out=vec![0xa5;source.len()+17];ns::convert(&source,7*ch*bytes,ch,bytes,le,true,out_le,&mut out).unwrap();
++        assert_eq!(&out[..source.len()],expected);assert!(out[source.len()..].iter().all(|v|*v==0xa5));
++        let mut plain=vec![0;source.len()];ns::convert(&expected,7*ch*bytes,ch,bytes,out_le,false,out_le,&mut plain).unwrap();assert_eq!(plain,expected);
++    }}}}
++}
++#[test]
++fn native_stream_acceptance_budget_and_failure_frames(){
++    for (codec,input) in [(1,vec![65,66,67]),(32773,vec![2,65,66,67])]{
++        let fee=native::work_limit(input.len(),3).unwrap();let mut out=[0xa5;7];let mut b=Budget{remaining:fee-1};
++        assert_eq!(native::decode(&input,codec,3,3,3,&mut out,&mut b),Err(Error::Limit));assert_eq!(out,[0xa5;7]);
++        b.remaining=fee;native::decode(&input,codec,3,3,3,&mut out,&mut b).unwrap();assert_eq!(&out[..3],b"ABC");assert_eq!(b.remaining,0);assert_eq!(&out[3..],&[0xa5;4]);
++    }
++    for s in [&[2u8,65,66][..],&[3,65,66,67,68][..]]{
++        let mut out=[0xa5;7];assert!(native::decode(s,32773,3,3,3,&mut out,&mut Budget{remaining:1000}).is_err());assert_eq!(&out[3..],&[0xa5;4]);
++    }
++    assert!(native::work_limit(usize::MAX,1).is_err());
++    let mut out=[0xa5;8];for (row,ch,bytes) in [(0,1,1),(3,2,1),(4,65,1),(4,1,3),(3,1,1)]{
++        assert!(ns::convert(&[0;4],row,ch,bytes,true,true,true,&mut out).is_err());assert_eq!(out,[0xa5;8]);
++    }
++    let mut all:Vec<u8>=(0..=255).collect();ns::reverse_bits(&mut all);for i in 0..256{assert_eq!(all[i],(i as u8).reverse_bits());}
++}
++#[test]
++fn bigtiff_64bit_ranges_and_header_acceptance(){
++    for le in [false,true]{
++        let mut s=[0u8;20];s[..2].copy_from_slice(if le{b"II"}else{b"MM"});
++        let put16=|s:&mut[u8],at:usize,v:u16|s[at..at+2].copy_from_slice(&if le{v.to_le_bytes()}else{v.to_be_bytes()});
++        let put64=|s:&mut[u8],at:usize,v:u64|s[at..at+8].copy_from_slice(&if le{v.to_le_bytes()}else{v.to_be_bytes()});
++        put16(&mut s,2,43);put16(&mut s,4,8);put64(&mut s,8,(1u64<<40)+17);
++        let h=container::header(&s).unwrap();assert!(h.big);assert_eq!(h.first_ifd,(1u64<<40)+17);assert_eq!(h.little_endian,le);
++        s[6]=1;assert!(container::header(&s).is_err());s[6]=0;
++        put16(&mut s,0,273);put16(&mut s,2,16);put64(&mut s,4,2);put64(&mut s,12,1u64<<40);
++        let e=container::entry(&s,1u64<<32,true,le,(1u64<<40)+16).unwrap();assert_eq!(e.offset,1u64<<40);assert_eq!(e.length,16);assert!(!e.inline);
++        assert!(container::entry(&s,1u64<<32,true,le,(1u64<<40)+15).is_err());
++        put64(&mut s,4,u64::MAX);assert!(container::entry(&s,16,true,le,u64::MAX).is_err());
++        put64(&mut s,4,1);let e=container::entry(&s,1u64<<40,true,le,(1u64<<40)+20).unwrap();assert!(e.inline);assert_eq!(e.offset,(1u64<<40)+12);
++    }
++}
++#[test]
++fn ojpeg_scan_relabeling_preserves_entropy_and_checks_source(){
++    let raw=[255,218,0,12,3,1,0,2,17,3,17,0,63,0,10,20,255,0,30];
++    let mut renamed=raw;native::renumber_ojpeg_scan(&mut renamed,3,[1,2,3],[0,17,17]).unwrap();
++    assert_eq!(&renamed[..14],&[255,218,0,12,3,0,0,1,17,2,34,0,63,0]);assert_eq!(&renamed[14..],&raw[14..]);
++    let mut bad=raw;assert!(native::renumber_ojpeg_scan(&mut bad,3,[0,1,2],[0,17,17]).is_err());assert_eq!(bad,raw);
++}

@@ -1,0 +1,32 @@
+test_bilevel_all_byte_patterns (__main__.Integration.test_bilevel_all_byte_patterns) ... ok
+test_bilevel_defaults_and_pages (__main__.Integration.test_bilevel_defaults_and_pages) ... ok
+test_bilevel_invalid_and_truncated (__main__.Integration.test_bilevel_invalid_and_truncated) ... ok
+test_bilevel_limits (__main__.Integration.test_bilevel_limits) ... ok
+test_bilevel_matrix (__main__.Integration.test_bilevel_matrix) ... ok
+test_cycle_bounded (__main__.Integration.test_cycle_bounded) ... ok
+test_defaults (__main__.Integration.test_defaults) ... ok
+test_limits (__main__.Integration.test_limits) ... ok
+test_lzw_code_boundaries_and_resets (__main__.Integration.test_lzw_code_boundaries_and_resets) ... ok
+test_lzw_defaults_pages_and_limits (__main__.Integration.test_lzw_defaults_pages_and_limits) ... ok
+test_lzw_malformed_and_truncated (__main__.Integration.test_lzw_malformed_and_truncated) ... ok
+test_lzw_matrix (__main__.Integration.test_lzw_matrix) ... ok
+test_lzw_random_and_libtiff_encoder (__main__.Integration.test_lzw_random_and_libtiff_encoder) ... ok
+test_malformed (__main__.Integration.test_malformed) ... ok
+test_packbits_defaults_and_pages (__main__.Integration.test_packbits_defaults_and_pages) ... ok
+test_packbits_malformed (__main__.Integration.test_packbits_malformed) ... ok
+test_packbits_matrix (__main__.Integration.test_packbits_matrix) ... ok
+test_packbits_repeats_and_controls (__main__.Integration.test_packbits_repeats_and_controls) ... ok
+test_packbits_work_and_output_limits (__main__.Integration.test_packbits_work_and_output_limits) ... ok
+test_pages (__main__.Integration.test_pages) ... ok
+test_profile_matrix (__main__.Integration.test_profile_matrix) ... ok
+test_truncation (__main__.Integration.test_truncation) ... ok
+test_unsupported (__main__.Integration.test_unsupported) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 15.693s
+
+OK
+bilevel matrix: 320 cases; oracle=True
+LZW matrix: 320 cases; oracle=True
+PackBits matrix: 640 cases; oracle=True
+profile matrix: 96 cases; oracle=True

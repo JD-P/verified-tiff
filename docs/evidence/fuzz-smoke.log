@@ -1,0 +1,1 @@
+seed=0x5449464650524f4f iterations=20000 accepted=325 errors=[3326, 7046, 37, 4267, 0, 4999] jpeg_accepted=14 jpeg_decoded=3 fax_accepted=9 fax_decoded=8 float_accepted=21 float_decoded=15 webp_accepted=14 webp_decoded=8 logluv_accepted=32 logluv_decoded=32

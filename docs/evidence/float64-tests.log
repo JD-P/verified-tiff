@@ -1,0 +1,11 @@
+test_format_matrix (__main__.Float64.test_format_matrix) ... ok
+test_invalid_metadata_and_truncation (__main__.Float64.test_invalid_metadata_and_truncation) ... ok
+test_original_float64_regressions (__main__.Float64.test_original_float64_regressions) ... ok
+test_rows_tiles_pages_and_limits (__main__.Float64.test_rows_tiles_pages_and_limits) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.341s
+
+OK
+float64 matrix: 256; bit-exact native oracle=True
+float64 page/edge cases: 16

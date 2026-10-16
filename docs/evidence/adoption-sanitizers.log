@@ -1,0 +1,68 @@
+test_ccitt_rle (__main__.Consumers.test_ccitt_rle) ... ok
+test_cmyk_and_lab (__main__.Consumers.test_cmyk_and_lab) ... ok
+test_environment_limits (__main__.Consumers.test_environment_limits) ... ok
+test_logluv_float (__main__.Consumers.test_logluv_float) ... ok
+test_predictor3 (__main__.Consumers.test_predictor3) ... ok
+test_read_side_sample_format (__main__.Consumers.test_read_side_sample_format) ... ok
+test_registered_anonymous_and_nonimage_directories (__main__.Consumers.test_registered_anonymous_and_nonimage_directories) ... ok
+test_temporary_compressed_contexts (__main__.Consumers.test_temporary_compressed_contexts) ... ok
+test_temporary_decoder_context (__main__.Consumers.test_temporary_decoder_context) ... ok
+test_transfer_function (__main__.Consumers.test_transfer_function) ... ok
+test_ycbcr (__main__.Consumers.test_ycbcr) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 4.111s
+
+OK
+test_bilevel_native_padding (__main__.CApi.test_bilevel_native_padding) ... ok
+test_contracts_from_c (__main__.CApi.test_contracts_from_c) ... ok
+test_every_generated_stub (__main__.CApi.test_every_generated_stub) ... ok
+test_expected_unsupported_cases (__main__.CApi.test_expected_unsupported_cases) ... ok
+test_mutated_inputs (__main__.CApi.test_mutated_inputs) ... ok
+test_native_full_tiles (__main__.CApi.test_native_full_tiles) ... ok
+test_native_samples_and_byte_order (__main__.CApi.test_native_samples_and_byte_order) ... ok
+test_prelinked_binary_symbol_versions (__main__.CApi.test_prelinked_binary_symbol_versions) ... ok
+test_preserved_native_samples (__main__.CApi.test_preserved_native_samples) ... ok
+test_raw_segments_pages_and_logluv (__main__.CApi.test_raw_segments_pages_and_logluv) ... ok
+test_rgba_rendering_and_orientations (__main__.CApi.test_rgba_rendering_and_orientations) ... ok
+test_rgba_segments (__main__.CApi.test_rgba_segments) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 4.952s
+
+OK
+C API: metadata/varargs, directory rollback, buffer frames, fd/callback ownership, limits, stubs, TLS and utilities passed
+C public API inventory: 198 symbols; 52 generated stubs exercised
+C ABI mutation smoke: seed=0x4341504954494646 iterations=2000 seeds=80 accepted=1136 native_decoded=823
+C native full tiles: 72 exact libtiff comparisons
+C native matrix: 128 files, 256 exact scanline/strip comparisons including independent source samples
+Previously linked libtiff.so.6 consumer ran unchanged with compatibility library
+Native palette, associated alpha and padded edge tiles: 48 files
+C RGBA matrix: 160 independent-pixel checks, 136 exact libtiff comparisons; four output orientations
+test_all_source_and_output_orientations (__main__.Coverage.test_all_source_and_output_orientations) ... ok
+test_bigtiff_subifds_and_sparse_offsets (__main__.Coverage.test_bigtiff_subifds_and_sparse_offsets) ... ok
+test_common_metadata_and_read_modes (__main__.Coverage.test_common_metadata_and_read_modes) ... ok
+test_lazy_callbacks_and_bounded_memory (__main__.Coverage.test_lazy_callbacks_and_bounded_memory) ... ok
+test_malformed_bigtiff_and_directory_rollback (__main__.Coverage.test_malformed_bigtiff_and_directory_rollback) ... ok
+test_native_word_formats_prediction_alpha_and_edges (__main__.Coverage.test_native_word_formats_prediction_alpha_and_edges) ... ok
+test_packed_fill_order (__main__.Coverage.test_packed_fill_order) ... ok
+test_rgba16_alpha_scaling (__main__.Coverage.test_rgba16_alpha_scaling) ... ok
+test_segment_source_orientations_and_edge_padding (__main__.Coverage.test_segment_source_orientations_and_edge_padding) ... ok
+test_special_codecs_originals_remain_segment_readable (__main__.Coverage.test_special_codecs_originals_remain_segment_readable) ... ok
+test_work_budget_is_shared_across_rgba_segments (__main__.Coverage.test_work_budget_is_shared_across_rgba_segments) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 10.448s
+
+OK
+Broader native samples: 640 independent files, 544 pinned-oracle files
+test_bounded_final_strip_padding_and_checksum_rejection (__main__.ZstdCompat.test_bounded_final_strip_padding_and_checksum_rejection) ... ok
+test_native_layouts_predictors_fill_orders_and_bigtiff (__main__.ZstdCompat.test_native_layouts_predictors_fill_orders_and_bigtiff) ... ok
+test_rgba_color_and_alpha (__main__.ZstdCompat.test_rgba_color_and_alpha) ... ok
+test_temporary_user_buffer_contexts (__main__.ZstdCompat.test_temporary_user_buffer_contexts) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 3.913s
+
+OK
+ZSTD TIFF: 256 independent files, 224 pinned-oracle files

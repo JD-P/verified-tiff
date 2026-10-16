@@ -1,0 +1,117 @@
+Exact before/after: main gray-none native
+Exact before/after: main gray-none scan
+Exact before/after: main gray-none rgba
+Exact before/after: main rgb-none native
+Exact before/after: main rgb-none rgba
+Exact before/after: main rgb-none crop
+Exact before/after: main gray-packbits native
+Exact before/after: main gray-packbits scan
+Exact before/after: main gray-packbits rgba
+Exact before/after: main gray-lzw native
+Exact before/after: main gray-lzw scan
+Exact before/after: main gray-lzw rgba
+Exact before/after: main rgb-lzw native
+Exact before/after: main rgb-lzw rgba
+Exact before/after: main rgb-lzw crop
+Exact before/after: main gray-deflate native
+Exact before/after: main gray-deflate scan
+Exact before/after: main gray-deflate rgba
+Exact before/after: main rgb-deflate native
+Exact before/after: main rgb-deflate rgba
+Exact before/after: main rgb-deflate crop
+Exact before/after: main gray-zstd native
+Exact before/after: main gray-zstd scan
+Exact before/after: main gray-zstd rgba
+Exact before/after: main rgb-zstd native
+Exact before/after: main rgb-zstd rgba
+Exact before/after: main rgb-zstd crop
+Exact before/after: main noise-lzw native
+Exact before/after: main noise-deflate native
+Exact before/after: main noise-zstd native
+Exact before/after: main jpeg-smooth native
+Exact before/after: main jpeg-smooth rgba
+Exact before/after: main jpeg-texture native
+Exact before/after: main jpeg-texture rgba
+Exact before/after: main rgb-tiled-lzw native
+Exact before/after: main rgb-tiled-lzw rgba
+Exact before/after: main rgb-tiled-lzw crop
+Exact before/after: main gray16-deflate-p2 native
+Exact before/after: main gray16-deflate-p2 scan
+Exact before/after: main float32-deflate-p3 native
+Exact before/after: main float32-deflate-p3 scan
+Exact before/after: main float16-deflate-p3 native
+Exact before/after: main float16-deflate-p3 scan
+Exact before/after: main complex64-lzw native
+Exact before/after: main complex64-lzw scan
+Exact before/after: main fax-rle native
+Exact before/after: main fax-rle rgba
+Exact before/after: main fax-g3 native
+Exact before/after: main fax-g3 rgba
+Exact before/after: main fax-g4 native
+Exact before/after: main fax-g4 rgba
+main webp-lossless native {'before': 27.5708, 'after': 15.6204, 'libtiff': 2.8106}
+main webp-lossless rgba {'before': 32.3903, 'after': 19.6779, 'libtiff': 4.363}
+main webp-lossless crop {'before': 3.5722, 'after': 1.9256, 'libtiff': 0.499}
+main webp-lossy native {'before': 62.1539, 'after': 45.6236, 'libtiff': 7.4056}
+main webp-lossy rgba {'before': 66.8385, 'after': 49.3107, 'libtiff': 8.7732}
+main webp-lossy crop {'before': 8.3508, 'after': 5.6789, 'libtiff': 1.2594}
+Exact before/after: main lerc-float-plain native
+Exact before/after: main lerc-float-deflate native
+Exact before/after: main lerc-float-zstd native
+Exact before/after: main cmyk-deflate rgba
+Exact before/after: main cmyk-deflate crop
+Exact before/after: main lab-deflate rgba
+Exact before/after: main lab-deflate crop
+Exact before/after: main large-strip-none firstrow
+Exact before/after: main large-strip-none crop
+Exact before/after: main large-strip-lzw firstrow
+Exact before/after: main large-strip-lzw crop
+Exact before/after: main large-strip-deflate firstrow
+Exact before/after: main large-strip-deflate crop
+Exact before/after: main many-strips open
+Exact before/after: main many-strips lookup
+Exact before/after: main many-strips open-lazy
+Exact before/after: main many-strips lookup-lazy
+Exact before/after: main original-lzw-single-strip.tiff native
+Exact before/after: main original-lzw-single-strip.tiff rgba
+Exact before/after: main original-testfax4.tiff native
+Exact before/after: main original-testfax4.tiff rgba
+Exact before/after: main original-quad-lzw-compat.tiff native
+Exact before/after: main original-quad-lzw-compat.tiff rgba
+Exact before/after: main lerc-float64-tiled native
+Exact before/after: main lerc-uint16-tiled native
+Exact before/after: main lerc-int16-tiled native
+Exact before/after: main lerc-float32-strips native
+main webp-lossy-opaque native {'before': 47.8149, 'after': 38.9024, 'libtiff': 3.8873}
+main webp-lossy-opaque rgba {'before': 48.3902, 'after': 38.8983, 'libtiff': 4.4508}
+main webp-lossy-opaque crop {'before': 5.7706, 'after': 4.6007, 'libtiff': 0.4462}
+main webp-lossy-texture native {'before': 293.0968, 'after': 274.6214, 'libtiff': 40.6088}
+main webp-lossy-texture rgba {'before': 294.4903, 'after': 267.6906, 'libtiff': 39.4175}
+main webp-lossy-texture crop {'before': 17.8609, 'after': 16.536, 'libtiff': 2.5155}
+main webp-lossy-odd native {'before': 3.6356, 'after': 2.8291, 'libtiff': 0.5314}
+main webp-lossy-odd rgba {'before': 4.4658, 'after': 3.6336, 'libtiff': 0.6474}
+main webp-lossy-odd crop {'before': 4.4695, 'after': 3.6116, 'libtiff': 0.7261}
+main webp-lossless-opaque native {'before': 27.0407, 'after': 15.3974, 'libtiff': 2.7866}
+main webp-lossless-opaque rgba {'before': 28.7427, 'after': 16.2455, 'libtiff': 3.427}
+main webp-lossless-opaque crop {'before': 3.1591, 'after': 1.7236, 'libtiff': 0.4136}
+main webp-lossless-texture native {'before': 622.4803, 'after': 598.4261, 'libtiff': 12.9437}
+main webp-lossless-texture rgba {'before': 618.4717, 'after': 610.6941, 'libtiff': 15.0067}
+main webp-lossless-texture crop {'before': 39.4428, 'after': 38.5065, 'libtiff': 0.8884}
+main webp-lossless-odd native {'before': 1.7306, 'after': 0.9096, 'libtiff': 0.1904}
+main webp-lossless-odd rgba {'before': 2.1175, 'after': 1.2789, 'libtiff': 0.427}
+main webp-lossless-odd crop {'before': 1.8466, 'after': 1.025, 'libtiff': 0.3826}
+Exact before/after: layout layout-rgb-deflate-16 native
+Exact before/after: layout layout-rgb-deflate-16 crop
+Exact before/after: layout layout-rgb-deflate-32 native
+Exact before/after: layout layout-rgb-deflate-32 crop
+Exact before/after: layout layout-rgb-deflate-64 native
+Exact before/after: layout layout-rgb-deflate-64 crop
+Exact before/after: layout layout-rgb-deflate-256 native
+Exact before/after: layout layout-rgb-deflate-256 crop
+Exact before/after: defaults large-strip-none firstrow
+Exact before/after: defaults large-strip-none crop
+Exact before/after: defaults large-strip-lzw firstrow
+Exact before/after: defaults large-strip-lzw crop
+Exact before/after: defaults large-strip-deflate firstrow
+Exact before/after: defaults large-strip-deflate crop
+Completed 116 workloads; all before/after output bytes exact

@@ -1,0 +1,295 @@
+Verus
+  Version: 0.2026.10.04.426d8b0
+  Profile: release
+  Platform: linux_x86_64
+  Toolchain: 1.98.1-x86_64-unknown-linux-gnu (overridden by environment variable RUSTUP_TOOLCHAIN)
+
+Core source audit passed (supplements, does not replace, verification).
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> src/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> src/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> src/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 3 warnings emitted
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> src/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> src/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> src/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> src/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 3 warnings emitted
+
+{
+  "encountered-error": false,
+  "encountered-vir-error": false,
+  "success": true,
+  "verified": 1638,
+  "errors": 0,
+  "is-verifying-entire-crate": true,
+  "core_sources_sha256": {
+    "src/bit_window.rs": "6e6bd8a6460a71041c48bd17e450b9f0e2583df0fc223af0161b8b217011f711",
+    "src/container.rs": "e7afed6ae8a92b5eedbccf5155b3f4aede7666f0df88d1a8bbe537ed93e22756",
+    "src/deflate.rs": "537386f7d50fa7ddc1eccc9c8359374e1adb1a44dd822a4e8853e40d17c3bc28",
+    "src/deflate_bits.rs": "6cff499ffd7d67a51f1acbd95896b3b5cfc8b472356398ab90ead5a42de11f1f",
+    "src/deflate_header.rs": "b28ad0bafe275e79d80ba87181f7010919888ef2e782f1931331cb4a78735f86",
+    "src/deflate_plane.rs": "b86b9a71cf77ed39e3281de41150869d7fb49548d5037650470c68f1ef2b996c",
+    "src/extended.rs": "25e6da90960b90d96a9bdb8b076b2f28c044ab6af4ab50bbe376b911582a082e",
+    "src/extended_image.rs": "63ecf6feb4eeafd608e5b553b73434ee8d82ebac352e5c7ce2e708ed90423da1",
+    "src/extended_witness.rs": "74155774be5410f18f9ad7f6168f53dad68f2ab976c35e01408355f7a004ffb0",
+    "src/fax.rs": "c582ea260c7d2749225d23151e9fbfc50d1d716c964a61d09ded7304d4354580",
+    "src/fax_bits.rs": "9d526e1311a24674c85eb8a7b91bf79cc379f5dcc3b4bd97cd5b317ef4bc6d6f",
+    "src/fax_format.rs": "fb78e1883ab545498170f48270049a4d97dd38397161675bed1d910060279e16",
+    "src/fax_frame.rs": "d8c838cfe153bf817ac2e92a084afe947fc1680e373e2f8aa93dbaa6f66abd04",
+    "src/fax_meta.rs": "8edbc10c2048ed922d469c6ffe51c4e6c0e58f8539d1eb4941c0bdfab91044f4",
+    "src/fax_row.rs": "3b6053b0cb6ae96e87b0c025bd0da61529021aa1de4f8681307f1ac22128f88f",
+    "src/fax_segment.rs": "1ec795f1b5688b852ff5d43597fe85d786fd717a6b44bd5bce53305d7357d613",
+    "src/fax_tables.rs": "df1f952d38c0c7460ca82f6a7301eb77547e3e0c8cfc6cb107bb25f6b9ecde4b",
+    "src/fax_tiff.rs": "36bb6c3690818013ff2d07b93ed76e5915d936c66c995b2fab2368928bb0bbfb",
+    "src/fax_witness.rs": "a092f07e0adf23b3be697c17a1239441632fc1cebfeb89e14cecddb220e4e7fb",
+    "src/float64.rs": "d4861c176d364619ad24c7229fc78b3698b03e0bbb554fc498d7968b3f307f9b",
+    "src/float_witness.rs": "6f20fc8269a769571ef3724dbc26677590ad5d5f6c8fccaeb7cbebfe821cd483",
+    "src/jpeg.rs": "d7bef8e9c976efa466e2fb3e76618d0463560f9f76815991a9aaf79364f5f606",
+    "src/jpeg_bits.rs": "e368c220cc6e28cb2c54b0b05e518052db4443be3247ef44422ef4611aa4c494",
+    "src/jpeg_block.rs": "402461699901cda60f71b5d15ff8c19164962be29ee246c8fd70fdf7449d9f5a",
+    "src/jpeg_color.rs": "b2c7e4f64e8e181a6a9486b8e28a8a8786886df150733e16eee15d192263cfed",
+    "src/jpeg_container.rs": "39c55e8eec3b799ff89b55feaa0febe5a1131b427f4cfedfd750185a976c2a42",
+    "src/jpeg_format.rs": "71e21e667740d371d295b403449502600661ac13a0490f0b77d39f96986ce554",
+    "src/jpeg_header.rs": "4c630dc9c471137383641158c34986ec507ef5121dc512be2c2faa448ab9a35a",
+    "src/jpeg_huffman.rs": "9b7b346c8fa4cc5619aa446284c24e3a2e3b4cbd67a410103fde00f0550dbed7",
+    "src/jpeg_layout.rs": "90b3d99c6ae1465ac517e2fc7ce8b8826e31b776728c6749fb3d69b07134b40d",
+    "src/jpeg_meta.rs": "44c72bc1f3c47f2ed62857f3bec3c3a3d247a4cb62028f1f52f3d7d45ca0f85f",
+    "src/jpeg_scan.rs": "cec06697f5653d0fb9357d7dec69531421f8f27e5d16cff5004c27cb2d88ea21",
+    "src/jpeg_segment.rs": "815937b8e13b9cab8426f3f912991f5bb870b75a83c4065a268c0d15cec2b1f3",
+    "src/jpeg_tiff.rs": "115bb415fc28b4d8f01b6730554bcb443e527d99b933966c362fd7d25d752097",
+    "src/jpeg_transform.rs": "dbe314473cea51d1b52d3f46730b6341493b2665a40e54bbd90733451a76bdad",
+    "src/jpeg_witness.rs": "6b18f1e5547a9c2f85484bb99faad4477b735f33e7a9fc8fb14afeeaa30453f3",
+    "src/lerc_bits.rs": "a2209e77d4ca361f5132a93a6325e884b52d8d2b022a1ef4e6269aa4f21ba26e",
+    "src/lerc_block.rs": "680f4c9900dfe055149832bea70bed17611016bd7d829555d143ad90f59cb9b8",
+    "src/lerc_byte_image.rs": "6bb1bba4cbe548c4e5c836cf307d68969886dfba08fe80f254ca11d0aa307873",
+    "src/lerc_checksum.rs": "aff1c258971618cb712794e18f8044972508d13c28417ee7608ebaa398ebbaac",
+    "src/lerc_header.rs": "602fdecf66838ac55f04898f5a29d8a0d859b4fddc83cd57b6fbe6b9aa58de21",
+    "src/lerc_huffman.rs": "fb0702e708b2b2be222992b7c37913caf081c94b5a5161f538cc70f2b9d3dd19",
+    "src/lerc_image.rs": "e327bb09d030a6731adca660a61cbe5c8b70c8e3f34838cfcdb5dae8af621625",
+    "src/lerc_mask.rs": "23b79743682beb0e9d8fda2c4eb2d07530f8e9bb9515afed05732129de5b4429",
+    "src/lerc_numeric.rs": "e60931efa630a138ec14b5508e97df186652e72a81f103fc22dc7927576da35d",
+    "src/lerc_planes.rs": "5849b548976b0b33ad424fc96acfb15cb20b655992c3c6b2d97e5fb6f9958abd",
+    "src/lerc_samples.rs": "8080f3b216a03023c21dd7426693b99413ea3c6fe62e2c0eef8b85872fccf2d6",
+    "src/lib.rs": "a55229c9fbc740ede55381baf13ed39c8638a55bd195c2c9cc4b4e6e88e1d6cb",
+    "src/logluv.rs": "c35364d1fc5849ee7fb67467fa86673806f5f69cafdf636c2206b10045401754",
+    "src/logluv_format.rs": "ec5183d23ec0ce4dcaf6453b009c1ef5ae732e4b3d44b0b3f0158bbc0429214b",
+    "src/logluv_segment.rs": "98bd9f3f4f2a4684138ea19620a051df84c62ed002f0e7021acf3d17e66bf4c6",
+    "src/logluv_tiff.rs": "213c524904c6121e59c8919c79dfadb0d212159cbd76a4e7d27a9facafcf5750",
+    "src/logluv_witness.rs": "17b892547a364218b5c7721eb404f1992f81350cae5481a2585e94acf83df2e4",
+    "src/native.rs": "2147ce91366bba83d6ba78fff5ed9d7798fe6a0741af986c98104e714026faeb",
+    "src/native_fp.rs": "4bbe3d26044053588e5fbdcf2bd095bfd52f82488f231f626730cc111d180272",
+    "src/native_lerc.rs": "1a6ac18eaab3a5bf706c4cada8317a12a919796d27dc43d2fd8517090e33c20f",
+    "src/native_rle.rs": "cf685757f0f097b156cff6e206eeb9273912461c543a27109bd98d658dbd100a",
+    "src/native_samples.rs": "765905ff83abd5528e7db6c3ec79c79e2cdc55a72cac1855bda1c201fa1ad66b",
+    "src/native_stream.rs": "7afd6f4aca7323ea84f1daf9e5b9fc2770b8e27056b30e6af3ebeedc89650069",
+    "src/native_vp8.rs": "3c5d64ebd16a591a028eeb00c796c3b1ed000d4074f3c09f4744d7b3912d39b3",
+    "src/native_webp.rs": "88d3918d8c35fdd397c637a54a8ec53f37542185544563cd5080faa954890901",
+    "src/native_zstd.rs": "fd8fa7db2ad51a1e9f4513f91812592138540052082b3a43495aa0de9240cb5d",
+    "src/raster_layout.rs": "9a5241f3bd12a7fd8ebd89e1bbef0edb1b4f378bae917e851b6491a2e6fbb47a",
+    "src/reader.rs": "958c539719631af8d6813450423861513c532593f97d1597a7131d41df460f13",
+    "src/vp8_bool.rs": "726b74de14e533c6c77c22eb6a3d1307301e5ace6af79fe4c1d5834f73012419",
+    "src/vp8_coeff.rs": "6c6a83123e848ac87b8ce861b770f749cdc355bf0bcf80d28a5f5b469b9176f8",
+    "src/vp8_color.rs": "91c92298cdff5085f919f7d9a484a96dc4e55f613c8a4e7e114cfc5bd19010f5",
+    "src/vp8_edges.rs": "6f1bee956945a5c1899fa19af5b98cb21592dad5d74c6212cb12f2408456aae6",
+    "src/vp8_fields.rs": "662ab5207f811dedffb6a69f10ce0983021d9c1c6e24b5af9c7c02417fe80152",
+    "src/vp8_filter_info.rs": "f91b31cc1a4766d3b2e0c5615877132384ee3715c1a91a50e57f89c63d80dafb",
+    "src/vp8_filter_kernel.rs": "55cde597f52afe15cbd2cc079baa97379de9c5219e4c42ee1aea455a4fe2fc80",
+    "src/vp8_filter_plane.rs": "3243b38f03080288466d9fc7469979f00910d314db77586202d370956923b5cb",
+    "src/vp8_filter_write.rs": "6f0b7610d551987fc33516e68d6f893239602d50268bcaf673b946c4d51134a4",
+    "src/vp8_frame.rs": "85275c9821a9af8f3626c17bae62f946ba52e4082d6692cf9aee375b4b7ad9a8",
+    "src/vp8_header.rs": "8275dc16d9d0b9be599eafadf0021f8861fdf572109517c59957f25fa2505078",
+    "src/vp8_image.rs": "b989eafd05d55ce6114129c4cde881d12c913c48704e55dfe9e726bd4d0d7b70",
+    "src/vp8_macroblock.rs": "1f5858991daa15673199d6d3e4bec2e452d35eea325133c1061d090564c6d2d0",
+    "src/vp8_modes.rs": "0595abe9eaf93443e536407809494a11d918a4c8bcf6dc8b60b58aea9aa31218",
+    "src/vp8_plane.rs": "7bea5eeec11300b2f34d12165185c305c9db0fba9462cd0c3cecb65fdbbbb647",
+    "src/vp8_postfilter.rs": "2c2d0410fa9afbfe931659856adbdb62d5f5764ca3afb6d4ef8301504375d9db",
+    "src/vp8_predict.rs": "e7227ebc01ee7bd2df10731b5d0227656079308a65672d14cad2d2e7d61b3a0f",
+    "src/vp8_quant.rs": "e39f1ce758fde6ae399a793ada8f25901725052884faf431ad468a1fc0826108",
+    "src/vp8_render.rs": "71a57941b66aab8e7408abde0de53455ca74d2edcea77174eb1d35340bf57660",
+    "src/vp8_residual.rs": "c0dd20232b2e31ae904133bedc815c95bd00071f8497c83fa62fd2e22e7cc789",
+    "src/vp8_tables.rs": "56870dadff3c09aae737eb1aafd0be5b6156fd9ed8e002182fc1d6f37554fd40",
+    "src/vp8_transform.rs": "2df481c157c5317e5cd6638c73cf1944bda029efc520bcc4b3c7697ec3de03aa",
+    "src/vp8_tree.rs": "8ae041e6aed28baf480a93e65b3fde789cbeaaa413553b4d8e93709aa91f7379",
+    "src/webp.rs": "557b0b648e3e80d2372d95d38c4340aa61819a825b018c0e73b3941668d4fe81",
+    "src/webp_alpha.rs": "90c0400d7057b251794f0f5fd1fe308d05ca513fadabc174f6ab0e96f764097b",
+    "src/webp_aux.rs": "9ef02b1f1c19402c0ea16b2b1f75afffe2a9c8601b36453963b50e453eacbf11",
+    "src/webp_container.rs": "6f137484297f60bc24a7fd7abe3bcd0f4fd79eb9d4108918561d359acbcc1555",
+    "src/webp_format.rs": "7d72ec152ed8d4b40bf1f7cb5f7e5ed67cbd60af10227ca04e3f24e8988ec702",
+    "src/webp_header.rs": "3ac11bb8f43aa198016b0481a68ae7e391a2c980c07a6678be66846aea489cbd",
+    "src/webp_huffman.rs": "b12ebe6b74ba22c95112c60781cd73c2edbce7a606be0565ea77f3eeb96fc291",
+    "src/webp_inverse.rs": "d83d32d34fd85a7cfe571a3e49d43a716dd3ecc5105faf94a8648f8585e760f2",
+    "src/webp_pixels.rs": "fc16ad2cc221ca667bacbfda485acd3cffaab84f9df1a871157b8a9dc60d2643",
+    "src/webp_predict.rs": "c915425289113e47116a37c42f51d96d0a893208a0a18174d97921a14a1a6f32",
+    "src/webp_prepare.rs": "5a1eb3af1d2f0a8a51c9b4d0a272a1a631d5663e80e4ab4466232b4901ab3a95",
+    "src/webp_riff.rs": "583012b20cade4fa7cda982e85d6f8ec65ed47b12434a2f7484a4280fba92929",
+    "src/webp_segment.rs": "263b4249b23eef2762039baec2869a95bbd9a8fdfa58fef4ab44707270225586",
+    "src/webp_tiff.rs": "81e5eac819850b9a2eff1d0f13017f1def7dc5bc173110368476d58ea728ae91",
+    "src/webp_token.rs": "0342a762d5a92256fd6a6a38d9d6d39b8f5ccc30191260769435e3b9659553a2",
+    "src/webp_transforms.rs": "a349754234b55ef4e9852621b2a4019780b547ceae482d1f94b2e2658ede9dee",
+    "src/webp_witness.rs": "b129f6354d238197579b0d58dee88d93249ad268edaae80b8600674b326b66f7",
+    "src/zstd_bits.rs": "710be66b42ae6ef8005baedcc403a05f07d48ea44e25fa0a98950cc590176307",
+    "src/zstd_checksum.rs": "86e430764fb2a8d2d94123ac177c35e6f659a534b979ccc68d7d21f199a3f356",
+    "src/zstd_description.rs": "374909a23a6f892d091415cdf427589b3dfdfb542eef22eeb20c2d843e46aa44",
+    "src/zstd_frame.rs": "b37f67fad7eb6a00313c311b38be680d4ac848dc0f037efae083a29b556dc3ec",
+    "src/zstd_fse.rs": "aee33ea20fda353505742850a5d7de82f07c60e27d51855a623e69ed51370823",
+    "src/zstd_huffman.rs": "66ed95e740a7974c89d586598868c45bd9f1bafdb49f22a4a943a354f2a264b7",
+    "src/zstd_literals.rs": "c056637e37113f3c175a17383391d6dfd961fd66459caa07fd6c25377e0fe826",
+    "src/zstd_output.rs": "502cf686e1754c8a498477dc2f35c075d59b8b7be5ff360ed1d1d71db51bba2a",
+    "src/zstd_sequence_tables.rs": "2cf68ff8c24dcd15b7ddd60ba44f9f95b54e270af781d1143d8621f2d21e72dc",
+    "src/zstd_sequence_token.rs": "3cb61abe2703af20317cfac1b545536b7e8a4095a5f2bffca5a68a57a1f68892",
+    "src/zstd_sequences.rs": "dd16bf8ff09dcfed9c594170bd8cc0b2f8c9f1f65f983540cce08dc6b0378a7a",
+    "src/zstd_table.rs": "246c122413bb968040abf3075adf3ef93440421dd251ad22adc74c79cb60e89e",
+    "src/zstd_weights.rs": "dfdd1e915473f00fb8af784e93ce4dca99e9c79dac4974146de94a9600ae914c"
+  },
+  "source_sha256": "a55229c9fbc740ede55381baf13ed39c8638a55bd195c2c9cc4b4e6e88e1d6cb",
+  "verus": {
+    "profile": "release",
+    "version": "0.2026.10.04.426d8b0",
+    "platform": {
+      "os": "linux",
+      "arch": "x86_64"
+    },
+    "toolchain": "1.98.1-x86_64-unknown-linux-gnu (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "426d8b01e7ffb910a36c15e1f870ff985bb61eef"
+  }
+}
+Negative proof check: correctly rejected false postcondition
+Optimized path semantic check: correctly rejected broken copy
+Optimized path semantic check: correctly rejected broken target
+Acceptance proof check: correctly rejected always-error parser
+Deflate acceptance check: correctly rejected always-error codec
+Deflate shortcut semantic check: correctly rejected broken huffman
+Deflate shortcut semantic check: correctly rejected broken stored
+LZW tail semantic check: correctly rejected broken acceptance
+LZW tail semantic check: correctly rejected broken soundness
+Legacy LZW semantic check: correctly rejected broken selection
+Legacy LZW semantic check: correctly rejected broken width
+Legacy LZW semantic check: correctly rejected broken full
+Extended acceptance check: correctly rejected broken extended inspection
+Extended acceptance check: correctly rejected broken raster inspection
+JPEG semantic check: correctly rejected broken scan
+JPEG semantic check: correctly rejected broken image
+JPEG semantic check: correctly rejected broken idct
+JPEG semantic check: correctly rejected broken raster
+Fax semantic check: correctly rejected broken stream
+Fax semantic check: correctly rejected broken image
+Fax semantic check: correctly rejected broken pixels
+Fax semantic check: correctly rejected broken raster
+Float64 semantic check: correctly rejected broken bits
+Float64 semantic check: correctly rejected broken prediction
+Float64 semantic check: correctly rejected broken format
+WebP semantic check: correctly rejected broken stream
+WebP semantic check: correctly rejected broken image
+WebP semantic check: correctly rejected broken pixels
+WebP semantic check: correctly rejected broken cache
+WebP semantic check: correctly rejected broken raster
+LogLuv semantic check: correctly rejected broken stream
+LogLuv semantic check: correctly rejected broken image
+LogLuv semantic check: correctly rejected broken pixels
+LogLuv semantic check: correctly rejected broken chroma
+LogLuv semantic check: correctly rejected broken raster
+Throughput semantic gate: rejected broken bilevel
+Throughput semantic gate: rejected broken window
+Throughput semantic gate: rejected broken transform
+Throughput semantic gate: rejected broken identity
+Throughput acceptance gate: rejected always-error combined decoder
+Native semantic gate: rejected broken component-swap
+Native semantic gate: rejected broken stream-step
+Native semantic gate: rejected broken stream-phrase
+Native semantic gate: rejected broken stream-packet
+Native semantic gate: rejected broken float-shuffle
+Native semantic gate: rejected broken rle-alignment
+Native semantic gate: rejected broken predictor
+Native semantic gate: rejected broken bigoffset
+Native semantic gate: rejected broken sos-selector
+Native acceptance gate: rejected always-error native decoder
+Zstandard semantic gate: rejected broken reverse
+Zstandard semantic gate: rejected broken spread
+Zstandard semantic gate: rejected broken offset
+Zstandard semantic gate: rejected broken overlap
+Zstandard semantic gate: rejected broken checksum
+Zstandard semantic gate: rejected broken acceptance
+LERC/WebP semantic gate: rejected broken lerc-rounding
+LERC/WebP semantic gate: rejected broken webp-group
+LERC/WebP semantic gate: rejected broken lerc-checksum
+LERC/WebP semantic gate: rejected broken webp-predictor
+LERC/WebP semantic gate: rejected broken webp-palette
+LERC/WebP semantic gate: rejected broken webp-cross-color
+LERC/WebP semantic gate: rejected broken vp8-bool
+LERC/WebP semantic gate: rejected broken vp8-color
+LERC/WebP semantic gate: rejected broken webp-alpha
+LERC/WebP semantic gate: rejected broken lerc-acceptance
+LERC/WebP semantic gate: rejected broken webp-acceptance
+LERC/WebP semantic gate: rejected broken vp8-acceptance
+Reader optimization gate: rejected broken highest
+Reader optimization gate: rejected broken batch-output
+Reader optimization gate: rejected broken batch-work
+Reader optimization gate: rejected broken batch-acceptance

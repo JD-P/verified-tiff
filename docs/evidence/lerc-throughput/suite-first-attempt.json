@@ -1,0 +1,12 @@
+[
+  {
+    "name": "compat-tests",
+    "exit_code": 0,
+    "seconds": 80.99766299099974
+  },
+  {
+    "name": "sanitizer-tests",
+    "exit_code": 1,
+    "seconds": 31.72170024100069
+  }
+]

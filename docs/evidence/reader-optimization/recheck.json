@@ -1,0 +1,2521 @@
+{
+  "metadata": {
+    "utc": "2026-10-15T11:24:36.545979+00:00",
+    "main_results_sha256": "aad7ad9fe83e80bb71106ea608c176c0c5c313d45aee14a9d2131d8c88ffa372",
+    "script_sha256": "735cf28fa486e95e735d4bc53a3059d41a27939fe27f9522615f96c510b08cae",
+    "rounds": 9,
+    "milliseconds": 500,
+    "selection": "every original median slowdown greater than 10%",
+    "cpu": 0
+  },
+  "records": [
+    {
+      "case": "gray-deflate",
+      "mode": "scan",
+      "group": "main",
+      "main_speedup": 0.8332262324030755,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 210,
+            "seconds": 0.737374117,
+            "ns_per_operation": 3511305.32,
+            "peak_rss_kib": 2920,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 226,
+            "seconds": 0.79108366,
+            "ns_per_operation": 3500370.18,
+            "peak_rss_kib": 2892,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 248,
+            "seconds": 0.824328752,
+            "ns_per_operation": 3323906.26,
+            "peak_rss_kib": 3008,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 226,
+            "seconds": 0.817962777,
+            "ns_per_operation": 3619304.32,
+            "peak_rss_kib": 2920,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 220,
+            "seconds": 0.77843656,
+            "ns_per_operation": 3538348,
+            "peak_rss_kib": 2888,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 232,
+            "seconds": 0.774617824,
+            "ns_per_operation": 3338869.93,
+            "peak_rss_kib": 3008,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 242,
+            "seconds": 0.786705293,
+            "ns_per_operation": 3250848.32,
+            "peak_rss_kib": 2916,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 248,
+            "seconds": 0.939194759,
+            "ns_per_operation": 3787075.64,
+            "peak_rss_kib": 3012,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 242,
+            "seconds": 0.857446289,
+            "ns_per_operation": 3543166.48,
+            "peak_rss_kib": 2964,
+            "hash": "88bf067a38ae9325"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 208,
+            "seconds": 0.816135959,
+            "ns_per_operation": 3923730.57,
+            "peak_rss_kib": 3024,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 212,
+            "seconds": 0.870057296,
+            "ns_per_operation": 4104043.85,
+            "peak_rss_kib": 2968,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 216,
+            "seconds": 0.843096606,
+            "ns_per_operation": 3903225.03,
+            "peak_rss_kib": 2908,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 212,
+            "seconds": 0.842353891,
+            "ns_per_operation": 3973367.41,
+            "peak_rss_kib": 3036,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 214,
+            "seconds": 0.835656786,
+            "ns_per_operation": 3904938.25,
+            "peak_rss_kib": 3024,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 208,
+            "seconds": 0.818585335,
+            "ns_per_operation": 3935506.42,
+            "peak_rss_kib": 2968,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 204,
+            "seconds": 0.814490954,
+            "ns_per_operation": 3992602.72,
+            "peak_rss_kib": 2892,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 206,
+            "seconds": 0.79707438,
+            "ns_per_operation": 3869293.11,
+            "peak_rss_kib": 3016,
+            "hash": "88bf067a38ae9325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 214,
+            "seconds": 0.931789304,
+            "ns_per_operation": 4354155.63,
+            "peak_rss_kib": 2884,
+            "hash": "88bf067a38ae9325"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 3.51130532,
+          "q1_ms": 3.33886993,
+          "q3_ms": 3.54316648,
+          "min_ms": 3.25084832,
+          "max_ms": 3.7870756400000003
+        },
+        "after": {
+          "median_ms": 3.93550642,
+          "q1_ms": 3.90493825,
+          "q3_ms": 3.9926027200000003,
+          "min_ms": 3.86929311,
+          "max_ms": 4.35415563
+        }
+      },
+      "speedup": 0.8922118134926077
+    },
+    {
+      "case": "rgb-zstd",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8220785962297145,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 302,
+            "seconds": 0.50808321,
+            "ns_per_operation": 1682394.74,
+            "peak_rss_kib": 5348,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 406,
+            "seconds": 0.628860781,
+            "ns_per_operation": 1548918.18,
+            "peak_rss_kib": 5236,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 342,
+            "seconds": 0.531650352,
+            "ns_per_operation": 1554533.19,
+            "peak_rss_kib": 5200,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 418,
+            "seconds": 0.610097834,
+            "ns_per_operation": 1459564.2,
+            "peak_rss_kib": 5344,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 390,
+            "seconds": 0.573681196,
+            "ns_per_operation": 1470977.43,
+            "peak_rss_kib": 5208,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 352,
+            "seconds": 0.560503854,
+            "ns_per_operation": 1592340.49,
+            "peak_rss_kib": 5284,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 396,
+            "seconds": 0.599305599,
+            "ns_per_operation": 1513397.98,
+            "peak_rss_kib": 5284,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 362,
+            "seconds": 0.586047355,
+            "ns_per_operation": 1618915.35,
+            "peak_rss_kib": 5200,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 334,
+            "seconds": 0.560613463,
+            "ns_per_operation": 1678483.42,
+            "peak_rss_kib": 5280,
+            "hash": "cf57ce8ffd4c3325"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 378,
+            "seconds": 0.615496272,
+            "ns_per_operation": 1628297.02,
+            "peak_rss_kib": 5168,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 430,
+            "seconds": 0.723046354,
+            "ns_per_operation": 1681503.15,
+            "peak_rss_kib": 5084,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 368,
+            "seconds": 0.595128887,
+            "ns_per_operation": 1617198.06,
+            "peak_rss_kib": 5168,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 392,
+            "seconds": 0.630591589,
+            "ns_per_operation": 1608652.01,
+            "peak_rss_kib": 5168,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 432,
+            "seconds": 0.669360903,
+            "ns_per_operation": 1549446.53,
+            "peak_rss_kib": 5200,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 388,
+            "seconds": 0.777784768,
+            "ns_per_operation": 2004599.92,
+            "peak_rss_kib": 5200,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 328,
+            "seconds": 0.51012305,
+            "ns_per_operation": 1555253.2,
+            "peak_rss_kib": 5172,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 418,
+            "seconds": 0.655245447,
+            "ns_per_operation": 1567572.84,
+            "peak_rss_kib": 5172,
+            "hash": "cf57ce8ffd4c3325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 366,
+            "seconds": 0.676393718,
+            "ns_per_operation": 1848070.27,
+            "peak_rss_kib": 5172,
+            "hash": "cf57ce8ffd4c3325"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 1.55453319,
+          "q1_ms": 1.51339798,
+          "q3_ms": 1.6189153500000002,
+          "min_ms": 1.4595642,
+          "max_ms": 1.6823947399999999
+        },
+        "after": {
+          "median_ms": 1.61719806,
+          "q1_ms": 1.5675728400000002,
+          "q3_ms": 1.68150315,
+          "min_ms": 1.54944653,
+          "max_ms": 2.00459992
+        }
+      },
+      "speedup": 0.9612509614314031
+    },
+    {
+      "case": "noise-lzw",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8755188668286097,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.548540853,
+            "ns_per_operation": 45711737.8,
+            "peak_rss_kib": 4268,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 11,
+            "seconds": 0.786361837,
+            "ns_per_operation": 71487439.7,
+            "peak_rss_kib": 4304,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 14,
+            "seconds": 0.814813127,
+            "ns_per_operation": 58200937.6,
+            "peak_rss_kib": 4284,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 8,
+            "seconds": 0.514152606,
+            "ns_per_operation": 64269075.8,
+            "peak_rss_kib": 4308,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 14,
+            "seconds": 0.869275336,
+            "ns_per_operation": 62091095.4,
+            "peak_rss_kib": 4304,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.523290394,
+            "ns_per_operation": 43607532.8,
+            "peak_rss_kib": 4280,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.557253643,
+            "ns_per_operation": 46437803.6,
+            "peak_rss_kib": 4284,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 9,
+            "seconds": 0.546683479,
+            "ns_per_operation": 60742608.8,
+            "peak_rss_kib": 4288,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 8,
+            "seconds": 0.528561761,
+            "ns_per_operation": 66070220.1,
+            "peak_rss_kib": 4308,
+            "hash": "ba3744a0368fc2c6"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.577434002,
+            "ns_per_operation": 48119500.2,
+            "peak_rss_kib": 4308,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 16,
+            "seconds": 0.727699431,
+            "ns_per_operation": 45481214.4,
+            "peak_rss_kib": 4244,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 9,
+            "seconds": 0.599379358,
+            "ns_per_operation": 66597706.4,
+            "peak_rss_kib": 4272,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.663928617,
+            "ns_per_operation": 55327384.8,
+            "peak_rss_kib": 4356,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 16,
+            "seconds": 0.783147757,
+            "ns_per_operation": 48946734.8,
+            "peak_rss_kib": 4240,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 11,
+            "seconds": 0.523097254,
+            "ns_per_operation": 47554295.8,
+            "peak_rss_kib": 4300,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.535034669,
+            "ns_per_operation": 44586222.4,
+            "peak_rss_kib": 4268,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 12,
+            "seconds": 0.658226254,
+            "ns_per_operation": 54852187.8,
+            "peak_rss_kib": 4364,
+            "hash": "ba3744a0368fc2c6"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 1048576,
+            "iterations": 9,
+            "seconds": 0.518018354,
+            "ns_per_operation": 57557594.9,
+            "peak_rss_kib": 4240,
+            "hash": "ba3744a0368fc2c6"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 60.7426088,
+          "q1_ms": 46.4378036,
+          "q3_ms": 64.2690758,
+          "min_ms": 43.607532799999994,
+          "max_ms": 71.4874397
+        },
+        "after": {
+          "median_ms": 48.946734799999994,
+          "q1_ms": 47.5542958,
+          "q3_ms": 55.3273848,
+          "min_ms": 44.5862224,
+          "max_ms": 66.59770639999999
+        }
+      },
+      "speedup": 1.2409940938491366
+    },
+    {
+      "case": "jpeg-smooth",
+      "mode": "rgba",
+      "group": "main",
+      "main_speedup": 0.8595994317599472,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.57958096,
+            "ns_per_operation": 57958096,
+            "peak_rss_kib": 10644,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.516122104,
+            "ns_per_operation": 51612210.4,
+            "peak_rss_kib": 10644,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.614759303,
+            "ns_per_operation": 61475930.3,
+            "peak_rss_kib": 10644,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 16,
+            "seconds": 0.95299634,
+            "ns_per_operation": 59562271.2,
+            "peak_rss_kib": 10624,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 18,
+            "seconds": 1.0122608,
+            "ns_per_operation": 56236710.9,
+            "peak_rss_kib": 10648,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 16,
+            "seconds": 0.783542153,
+            "ns_per_operation": 48971384.6,
+            "peak_rss_kib": 10644,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 11,
+            "seconds": 0.521390311,
+            "ns_per_operation": 47399119.2,
+            "peak_rss_kib": 10704,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 16,
+            "seconds": 0.869199252,
+            "ns_per_operation": 54324953.3,
+            "peak_rss_kib": 10628,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 16,
+            "seconds": 0.879883946,
+            "ns_per_operation": 54992746.6,
+            "peak_rss_kib": 10700,
+            "hash": "c80a39f7e7ee8325"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 14,
+            "seconds": 0.740347501,
+            "ns_per_operation": 52881964.4,
+            "peak_rss_kib": 10696,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.500982336,
+            "ns_per_operation": 50098233.6,
+            "peak_rss_kib": 10712,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 16,
+            "seconds": 0.948127931,
+            "ns_per_operation": 59257995.7,
+            "peak_rss_kib": 10708,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 8,
+            "seconds": 0.504106109,
+            "ns_per_operation": 63013263.6,
+            "peak_rss_kib": 10716,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 14,
+            "seconds": 0.862063527,
+            "ns_per_operation": 61575966.2,
+            "peak_rss_kib": 10708,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.557353798,
+            "ns_per_operation": 55735379.8,
+            "peak_rss_kib": 10716,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 20,
+            "seconds": 0.987537331,
+            "ns_per_operation": 49376866.6,
+            "peak_rss_kib": 10712,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.595142958,
+            "ns_per_operation": 59514295.8,
+            "peak_rss_kib": 10712,
+            "hash": "c80a39f7e7ee8325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 4194304,
+            "iterations": 10,
+            "seconds": 0.5337398,
+            "ns_per_operation": 53373980,
+            "peak_rss_kib": 10700,
+            "hash": "c80a39f7e7ee8325"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 54.992746600000004,
+          "q1_ms": 51.612210399999995,
+          "q3_ms": 57.958096,
+          "min_ms": 47.3991192,
+          "max_ms": 61.475930299999995
+        },
+        "after": {
+          "median_ms": 55.7353798,
+          "q1_ms": 52.8819644,
+          "q3_ms": 59.5142958,
+          "min_ms": 49.3768666,
+          "max_ms": 63.0132636
+        }
+      },
+      "speedup": 0.9866757308792934
+    },
+    {
+      "case": "rgb-tiled-lzw",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8345945993649416,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 28,
+            "seconds": 0.519777934,
+            "ns_per_operation": 18563497.6,
+            "peak_rss_kib": 5176,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 42,
+            "seconds": 0.859571891,
+            "ns_per_operation": 20465997.4,
+            "peak_rss_kib": 5200,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 29,
+            "seconds": 0.563444507,
+            "ns_per_operation": 19429120.9,
+            "peak_rss_kib": 5188,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 25,
+            "seconds": 0.564960603,
+            "ns_per_operation": 22598424.1,
+            "peak_rss_kib": 5168,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 54,
+            "seconds": 0.976001747,
+            "ns_per_operation": 18074106.4,
+            "peak_rss_kib": 5176,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 29,
+            "seconds": 0.56863915,
+            "ns_per_operation": 19608246.6,
+            "peak_rss_kib": 5192,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 58,
+            "seconds": 0.941591595,
+            "ns_per_operation": 16234337.8,
+            "peak_rss_kib": 5184,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 58,
+            "seconds": 0.956866128,
+            "ns_per_operation": 16497691.9,
+            "peak_rss_kib": 5196,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 28,
+            "seconds": 0.578259551,
+            "ns_per_operation": 20652126.8,
+            "peak_rss_kib": 5196,
+            "hash": "36a098e0f2687325"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 56,
+            "seconds": 0.971149254,
+            "ns_per_operation": 17341951,
+            "peak_rss_kib": 5136,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 36,
+            "seconds": 0.664073473,
+            "ns_per_operation": 18446485.4,
+            "peak_rss_kib": 5228,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 28,
+            "seconds": 0.533513652,
+            "ns_per_operation": 19054059,
+            "peak_rss_kib": 5240,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 36,
+            "seconds": 0.628173396,
+            "ns_per_operation": 17449261,
+            "peak_rss_kib": 5196,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 58,
+            "seconds": 0.935974702,
+            "ns_per_operation": 16137494.9,
+            "peak_rss_kib": 5228,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 54,
+            "seconds": 1.02754106,
+            "ns_per_operation": 19028538.2,
+            "peak_rss_kib": 5132,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 56,
+            "seconds": 0.890638654,
+            "ns_per_operation": 15904261.7,
+            "peak_rss_kib": 5240,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 60,
+            "seconds": 0.966547697,
+            "ns_per_operation": 16109128.3,
+            "peak_rss_kib": 5240,
+            "hash": "36a098e0f2687325"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 3145728,
+            "iterations": 31,
+            "seconds": 0.520550408,
+            "ns_per_operation": 16791948.6,
+            "peak_rss_kib": 5236,
+            "hash": "36a098e0f2687325"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 19.429120899999997,
+          "q1_ms": 18.074106399999998,
+          "q3_ms": 20.4659974,
+          "min_ms": 16.234337800000002,
+          "max_ms": 22.598424100000003
+        },
+        "after": {
+          "median_ms": 17.341951,
+          "q1_ms": 16.1374949,
+          "q3_ms": 18.4464854,
+          "min_ms": 15.9042617,
+          "max_ms": 19.054059
+        }
+      },
+      "speedup": 1.1203538114021885
+    },
+    {
+      "case": "complex64-lzw",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8069772396636731,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 8,
+            "seconds": 0.905609648,
+            "ns_per_operation": 113201206,
+            "peak_rss_kib": 14052,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.583802744,
+            "ns_per_operation": 116760549,
+            "peak_rss_kib": 13968,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 4,
+            "seconds": 0.561182298,
+            "ns_per_operation": 140295574,
+            "peak_rss_kib": 14052,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 6,
+            "seconds": 0.929598381,
+            "ns_per_operation": 154933064,
+            "peak_rss_kib": 14044,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.592098317,
+            "ns_per_operation": 118419663,
+            "peak_rss_kib": 14048,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 8,
+            "seconds": 0.896993411,
+            "ns_per_operation": 112124176,
+            "peak_rss_kib": 14048,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 4,
+            "seconds": 0.510415966,
+            "ns_per_operation": 127603991,
+            "peak_rss_kib": 14048,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.611168175,
+            "ns_per_operation": 122233635,
+            "peak_rss_kib": 13892,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.622063223,
+            "ns_per_operation": 124412645,
+            "peak_rss_kib": 14052,
+            "hash": "f46401420a341de5"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.637826876,
+            "ns_per_operation": 127565375,
+            "peak_rss_kib": 13512,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.564677237,
+            "ns_per_operation": 112935447,
+            "peak_rss_kib": 13516,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.869525328,
+            "ns_per_operation": 173905066,
+            "peak_rss_kib": 13592,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 4,
+            "seconds": 0.678748589,
+            "ns_per_operation": 169687147,
+            "peak_rss_kib": 13504,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.55094543,
+            "ns_per_operation": 110189086,
+            "peak_rss_kib": 13508,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.571831601,
+            "ns_per_operation": 114366320,
+            "peak_rss_kib": 13592,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.63163271,
+            "ns_per_operation": 126326542,
+            "peak_rss_kib": 13472,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.530202002,
+            "ns_per_operation": 106040400,
+            "peak_rss_kib": 13516,
+            "hash": "f46401420a341de5"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 8388608,
+            "iterations": 5,
+            "seconds": 0.643297117,
+            "ns_per_operation": 128659423,
+            "peak_rss_kib": 13476,
+            "hash": "f46401420a341de5"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 122.233635,
+          "q1_ms": 116.760549,
+          "q3_ms": 127.603991,
+          "min_ms": 112.124176,
+          "max_ms": 154.933064
+        },
+        "after": {
+          "median_ms": 126.326542,
+          "q1_ms": 112.935447,
+          "q3_ms": 128.659423,
+          "min_ms": 106.0404,
+          "max_ms": 173.905066
+        }
+      },
+      "speedup": 0.9676005775571693
+    },
+    {
+      "case": "fax-rle",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8775832484172399,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 65,
+            "seconds": 0.546623859,
+            "ns_per_operation": 8409597.83,
+            "peak_rss_kib": 2432,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 116,
+            "seconds": 0.944110468,
+            "ns_per_operation": 8138883.34,
+            "peak_rss_kib": 2444,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 61,
+            "seconds": 0.57094566,
+            "ns_per_operation": 9359764.92,
+            "peak_rss_kib": 2440,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 65,
+            "seconds": 0.524531644,
+            "ns_per_operation": 8069717.6,
+            "peak_rss_kib": 2432,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 126,
+            "seconds": 0.961769182,
+            "ns_per_operation": 7633088.75,
+            "peak_rss_kib": 2416,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 122,
+            "seconds": 0.964546879,
+            "ns_per_operation": 7906121.96,
+            "peak_rss_kib": 2440,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 63,
+            "seconds": 0.533269325,
+            "ns_per_operation": 8464592.46,
+            "peak_rss_kib": 2444,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 61,
+            "seconds": 0.5094631,
+            "ns_per_operation": 8351854.1,
+            "peak_rss_kib": 2424,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 108,
+            "seconds": 0.866235498,
+            "ns_per_operation": 8020699.06,
+            "peak_rss_kib": 2424,
+            "hash": "8d5b1ed6f75d42ed"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 92,
+            "seconds": 0.747446644,
+            "ns_per_operation": 8124420.04,
+            "peak_rss_kib": 2416,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 122,
+            "seconds": 0.934188329,
+            "ns_per_operation": 7657281.39,
+            "peak_rss_kib": 2432,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 126,
+            "seconds": 0.988708133,
+            "ns_per_operation": 7846889.94,
+            "peak_rss_kib": 2500,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 108,
+            "seconds": 0.837788671,
+            "ns_per_operation": 7757302.51,
+            "peak_rss_kib": 2496,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 126,
+            "seconds": 0.953861155,
+            "ns_per_operation": 7570326.63,
+            "peak_rss_kib": 2416,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 122,
+            "seconds": 0.966930134,
+            "ns_per_operation": 7925656.84,
+            "peak_rss_kib": 2496,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 122,
+            "seconds": 1.00827638,
+            "ns_per_operation": 8264560.52,
+            "peak_rss_kib": 2492,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 132,
+            "seconds": 1.00726571,
+            "ns_per_operation": 7630800.8,
+            "peak_rss_kib": 2484,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 64,
+            "seconds": 0.548754866,
+            "ns_per_operation": 8574294.78,
+            "peak_rss_kib": 2432,
+            "hash": "8d5b1ed6f75d42ed"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 8.13888334,
+          "q1_ms": 8.02069906,
+          "q3_ms": 8.409597830000001,
+          "min_ms": 7.63308875,
+          "max_ms": 9.35976492
+        },
+        "after": {
+          "median_ms": 7.8468899400000005,
+          "q1_ms": 7.65728139,
+          "q3_ms": 8.12442004,
+          "min_ms": 7.57032663,
+          "max_ms": 8.574294779999999
+        }
+      },
+      "speedup": 1.0372113540820223
+    },
+    {
+      "case": "fax-g3",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8618761241853444,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 58,
+            "seconds": 0.99658594,
+            "ns_per_operation": 17182516.2,
+            "peak_rss_kib": 2544,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 30,
+            "seconds": 0.557285954,
+            "ns_per_operation": 18576198.5,
+            "peak_rss_kib": 2512,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 60,
+            "seconds": 1.01733194,
+            "ns_per_operation": 16955532.3,
+            "peak_rss_kib": 2560,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 29,
+            "seconds": 0.510015062,
+            "ns_per_operation": 17586726.3,
+            "peak_rss_kib": 2508,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 52,
+            "seconds": 0.971667125,
+            "ns_per_operation": 18685906.2,
+            "peak_rss_kib": 2508,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 50,
+            "seconds": 0.890857766,
+            "ns_per_operation": 17817155.3,
+            "peak_rss_kib": 2560,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 60,
+            "seconds": 1.00402358,
+            "ns_per_operation": 16733726.4,
+            "peak_rss_kib": 2504,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 52,
+            "seconds": 0.919255397,
+            "ns_per_operation": 17677988.4,
+            "peak_rss_kib": 2504,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 30,
+            "seconds": 0.527687707,
+            "ns_per_operation": 17589590.2,
+            "peak_rss_kib": 2560,
+            "hash": "8d5b1ed6f75d42ed"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 30,
+            "seconds": 0.524618242,
+            "ns_per_operation": 17487274.7,
+            "peak_rss_kib": 2484,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 29,
+            "seconds": 0.518587857,
+            "ns_per_operation": 17882339.9,
+            "peak_rss_kib": 2628,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 30,
+            "seconds": 0.541317221,
+            "ns_per_operation": 18043907.4,
+            "peak_rss_kib": 2564,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 32,
+            "seconds": 0.548827322,
+            "ns_per_operation": 17150853.8,
+            "peak_rss_kib": 2624,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 28,
+            "seconds": 0.512708968,
+            "ns_per_operation": 18311034.6,
+            "peak_rss_kib": 2632,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 31,
+            "seconds": 0.593948826,
+            "ns_per_operation": 19159639.5,
+            "peak_rss_kib": 2564,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 54,
+            "seconds": 0.906119004,
+            "ns_per_operation": 16779981.6,
+            "peak_rss_kib": 2568,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 30,
+            "seconds": 0.516771827,
+            "ns_per_operation": 17225727.6,
+            "peak_rss_kib": 2564,
+            "hash": "8d5b1ed6f75d42ed"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 131072,
+            "iterations": 27,
+            "seconds": 0.518432686,
+            "ns_per_operation": 19201210.6,
+            "peak_rss_kib": 2628,
+            "hash": "8d5b1ed6f75d42ed"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 17.5895902,
+          "q1_ms": 17.1825162,
+          "q3_ms": 17.8171553,
+          "min_ms": 16.733726400000002,
+          "max_ms": 18.685906199999998
+        },
+        "after": {
+          "median_ms": 17.882339899999998,
+          "q1_ms": 17.225727600000003,
+          "q3_ms": 18.311034600000003,
+          "min_ms": 16.779981600000003,
+          "max_ms": 19.201210600000003
+        }
+      },
+      "speedup": 0.9836291166795237
+    },
+    {
+      "case": "many-strips",
+      "mode": "open",
+      "group": "main",
+      "main_speedup": 0.8687232808623468,
+      "samples": {
+        "before": [
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.636804469,
+            "ns_per_operation": 2122.68156,
+            "peak_rss_kib": 3184,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.550506994,
+            "ns_per_operation": 1835.02331,
+            "peak_rss_kib": 3156,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.567152116,
+            "ns_per_operation": 1890.50705,
+            "peak_rss_kib": 3184,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.534676025,
+            "ns_per_operation": 1782.25342,
+            "peak_rss_kib": 3156,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 275838,
+            "seconds": 0.50690027,
+            "ns_per_operation": 1837.67382,
+            "peak_rss_kib": 3164,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.551493424,
+            "ns_per_operation": 1838.31141,
+            "peak_rss_kib": 3180,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.533607905,
+            "ns_per_operation": 1778.69302,
+            "peak_rss_kib": 3188,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.514071267,
+            "ns_per_operation": 1713.57089,
+            "peak_rss_kib": 3180,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.563669965,
+            "ns_per_operation": 1878.89988,
+            "peak_rss_kib": 3156,
+            "hash": "a182063f7136dc50"
+          }
+        ],
+        "after": [
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.624238173,
+            "ns_per_operation": 2080.79391,
+            "peak_rss_kib": 3116,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.586992326,
+            "ns_per_operation": 1956.64109,
+            "peak_rss_kib": 3176,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.539956605,
+            "ns_per_operation": 1799.85535,
+            "peak_rss_kib": 3220,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.57734463,
+            "ns_per_operation": 1924.4821,
+            "peak_rss_kib": 3148,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.57656214,
+            "ns_per_operation": 1921.8738,
+            "peak_rss_kib": 3124,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.532571808,
+            "ns_per_operation": 1775.23936,
+            "peak_rss_kib": 3172,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.554077984,
+            "ns_per_operation": 1846.92661,
+            "peak_rss_kib": 3116,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.558919587,
+            "ns_per_operation": 1863.06529,
+            "peak_rss_kib": 3220,
+            "hash": "a182063f7136dc50"
+          },
+          {
+            "width": 1,
+            "height": 200000,
+            "bytes": 24,
+            "iterations": 300000,
+            "seconds": 0.509620409,
+            "ns_per_operation": 1698.7347,
+            "peak_rss_kib": 3116,
+            "hash": "a182063f7136dc50"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 0.00183767382,
+          "q1_ms": 0.00178225342,
+          "q3_ms": 0.00187889988,
+          "min_ms": 0.00171357089,
+          "max_ms": 0.00212268156
+        },
+        "after": {
+          "median_ms": 0.00186306529,
+          "q1_ms": 0.00179985535,
+          "q3_ms": 0.0019244821,
+          "min_ms": 0.0016987347,
+          "max_ms": 0.00208079391
+        }
+      },
+      "speedup": 0.9863711324899408
+    },
+    {
+      "case": "original-quad-lzw-compat.tiff",
+      "mode": "native",
+      "group": "main",
+      "main_speedup": 0.8177268563499495,
+      "samples": {
+        "before": [
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 96,
+            "seconds": 0.520251634,
+            "ns_per_operation": 5419287.85,
+            "peak_rss_kib": 2480,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 94,
+            "seconds": 0.51421211,
+            "ns_per_operation": 5470341.6,
+            "peak_rss_kib": 2480,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 134,
+            "seconds": 0.705426092,
+            "ns_per_operation": 5264373.82,
+            "peak_rss_kib": 2488,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 166,
+            "seconds": 0.86463994,
+            "ns_per_operation": 5208674.34,
+            "peak_rss_kib": 2516,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 168,
+            "seconds": 0.964062173,
+            "ns_per_operation": 5738465.32,
+            "peak_rss_kib": 2456,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 91,
+            "seconds": 0.508499757,
+            "ns_per_operation": 5587909.42,
+            "peak_rss_kib": 2484,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 95,
+            "seconds": 0.523674168,
+            "ns_per_operation": 5512359.66,
+            "peak_rss_kib": 2488,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 170,
+            "seconds": 0.92670792,
+            "ns_per_operation": 5451223.06,
+            "peak_rss_kib": 2468,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 92,
+            "seconds": 0.522210803,
+            "ns_per_operation": 5676204.38,
+            "peak_rss_kib": 2460,
+            "hash": "c932dc855e8e7575"
+          }
+        ],
+        "after": [
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 180,
+            "seconds": 0.94634287,
+            "ns_per_operation": 5257460.39,
+            "peak_rss_kib": 2440,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 190,
+            "seconds": 0.982210192,
+            "ns_per_operation": 5169527.33,
+            "peak_rss_kib": 2424,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 98,
+            "seconds": 0.515766542,
+            "ns_per_operation": 5262923.9,
+            "peak_rss_kib": 2520,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 190,
+            "seconds": 0.998577641,
+            "ns_per_operation": 5255671.79,
+            "peak_rss_kib": 2544,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 90,
+            "seconds": 0.508076098,
+            "ns_per_operation": 5645289.98,
+            "peak_rss_kib": 2488,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 95,
+            "seconds": 0.543687839,
+            "ns_per_operation": 5723029.88,
+            "peak_rss_kib": 2424,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 162,
+            "seconds": 0.877965479,
+            "ns_per_operation": 5419539.99,
+            "peak_rss_kib": 2544,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 172,
+            "seconds": 0.909860661,
+            "ns_per_operation": 5289887.56,
+            "peak_rss_kib": 2420,
+            "hash": "c932dc855e8e7575"
+          },
+          {
+            "width": 512,
+            "height": 384,
+            "bytes": 589824,
+            "iterations": 190,
+            "seconds": 1.01191044,
+            "ns_per_operation": 5325844.42,
+            "peak_rss_kib": 2420,
+            "hash": "c932dc855e8e7575"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 5.470341599999999,
+          "q1_ms": 5.41928785,
+          "q3_ms": 5.58790942,
+          "min_ms": 5.20867434,
+          "max_ms": 5.73846532
+        },
+        "after": {
+          "median_ms": 5.2898875599999995,
+          "q1_ms": 5.257460389999999,
+          "q3_ms": 5.4195399900000005,
+          "min_ms": 5.16952733,
+          "max_ms": 5.7230298799999995
+        }
+      },
+      "speedup": 1.0341130199750408
+    },
+    {
+      "case": "layout-rgb-deflate-16",
+      "mode": "crop",
+      "group": "layout",
+      "main_speedup": 0.7857176059397034,
+      "samples": {
+        "before": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 430,
+            "seconds": 0.799185163,
+            "ns_per_operation": 1858570.15,
+            "peak_rss_kib": 2028,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 284,
+            "seconds": 0.506116558,
+            "ns_per_operation": 1782100.56,
+            "peak_rss_kib": 2028,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 580,
+            "seconds": 0.98236035,
+            "ns_per_operation": 1693724.74,
+            "peak_rss_kib": 2000,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 346,
+            "seconds": 0.538516834,
+            "ns_per_operation": 1556407.03,
+            "peak_rss_kib": 2096,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 500,
+            "seconds": 0.862230084,
+            "ns_per_operation": 1724460.17,
+            "peak_rss_kib": 2044,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 258,
+            "seconds": 0.502170654,
+            "ns_per_operation": 1946397.88,
+            "peak_rss_kib": 1976,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 582,
+            "seconds": 0.986739468,
+            "ns_per_operation": 1695428.64,
+            "peak_rss_kib": 2112,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 568,
+            "seconds": 0.947858542,
+            "ns_per_operation": 1668765.04,
+            "peak_rss_kib": 2044,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 566,
+            "seconds": 0.937991714,
+            "ns_per_operation": 1657229.18,
+            "peak_rss_kib": 2096,
+            "hash": "bebbabf065ed7b25"
+          }
+        ],
+        "after": [
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 444,
+            "seconds": 0.884851729,
+            "ns_per_operation": 1992909.3,
+            "peak_rss_kib": 2092,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 488,
+            "seconds": 0.951497973,
+            "ns_per_operation": 1949790.93,
+            "peak_rss_kib": 1984,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 251,
+            "seconds": 0.528775682,
+            "ns_per_operation": 2106676.02,
+            "peak_rss_kib": 1964,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 418,
+            "seconds": 0.8037061,
+            "ns_per_operation": 1922741.87,
+            "peak_rss_kib": 2120,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 488,
+            "seconds": 0.914009246,
+            "ns_per_operation": 1872969.77,
+            "peak_rss_kib": 1968,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 462,
+            "seconds": 0.932285321,
+            "ns_per_operation": 2017933.6,
+            "peak_rss_kib": 2116,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 430,
+            "seconds": 0.802348127,
+            "ns_per_operation": 1865925.88,
+            "peak_rss_kib": 1984,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 516,
+            "seconds": 0.950337953,
+            "ns_per_operation": 1841740.22,
+            "peak_rss_kib": 1964,
+            "hash": "bebbabf065ed7b25"
+          },
+          {
+            "width": 1024,
+            "height": 1024,
+            "bytes": 65536,
+            "iterations": 494,
+            "seconds": 0.881713887,
+            "ns_per_operation": 1784845.93,
+            "peak_rss_kib": 1976,
+            "hash": "bebbabf065ed7b25"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 1.6954286399999998,
+          "q1_ms": 1.66876504,
+          "q3_ms": 1.7821005600000002,
+          "min_ms": 1.5564070300000001,
+          "max_ms": 1.94639788
+        },
+        "after": {
+          "median_ms": 1.92274187,
+          "q1_ms": 1.8659258799999998,
+          "q3_ms": 1.9929093,
+          "min_ms": 1.78484593,
+          "max_ms": 2.10667602
+        }
+      },
+      "speedup": 0.8817765226072701
+    },
+    {
+      "case": "large-strip-lzw",
+      "mode": "firstrow",
+      "group": "defaults",
+      "main_speedup": 0.8765013394102376,
+      "samples": {
+        "before": [
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.576659395,
+            "ns_per_operation": 96109899.2,
+            "peak_rss_kib": 7272,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.576825115,
+            "ns_per_operation": 96137519.2,
+            "peak_rss_kib": 7272,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.570108884,
+            "ns_per_operation": 95018147.3,
+            "peak_rss_kib": 7292,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.60038437,
+            "ns_per_operation": 100064062,
+            "peak_rss_kib": 7272,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 5,
+            "seconds": 0.516652824,
+            "ns_per_operation": 103330565,
+            "peak_rss_kib": 7272,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 10,
+            "seconds": 1.02506646,
+            "ns_per_operation": 102506646,
+            "peak_rss_kib": 7268,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 10,
+            "seconds": 0.994905498,
+            "ns_per_operation": 99490549.8,
+            "peak_rss_kib": 7284,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 10,
+            "seconds": 0.988663591,
+            "ns_per_operation": 98866359.1,
+            "peak_rss_kib": 7272,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.621151084,
+            "ns_per_operation": 103525181,
+            "peak_rss_kib": 7260,
+            "hash": "95bdeb3f74911725"
+          }
+        ],
+        "after": [
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.56113132,
+            "ns_per_operation": 93521886.7,
+            "peak_rss_kib": 7208,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 5,
+            "seconds": 0.512646256,
+            "ns_per_operation": 102529251,
+            "peak_rss_kib": 7240,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.569046101,
+            "ns_per_operation": 94841016.8,
+            "peak_rss_kib": 7208,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.62737001,
+            "ns_per_operation": 104561668,
+            "peak_rss_kib": 7208,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 5,
+            "seconds": 0.501786021,
+            "ns_per_operation": 100357204,
+            "peak_rss_kib": 7268,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 10,
+            "seconds": 0.949262671,
+            "ns_per_operation": 94926267.1,
+            "peak_rss_kib": 7328,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.593355341,
+            "ns_per_operation": 98892556.8,
+            "peak_rss_kib": 7224,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 6,
+            "seconds": 0.58145773,
+            "ns_per_operation": 96909621.7,
+            "peak_rss_kib": 7268,
+            "hash": "95bdeb3f74911725"
+          },
+          {
+            "width": 4096,
+            "height": 4096,
+            "bytes": 4096,
+            "iterations": 5,
+            "seconds": 0.512344691,
+            "ns_per_operation": 102468938,
+            "peak_rss_kib": 7204,
+            "hash": "95bdeb3f74911725"
+          }
+        ]
+      },
+      "statistics": {
+        "before": {
+          "median_ms": 99.4905498,
+          "q1_ms": 96.1375192,
+          "q3_ms": 102.506646,
+          "min_ms": 95.0181473,
+          "max_ms": 103.525181
+        },
+        "after": {
+          "median_ms": 98.8925568,
+          "q1_ms": 94.92626709999999,
+          "q3_ms": 102.468938,
+          "min_ms": 93.5218867,
+          "max_ms": 104.561668
+        }
+      },
+      "speedup": 1.006046895937875
+    }
+  ]
+}

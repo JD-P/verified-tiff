@@ -1,0 +1,81 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/native_stream.rs:32:5
+   |
+32 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/native_stream.rs:33:5
+   |
+33 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/native_stream.rs:85:5
+   |
+85 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+   |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/deflate.rs:36:1
+   |
+36 | pub(super) struct Model {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module vp8_transform (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/vp8_transform.rs:48:1
+   |
+48 | fn pass4(a:[i32;4],b:[i32;4],c:[i32;4],d:[i32;4],bias:i32,walsh:bool,limit:i32) -> (r:[[i32;4];4])
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: precondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/vp8_transform.rs:60:14
+   |
+60 |         [add(add(ab,cd),z),add(sub(ab,cd),z),add(sub(amb,cmd),z),add(add(amb,cmd),z)]
+   |              ^^^^^^^^^^
+   |
+  ::: /workspace/scratch/017cea9a2f6e/verified-tiff/trusted-simd/src/lib.rs:17:14
+   |
+17 |     requires bounded(a,4000000),bounded(b,4000000),
+   |              ------------------ failed precondition
+
+error: precondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/vp8_transform.rs:62:17
+   |
+62 |         let m1b=mul_shift16(b,20091);let m2b=mul_shift16(b,35468);
+   |                 ^^^^^^^^^^^^^^^^^^^^
+   |
+  ::: /workspace/scratch/017cea9a2f6e/verified-tiff/trusted-simd/src/lib.rs:29:14
+   |
+29 |     requires bounded(a,1000000),c<=65535,
+   |              ------------------ failed precondition
+
+error: precondition not satisfied
+  --> /workspace/scratch/017cea9a2f6e/verified-tiff/target/reject-webp-simd-lane-range/vp8_transform.rs:63:17
+   |
+63 |         let m1d=mul_shift16(d,20091);let m2d=mul_shift16(d,35468);
+   |                 ^^^^^^^^^^^^^^^^^^^^
+   |
+  ::: /workspace/scratch/017cea9a2f6e/verified-tiff/trusted-simd/src/lib.rs:29:14
+   |
+29 |     requires bounded(a,1000000),c<=65535,
+   |              ------------------ failed precondition
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 3 previous errors; 3 warnings emitted
+

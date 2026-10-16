@@ -1,0 +1,3 @@
+Core source audit passed (supplements, does not replace, verification).
+Trusted FP boundary: five explicitly assumed primitives; source hashes match the review ledger.
+Trusted SIMD boundary: eleven integer lane operations and feature dispatch; reviewed source hashes match.

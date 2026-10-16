@@ -1,0 +1,2 @@
+{"engines": ["imagemagick", "lept", "gdk"], "comparisons": 30, "matched": 30}
+{"pillow_version": "12.3.0", "forced_libtiff": true, "loader_binding_confirmed": true, "exact_files": 12}

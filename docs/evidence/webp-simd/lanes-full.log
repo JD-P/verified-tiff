@@ -1,0 +1,24 @@
+   Compiling verified-tiff-simd v0.1.0 (/workspace/scratch/017cea9a2f6e/verified-tiff/trusted-simd)
+    Finished `release` profile [optimized] target(s) in 0.27s
+     Running unittests src/lib.rs (target/release/deps/verified_tiff_simd-497c4e945c57db0c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/lanes.rs (target/release/deps/lanes-42b2788266db588e)
+
+running 4 tests
+test dispatch_configuration ... ok
+test lossless_integer_operations ... ok
+test wide_lanes_boundaries_and_random ... ok
+test color_multiply_exhaustive_and_pack_edges ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+   Doc-tests verified_tiff_simd
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

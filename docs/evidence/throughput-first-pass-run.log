@@ -1,0 +1,18 @@
+gray-none {'before': 0.0323, 'libtiff': 0.0328, 'before_rgba': 3.5941, 'system_rgba': 0.6797, 'after': 0.032, 'after_rgba': 3.4825, 'libtiff_rgba': 0.5176} speedup 1.01
+gray-packbits {'before': 4.9265, 'libtiff': 1.2101, 'before_rgba': 8.8928, 'system_rgba': 1.8748, 'after': 5.1122, 'after_rgba': 8.6123, 'libtiff_rgba': 1.6821} speedup 0.96
+gray-lzw {'before': 14.5925, 'libtiff': 0.9209, 'before_rgba': 22.268, 'system_rgba': 1.6008, 'after': 8.456, 'after_rgba': 12.9238, 'libtiff_rgba': 1.4995} speedup 1.73
+gray-deflate {'before': 17.9326, 'libtiff_rgba': 0.8906, 'before_rgba': 27.5871, 'system_rgba': 0.7984, 'libtiff': 0.4281, 'after': 6.728, 'after_rgba': 13.6481, 'combined': 4.0636} speedup 2.67
+rgb-none {'before': 0.0924, 'libtiff': 0.0906, 'before_rgba': 7.7572, 'system_rgba': 0.7703, 'after': 0.093, 'after_rgba': 8.2811, 'libtiff_rgba': 0.7514} speedup 0.99
+rgb-lzw {'before': 49.4269, 'libtiff': 3.057, 'before_rgba': 73.4378, 'system_rgba': 3.4879, 'after': 26.7404, 'after_rgba': 40.76, 'libtiff_rgba': 3.6346} speedup 1.85
+rgb-deflate {'before': 53.643, 'libtiff_rgba': 1.7624, 'before_rgba': 82.3698, 'system_rgba': 0.8863, 'libtiff': 1.2168, 'after': 23.8839, 'after_rgba': 41.4393, 'combined': 10.5553} speedup 2.25
+rgb-jpeg {'before': 79.4548, 'libtiff': 3.1614, 'before_rgba': 91.6685, 'system_rgba': 2.6206, 'after': 34.6435, 'after_rgba': 50.782, 'libtiff_rgba': 3.7785} speedup 2.29
+rgb-jpeg-textured {'before': 297.0985, 'libtiff': 23.9909, 'before_rgba': 426.2781, 'system_rgba': 19.5014, 'after': 350.6305, 'after_rgba': 520.1196, 'libtiff_rgba': 25.0568} speedup 0.85
+rgb-tile-lzw {'before': 60.1941, 'libtiff': 2.8678, 'before_rgba': 75.3982, 'system_rgba': 3.3205, 'after': 48.8495, 'after_rgba': 58.8631, 'libtiff_rgba': 3.3309} speedup 1.23
+gray16-deflate {'before': 81.484, 'libtiff_rgba': 7.9047, 'before_rgba': 132.6763, 'system_rgba': 5.1943, 'libtiff': 8.1908, 'after': 59.4138, 'after_rgba': 94.4126, 'combined': 29.5841} speedup 1.37
+float64-lzw-p2 {'after': 88.3741, 'before': 90.69, 'libtiff': 12.4956} speedup 1.03
+noise-lzw {'before': 54.0021, 'libtiff': 2.3067, 'before_rgba': 83.4214, 'system_rgba': 3.0736, 'after': 21.678, 'after_rgba': 33.1562, 'libtiff_rgba': 2.7647} speedup 2.49
+noise-deflate {'before': 17.7589, 'libtiff_rgba': 1.0142, 'before_rgba': 27.8828, 'system_rgba': 0.8919, 'libtiff': 0.3767, 'after': 6.1536, 'after_rgba': 14.2881, 'combined': 3.2089} speedup 2.89
+fax3 {'before': 15.8977, 'libtiff': 1.7627, 'before_rgba': 25.669, 'system_rgba': 0.7558, 'after': 16.3248, 'after_rgba': 26.1952, 'libtiff_rgba': 0.7812} speedup 0.97
+fax4 {'before': 6.8745, 'libtiff': 1.8465, 'before_rgba': 12.7745, 'system_rgba': 0.9179, 'after': 6.9123, 'after_rgba': 12.9435, 'libtiff_rgba': 0.7697} speedup 0.99
+webp {'before': 20.3439, 'libtiff': 1.2678, 'before_rgba': 33.4621, 'system_rgba': 1.8983, 'after': 20.5957, 'after_rgba': 33.5579, 'libtiff_rgba': 1.8535} speedup 0.99
+logluv {'after': 7.9514, 'before': 7.85, 'libtiff': 1.1122} speedup 0.99

@@ -1,0 +1,16 @@
+target/rgba-optimization/profile-rgb-none.json 794 samples
+ 74.56% libtiff.so.6::verified_tiff_capi::decoder::rgba_row
+ 19.40% libc.so.6::[unresolved]
+  1.89% libtiff.so.6::<verified_tiff_capi::Handle>::native_range
+  1.01% libtiff.so.6::<verified_tiff_capi::Handle>::rgba
+  0.88% libtiff.so.6::<alloc::raw_vec::RawVecInner>::finish_grow
+  0.76% libtiff.so.6::<verified_tiff_capi::storage::Source>::read
+  0.25% libtiff.so.6::core::ptr::drop_glue::<verified_tiff_capi::storage::Buf<u8>>
+  0.25% libc.so.6::free@@GLIBC_2.2.5
+  0.13% libtiff.so.6::<verified_tiff_capi::Handle>::transform_native
+  0.13% libc.so.6::getenv@@GLIBC_2.2.5
+  0.13% libtiff.so.6::verified_tiff_capi::directory::assemble
+  0.13% libtiff.so.6::TIFFClientOpenExt@@LIBTIFF_4.5
+  0.13% libtiff.so.6::verified_tiff_capi::directory::value
+  0.13% libtiff.so.6::<verified_tiff_capi::Handle>::raw_row
+  0.13% verified::main

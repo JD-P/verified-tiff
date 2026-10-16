@@ -1,0 +1,224 @@
+--- a/src/lerc_numeric.rs
++++ b/src/lerc_numeric.rs
+@@ -90,7 +90,7 @@
+ #[inline(always)]
+ fn highest64(v:u64) -> (r:u32)
+     requires v>0,
+-    ensures r<64,(v as u128)>>r==1u128,
++    ensures r<64,(v as u128)>>r==1u128,r==top(v as u128,128),
+ {
+     let zeros=v.leading_zeros();
+     proof {vstd::std_specs::bits::axiom_u64_leading_zeros(v);}
+@@ -99,11 +99,12 @@
+         requires zeros<64,n==63-zeros,
+             (v>>((63-zeros) as u64))&1u64!=0u64,
+             v>>((64-zeros) as u64)==0;
++    proof {top_shift(v as u128,n,128);reveal_with_fuel(top,1);}
+     n
+ }
+ #[inline(always)]
+ fn highest(v:u128) -> (r:u32)
+-    ensures r==top(v,128),r<=127,
++    ensures r==top(v,128),r<=127,v==0 ==> r==0,v>0 ==> v>>r==1u128,
+ {
+     if v==0 {reveal_with_fuel(top,1);return 0;}
+     let high=(v>>64u32) as u64;
+@@ -143,12 +144,82 @@
+         sg|(((exp+1023) as u64)<<52)|(bits as u64%0x10000000000000u64)
+     }
+ }
++// The normal rounder knows its leading-bit position before rounding. Rounding
++// can only retain that position or carry once; a second leading-zero count is
++// unnecessary. The carry is absorbed by adding the significand to the field.
++#[inline(always)]
++fn round_significand(v:u128,n:u32) -> (r:u64)
++    requires n<128,0x10000000000000u128<=v>>n<0x20000000000000u128,
++    ensures r as u128==rounded(v,n),0x10000000000000u64<=r<=0x20000000000000u64,
++{
++    let q=(v>>n) as u64;
++    if n==0{assert(v>>0u32==v) by(bit_vector);return q;}
++    if n<64 {
++        assert((1u64<<n)>0) by(bit_vector) requires 0<n<64;
++        let half=1u64<<(n-1);let rem=(v as u64)&((1u64<<n)-1);
++        let r=q+if rem>half || (rem==half && q%2==1){1u64}else{0u64};
++        assert(r as u128==rounded(v,n)) by(bit_vector)
++            requires 0<n<64,0x10000000000000u128<=v>>n<0x20000000000000u128,
++                q==(v>>n) as u64,half==1u64<<((n-1) as u32),rem==(v as u64)&(((1u64<<n)-1) as u64),
++                r==q+if rem>half || (rem==half && q%2==1){1u64}else{0u64};
++        return r;
++    }
++    let wide=round(v,n);
++    assert(0x10000000000000u128<=wide<=0x20000000000000u128) by(bit_vector)
++        requires 64<=n<128,0x10000000000000u128<=v>>n<0x20000000000000u128,wide==rounded(v,n);
++    wide as u64
++}
++#[inline(always)]
++fn pack_normal(negative:bool,v:u128,e:i32,hi:u32) -> (r:u64)
++    requires 52<=hi<128,v>>hi==1u128,-4096<=e<=4096,
++        -1022<=e+hi<=1023,top(v,128)==hi,
++    ensures r==packed(negative,v,e),
++{
++    assert(0x10000000000000u128<=v>>((hi-52) as u32)<0x20000000000000u128) by(bit_vector)
++        requires 52<=hi<128,v>>hi==1u128;
++    let q=round_significand(v,hi-52);
++    let exp=e+hi as i32;
++    let sg=if negative{0x8000000000000000u64}else{0u64};
++    proof {
++        assert(0x10000000000000u64<=q<=0x20000000000000u64 &&
++            q as u128==rounded(v,(hi-52) as u32)) by(bit_vector)
++            requires 52<=hi<128,v>>hi==1u128,q==rounded(v,(hi-52) as u32) as u64;
++        let h=if q==0x20000000000000u64{53u32}else{52u32};
++        assert((q as u128)>>h==1u128) by(bit_vector)
++            requires 0x10000000000000u64<=q<=0x20000000000000u64,
++                h==if q==0x20000000000000u64{53u32}else{52u32};
++        top_shift(q as u128,h,128);reveal_with_fuel(top,1);
++    }
++    assert((((exp+1022) as u64)<<52)<=0x7fd0000000000000u64) by(bit_vector)
++        requires -1022<=exp<=1023;
++    let out=sg|(((exp+1022) as u64)<<52)+q;
++    proof {
++        let h=if q==0x20000000000000u64{53u32}else{52u32};
++        let ex=(exp+h as i32-52) as i32;
++        let bits=if h==53{q>>1u32}else{q};
++        assert(bits as u128==if h>52{(q as u128)>>((h-52) as u32)}else{(q as u128)<<((52-h) as u32)}) by(bit_vector)
++            requires h==if q==0x20000000000000u64{53u32}else{52u32},bits==if h==53{q>>1u32}else{q};
++        let expected=if ex>1023{sg|0x7ff0000000000000u64}else{sg|(((ex+1023) as u64)<<52)|(bits%0x10000000000000u64)};
++        assert(packed(negative,v,e)==expected);
++        assert(out==expected) by(bit_vector)
++            requires -1022<=exp<=1023,0x10000000000000u64<=q<=0x20000000000000u64,
++                h==if q==0x20000000000000u64{53u32}else{52u32},ex==(exp+h as i32-52) as i32,
++                bits==if h==53{q>>1u32}else{q},
++                out==sg|(((((exp+1022) as u64)<<52)+q) as u64),
++                expected==if ex>1023{sg|0x7ff0000000000000u64}else{sg|(((ex+1023) as u64)<<52)|(bits%0x10000000000000u64)};
++    }
++    out
++}
+ #[inline(always)]
+ pub(super) fn pack(negative:bool,v:u128,e:i32) -> (r:u64)
+     requires -4096<=e<=4096,
+     ensures r==packed(negative,v,e),
+ {
+-    let hi=highest(v);let shift=if hi>52{hi-52}else{0u32};
++    let hi=highest(v);
++    if hi>=52 && -1022<=e+hi as i32 && e+hi as i32<=1023 {
++        return pack_normal(negative,v,e,hi);
++    }
++    let shift=if hi>52{hi-52}else{0u32};
+     let small=if -1074-e>shift as i32{(-1074-e) as u32}else{shift};
+     let q=round(v,small);let power=e+small as i32;
+     let hi2=highest(q);let exp=power+hi2 as i32;
+@@ -183,12 +254,114 @@
+     let sg=if m==0 && sign(a)!=sign(b){false}else if sign(a)==sign(b) || x>=y{sign(a)}else{sign(b)};
+     packed(sg,m as u128,(e-64) as i32)
+ }
++// As in word-based IEEE implementations, keep eight low alignment bits and
++// summarize the discarded suffix by its nonzeroness. The proofs below relate
++// this directly to the original 128-bit LERC model, including subtraction.
++#[inline(always)]
++fn jam64(v:u64,n:u32) -> (r:u64)
++    ensures r as u128==sticky(v as u128,n),r<=v,
++{
++    if n==0{return v;}
++    if n>=64 {
++        let r=if v==0{0u64}else{1u64};
++        assert(r as u128==sticky(v as u128,n)) by(bit_vector)
++            requires n>=64,r==if v==0{0u64}else{1u64};
++        return r;
++    }
++    assert((1u64<<n)>0) by(bit_vector) requires 0<n<64;
++    let r=(v>>n)|if v&((1u64<<n)-1)==0{0u64}else{1u64};
++    assert(r as u128==sticky(v as u128,n) && r<=v) by(bit_vector)
++        requires 0<n<64,r==(v>>n)|if v&(((1u64<<n)-1) as u64)==0{0u64}else{1u64};
++    r
++}
++proof fn align_word(m:u128,d:u32)
++    requires m<0x20000000000000u128,
++    ensures sticky(((m as u64)<<8u32) as u128,d)==sticky(sticky(m<<64u32,d),56u32),
++{
++    assert(sticky(((m as u64)<<8u32) as u128,d)==sticky(sticky(m<<64u32,d),56u32)) by(bit_vector)
++        requires m<0x20000000000000u128;
++}
++proof fn combine_words(a:u128,b:u128,same:bool)
++    requires a<0x200000000000000000000000000000u128,
++        b<0x200000000000000000000000000000u128,
++        a&0xffffffffffffffffu128==0,
++    ensures
++        (a>>56u32)>=sticky(b,56u32) <==> a>=b,
++        (a>>56u32)==sticky(b,56u32) <==> a==b,
++        sticky((if same{a+b}else if a>=b{a-b}else{b-a}) as u128,56u32)==
++            if same{(a>>56u32)+sticky(b,56u32)}
++            else if a>=b{(a>>56u32)-sticky(b,56u32)}else{sticky(b,56u32)-(a>>56u32)},
++{
++    assert((a>>56u32)<0x2000000000000000u128 && sticky(b,56u32)<0x2000000000000000u128) by(bit_vector)
++        requires a<0x200000000000000000000000000000u128,b<0x200000000000000000000000000000u128;
++    assert((a>>56u32)>=sticky(b,56u32) <==> a>=b) by(bit_vector)
++        requires a&0xffffffffffffffffu128==0;
++    assert((a>>56u32)==sticky(b,56u32) <==> a==b) by(bit_vector)
++        requires a&0xffffffffffffffffu128==0;
++    assert(sticky((if same{a+b}else if a>=b{a-b}else{b-a}) as u128,56u32)==
++            if same{((a>>56u32)+sticky(b,56u32)) as u128}
++            else if a>=b{((a>>56u32)-sticky(b,56u32)) as u128}else{(sticky(b,56u32)-(a>>56u32)) as u128}) by(bit_vector)
++        requires a<0x200000000000000000000000000000u128,
++            b<0x200000000000000000000000000000u128,a&0xffffffffffffffffu128==0;
++}
++// Rounding after jamming: the jam bit must stay strictly below the guard bit.
++// Here 56 discarded bits and at least 54 leading bits in the retained word
++// give the separation required even after cancellation (FloatLib theorem 4).
++proof fn packed_jam(negative:bool,v:u128,w:u64,e:i32,n:u32)
++    requires w as u128==sticky(v,56u32),54<=n<64,(w as u128)>>n==1u128,
++        -1074<=e<=972,-1022<=e+n-8,
++    ensures packed(negative,v,(e-64) as i32)==packed(negative,w as u128,(e-8) as i32),
++{
++    assert(v>>((n+56) as u32)==1u128) by(bit_vector)
++        requires w as u128==sticky(v,56u32),54<=n<64,(w as u128)>>n==1u128;
++    top_shift(v,(n+56) as u32,128);
++    top_shift(w as u128,n,128);
++    reveal_with_fuel(top,1);
++    assert(rounded(v,(n+4) as u32)==rounded(w as u128,(n-52) as u32)) by(bit_vector)
++        requires w as u128==sticky(v,56u32),54<=n<64;
++}
+ #[inline(always)]
+ pub(super) fn plus(a:u64,b:u64) -> (r:u64)
+     ensures r==sum(a,b),
+ {
+     let (sa,ma,ea)=parts(a);let (sb,mb,eb)=parts(b);
+     let e=if ea>eb{ea}else{eb};
++    let da=(e-ea) as u32;let db=(e-eb) as u32;
++    let ax=(ma as u64)<<8u32;let bx=(mb as u64)<<8u32;
++    assert(ax<0x2000000000000000u64 && bx<0x2000000000000000u64) by(bit_vector)
++        requires ma<0x20000000000000u128,mb<0x20000000000000u128,
++            ax==(ma as u64)<<8u32,bx==(mb as u64)<<8u32;
++    let x=jam64(ax,da);let y=jam64(bx,db);
++    let m=if sa==sb{x+y}else if x>=y{x-y}else{y-x};
++    if m>=0x40000000000000u64 {
++        let n=highest64(m);
++        assert(n>=54) by(bit_vector) requires m>=0x40000000000000u64,n<64,(m as u128)>>n==1u128;
++        if -1022<=e-8+n as i32 && e-8+n as i32<=1023 {
++            let sg=if sa==sb || x>=y{sa}else{sb};
++            proof {
++                let wx=sticky(ma<<64u32,da);let wy=sticky(mb<<64u32,db);
++                let wm=(if sa==sb{wx+wy}else if wx>=wy{wx-wy}else{wy-wx}) as u128;
++                align_word(ma,da);align_word(mb,db);
++                assert(wx<0x200000000000000000000000000000u128 && wy<0x200000000000000000000000000000u128) by(bit_vector)
++                    requires ma<0x20000000000000u128,mb<0x20000000000000u128,
++                        wx==sticky(ma<<64u32,da),wy==sticky(mb<<64u32,db);
++                if ea>=eb {
++                    assert(wx==ma<<64u32 && (wx>>56u32)==ax as u128 && wx&0xffffffffffffffffu128==0) by(bit_vector)
++                        requires da==0,wx==sticky(ma<<64u32,da),ma<0x20000000000000u128,ax==(ma as u64)<<8u32;
++                    combine_words(wx,wy,sa==sb);
++                } else {
++                    assert(wy==mb<<64u32 && (wy>>56u32)==bx as u128 && wy&0xffffffffffffffffu128==0) by(bit_vector)
++                        requires db==0,wy==sticky(mb<<64u32,db),mb<0x20000000000000u128,bx==(mb as u64)<<8u32;
++                    combine_words(wy,wx,sa==sb);
++                }
++                assert(m as u128==sticky(wm,56u32));
++                assert(wm>0) by(bit_vector) requires m>0,m as u128==sticky(wm,56u32);
++                assert(sum(a,b)==packed(sg,wm,(e-64) as i32));
++                packed_jam(sg,wm,m,e,n);
++            }
++            return pack_normal(sg,m as u128,e-8,n);
++        }
++    }
+     let aa=ma<<64;let bb=mb<<64;
+     assert(aa<0x200000000000000000000000000000u128 && bb<0x200000000000000000000000000000u128) by(bit_vector)
+         requires ma<0x20000000000000u128,mb<0x20000000000000u128,aa==ma<<64u32,bb==mb<<64u32;

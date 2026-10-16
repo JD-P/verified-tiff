@@ -1,0 +1,11 @@
+warning: unused import: `model::*`
+ --> trusted-float/src/lib.rs:7:5
+  |
+7 | use model::*;
+  |     ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `verified-tiff-float` (lib) generated 1 warning (run `cargo fix --lib -p verified-tiff-float` to apply 1 suggestion)
+   Compiling verified-tiff-float v0.1.0 (/workspace/scratch/017cea9a2f6e/verified-tiff/trusted-float)
+    Finished `release` profile [optimized] target(s) in 0.09s

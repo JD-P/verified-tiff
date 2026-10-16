@@ -1,0 +1,78 @@
+{
+  "method": "SIGPROF interrupted instruction; flat self CPU samples",
+  "includes": "process startup, preflight, warmup, timed batch; no call graph",
+  "header": "samples 540 dropped 0 interval_us 1000",
+  "samples": 540,
+  "cpu": 0,
+  "command": [
+    "/workspace/scratch/ecc0c012b313/profile-project/verified-tiff/target/release/examples/benchmark",
+    "target/benchmark/inputs/rgb-jpeg-textured.tif",
+    "total",
+    "1500"
+  ],
+  "binary_sha256": "62de6bd15fbcddb137737aad1e092dcc9b8cf90acf6b2306a72ee2b8a82119f1",
+  "input_sha256": "93fcfeee5276a3381c7a2c4e748a3f9dc8fd5b709328b396d05e7922094931eb",
+  "sampler_sha256": "ed650b8f36d81e61b28bfbfc2f7c97ae60e4d46ce634b98b297d32f021f3cc77",
+  "resolver_sha256": "4b04019a703bb1444d8aa4fd0c85ebd58abbd0cc156a8b2434c5b8fad1ed08a2",
+  "diagnostic_run": {
+    "engine": "rust",
+    "mode": "total",
+    "iterations": 3,
+    "seconds": 2.15548544,
+    "ns_per_image": 718495146.6666666,
+    "width": 1024,
+    "height": 1024,
+    "bytes": 3145728,
+    "scratch_bytes": 393216,
+    "inspect_work": 170004683,
+    "decode_work": 164670714,
+    "hash": "f770ca9c792d75f9"
+  },
+  "functions": [
+    {
+      "function": "benchmark::verified_tiff::jpeg_huffman::decode",
+      "samples": 208,
+      "percent": 38.51851851851852
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_block::block",
+      "samples": 176,
+      "percent": 32.592592592592595
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_block::amplitude",
+      "samples": 87,
+      "percent": 16.11111111111111
+    },
+    {
+      "function": "benchmark::<verified_tiff::jpeg::JpegSegment>::decode_with_scratch",
+      "samples": 27,
+      "percent": 5.0
+    },
+    {
+      "function": "libc.so.6::[unresolved]",
+      "samples": 13,
+      "percent": 2.4074074074074074
+    },
+    {
+      "function": "benchmark::<verified_tiff::jpeg_tiff::JpegImage>::decode_with_scratch",
+      "samples": 12,
+      "percent": 2.2222222222222223
+    },
+    {
+      "function": "benchmark::verified_tiff::jpeg_transform::idct",
+      "samples": 11,
+      "percent": 2.037037037037037
+    },
+    {
+      "function": "benchmark::<verified_tiff::jpeg_scan::Cursor>::next",
+      "samples": 5,
+      "percent": 0.9259259259259259
+    },
+    {
+      "function": "benchmark::benchmark::main",
+      "samples": 1,
+      "percent": 0.18518518518518517
+    }
+  ]
+}

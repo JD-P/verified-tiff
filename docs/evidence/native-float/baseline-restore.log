@@ -1,0 +1,5 @@
+patching file src/lerc_numeric.rs
+patching file Cargo.toml
+patching file Cargo.lock
+patching file scripts/env.sh
+Restored and built baseline; all archived core/C source hashes matched.

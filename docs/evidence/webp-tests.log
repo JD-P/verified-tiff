@@ -1,0 +1,15 @@
+test_all_plane_distance_codes (__main__.WebpTests.test_all_plane_distance_codes) ... ok
+test_cache_and_copy_history (__main__.WebpTests.test_cache_and_copy_history) ... ok
+test_canonical_huffman_rejections (__main__.WebpTests.test_canonical_huffman_rejections) ... ok
+test_code_length_repetitions_and_token_limit (__main__.WebpTests.test_code_length_repetitions_and_token_limit) ... ok
+test_format_matrix (__main__.WebpTests.test_format_matrix) ... ok
+test_long_distance_and_normal_single_leaf (__main__.WebpTests.test_long_distance_and_normal_single_leaf) ... ok
+test_multi_page_and_metadata_rejections (__main__.WebpTests.test_multi_page_and_metadata_rejections) ... ok
+test_original_opaque_alpha (__main__.WebpTests.test_original_opaque_alpha) ... ok
+test_truncation_dimensions_container_and_stream_rejections (__main__.WebpTests.test_truncation_dimensions_container_and_stream_rejections) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 5.286s
+
+OK
+WebP profile matrix: 192 cases; libtiff/native exact

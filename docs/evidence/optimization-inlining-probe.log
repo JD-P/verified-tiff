@@ -1,0 +1,5 @@
+gray-packbits {'current-rgba': 10.8841079, 'old-rgba': 18.5837681, 'current-total': 7.175532818181819, 'variant-total': 6.853563240000001, 'old-total': 14.034166, 'variant-rgba': 10.9065034}
+gray-lzw {'current-rgba': 25.3726242, 'old-rgba': 28.611426, 'current-total': 14.616313, 'variant-total': 14.954803916666666, 'old-total': 22.20014125, 'variant-rgba': 24.7762366}
+rgb-lzw {'current-rgba': 79.785813, 'old-rgba': 86.796702, 'current-total': 52.2891145, 'variant-total': 46.11298575, 'old-total': 71.771711, 'variant-rgba': 80.039002}
+rgb-tile-lzw {'current-rgba': 75.901299, 'old-rgba': 74.103825, 'current-total': 59.340339, 'variant-total': 57.427223, 'old-total': 58.88258, 'variant-rgba': 75.1181147}
+noise-lzw {'current-rgba': 93.6692555, 'old-rgba': 80.4966708, 'current-total': 55.86516066666666, 'variant-total': 49.33498175, 'old-total': 62.615719, 'variant-rgba': 96.0836715}

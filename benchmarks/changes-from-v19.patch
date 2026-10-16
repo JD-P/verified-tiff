@@ -1,0 +1,1654 @@
+--- a/examples/benchmark.rs
++++ b/examples/benchmark.rs
+@@ -11,7 +11,7 @@
+     let args: Vec<String> = env::args().collect();
+     assert!(
+         args.len() == 4 || args.len() == 5,
+-        "INPUT inspect|decode|total MILLISECONDS [OUTPUT]"
++        "INPUT inspect|decode|total|combined MILLISECONDS [OUTPUT]"
+     );
+     let data = fs::read(&args[1]).unwrap();
+     let mode = &args[2];
+@@ -29,9 +29,6 @@
+     image
+         .decode_with_scratch(&mut output, &mut scratch, &mut Budget { remaining: WORK })
+         .unwrap();
+-    if args.len() == 5 {
+-        fs::write(&args[4], &output).unwrap();
+-    }
+     let mut run = || {
+         let mut budget = Budget { remaining: WORK };
+         match mode.as_str() {
+@@ -46,6 +43,10 @@
+                         &mut budget,
+                     )
+                     .unwrap();
++            }
++            "combined" => {
++                verified_tiff::decode_deflate_into(black_box(&data),0,&limits,
++                    black_box(&mut output),black_box(&mut scratch),&mut budget).unwrap();
+             }
+             "total" => {
+                 let fresh = inspect_raster(black_box(&data), 0, &limits, &mut budget).unwrap();
+@@ -78,6 +79,7 @@
+         }
+     }
+     let seconds = start.elapsed().as_secs_f64();
++    if args.len() == 5 { fs::write(&args[4], &output).unwrap(); }
+     let iterations = completed;
+     println!("{{\"engine\":\"rust\",\"mode\":\"{}\",\"iterations\":{},\"seconds\":{},\"ns_per_image\":{},\"width\":{},\"height\":{},\"bytes\":{},\"scratch_bytes\":{},\"inspect_work\":{},\"decode_work\":{},\"hash\":\"{:016x}\"}}",mode,iterations,seconds,seconds*1e9/iterations as f64,image.width(),image.height(),output.len(),scratch.len(),inspect_work,image.decode_work_limit(),hash(&output));
+ }
+--- /dev/null
++++ b/src/bit_window.rs
+@@ -0,0 +1,111 @@
++// Constant-size safe bit extraction, refined against the original bit models.
++use super::*;
++use crate::deflate_bits as db;
++verus! {
++#[verifier::inline]
++pub(super) open spec fn word(a:u8,b:u8,c:u8,msb:bool) -> u32 {
++    if msb {(a as u32)<<16 | (b as u32)<<8 | c as u32}
++    else {a as u32 | (b as u32)<<8 | (c as u32)<<16}
++}
++#[verifier::inline]
++pub(super) open spec fn extract(w:u32,skip:u32,n:u32,msb:bool) -> u32 {
++    (w >> (if msb {(24-skip-n) as u32} else {skip})) & (((1u32<<n)-1) as u32)
++}
++pub(super) proof fn powers(n:u32)
++    requires n<=16,
++    ensures (1u32<<n) as int==db::pow(n as int),n<=12 ==> db::pow(n as int)==pow2_code(n as int),
++{
++    assert((1u32<<n)==if n==0 {1u32} else if n==1 {2u32} else if n==2 {4u32}
++        else if n==3 {8u32} else if n==4 {16u32} else if n==5 {32u32}
++        else if n==6 {64u32} else if n==7 {128u32} else if n==8 {256u32}
++        else if n==9 {512u32} else if n==10 {1024u32} else if n==11 {2048u32}
++        else if n==12 {4096u32} else if n==13 {8192u32} else if n==14 {16384u32}
++        else if n==15 {32768u32} else {65536u32}) by(bit_vector) requires n<=16;
++}
++proof fn byte_bit(a:u8,b:u8,c:u8,j:u32,msb:bool)
++    requires j<24,
++    ensures ((word(a,b,c,msb) >> (if msb {(23-j) as u32} else {j})) & 1) as int
++        == ((if j<8 {a as int} else if j<16 {b as int} else {c as int})
++            /power2(if msb {7-(j as int)%8} else {(j as int)%8}))%2,
++{
++    let bit=if msb {(7-j%8) as u32} else {j%8};
++    powers(bit);
++    assert(((word(a,b,c,msb) >> (if msb {(23-j) as u32} else {j})) & 1)
++        == ((if j<8 {a as u32} else if j<16 {b as u32} else {c as u32})/(1u32<<bit))%2) by(bit_vector)
++        requires j<24,bit==if msb {(7-j%8) as u32} else {j%8};
++    assert(db::pow(bit as int)==power2(bit as int));
++}
++proof fn recurrence(w:u32,skip:u32,n:u32,msb:bool)
++    requires skip<8,0<n<=16,
++    ensures extract(w,skip,n,msb) as int ==
++        if msb {2*(extract(w,skip,(n-1) as u32,msb) as int)+((w>>((24-skip-n) as u32))&1) as int}
++        else {extract(w,skip,(n-1) as u32,msb) as int+db::pow(n as int-1)*(((w>>((skip+n-1) as u32))&1) as int)},
++        (extract(w,skip,n,msb) as int)<db::pow(n as int),
++{
++    powers(n);powers((n-1) as u32);
++    assert(extract(w,skip,n,msb)<(1u32<<n)) by(bit_vector) requires skip<8,0<n<=16;
++    if msb {
++        assert(extract(w,skip,n,true)==2*extract(w,skip,(n-1) as u32,true)+((w>>((24-skip-n) as u32))&1)) by(bit_vector)
++            requires skip<8,0<n<=16;
++        assert(extract(w,skip,(n-1) as u32,true)<65536 && ((w>>((24-skip-n) as u32))&1)<=1) by(bit_vector)
++            requires skip<8,0<n<=16;
++    } else {
++        assert(extract(w,skip,n,false)==extract(w,skip,(n-1) as u32,false)+(1u32<<((n-1) as u32))*((w>>((skip+n-1) as u32))&1)) by(bit_vector)
++            requires skip<8,0<n<=16;
++        assert(extract(w,skip,(n-1) as u32,false)<65536 && ((w>>((skip+n-1) as u32))&1)<=1 && (1u32<<((n-1) as u32))<=32768) by(bit_vector)
++            requires skip<8,0<n<=16;
++    }
++}
++pub(super) proof fn model(s:Seq<u8>,at:int,skip:u32,n:u32,msb:bool)
++    requires 0<=at,at+3<=s.len(),skip<8,n<=16,
++    ensures extract(word(s[at],s[at+1],s[at+2],msb),skip,n,msb) as int
++        ==if msb {lz_bits(s,at*8+skip,n as nat)} else {db::field(s,at*8+skip,n as nat)},
++        n<=12 ==> lz_lsb_bits(s,at*8+skip,n as nat)==db::field(s,at*8+skip,n as nat),
++    decreases n,
++{
++    reveal_with_fuel(lz_bits,1);reveal_with_fuel(lz_lsb_bits,1);reveal_with_fuel(db::field,1);
++    let w=word(s[at],s[at+1],s[at+2],msb);
++    if n==0 {
++        assert(extract(w,skip,n,msb)==0) by(bit_vector) requires n==0,skip<8;
++    } else {
++        model(s,at,skip,(n-1) as u32,msb);recurrence(w,skip,n,msb);
++        let j=(skip+n-1) as u32;
++        byte_bit(s[at],s[at+1],s[at+2],j,msb);powers((n-1) as u32);
++        quotient_remainder(j as int,8);
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(at*8+j as int,8,at+j as int/8,j as int%8);
++        assert(s[(at*8+j as int)/8]==if j<8 {s[at]} else if j<16 {s[at+1]} else {s[at+2]});
++    }
++}
++pub(super) proof fn digit(s:Seq<u8>,at:int,skip:u32,n:u32,k:u32)
++    requires 0<=at,at+3<=s.len(),skip<8,k<n<=16,
++    ensures ((extract(word(s[at],s[at+1],s[at+2],false),skip,n,false)>>k)&1) as int
++        ==db::field(s,at*8+skip+k,1),
++{
++    let w=word(s[at],s[at+1],s[at+2],false);let j=(skip+k) as u32;
++    byte_bit(s[at],s[at+1],s[at+2],j,false);
++    assert(((extract(w,skip,n,false)>>k)&1)==((w>>((skip+k) as u32))&1)) by(bit_vector)
++        requires skip<8,k<n<=16;
++    quotient_remainder(j as int,8);
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(at*8+j as int,8,at+j as int/8,j as int%8);
++    assert(s[(at*8+j as int)/8]==if j<8 {s[at]} else if j<16 {s[at+1]} else {s[at+2]});
++    reveal_with_fuel(db::field,2);
++}
++#[inline(always)]
++pub(super) fn read(s:&[u8],at:usize,skip:usize,n:usize,msb:bool) -> (r:usize)
++    requires at as int+3<=s.len(),skip<8,n<=16,
++    ensures r as int==if msb {lz_bits(s@,at as int*8+skip,n as nat)} else {db::field(s@,at as int*8+skip,n as nat)},
++        r<db::pow(n as int),n<=12 && !msb ==> r as int==lz_lsb_bits(s@,at as int*8+skip,n as nat),
++{
++    let a=s[at] as u32;let b=s[at+1] as u32;let c=s[at+2] as u32;
++    let w=if msb {a<<16 | b<<8 | c} else {a | b<<8 | c<<16};
++    let k=skip as u32;let len=n as u32;
++    proof {powers(len);assert(db::pow(len as int)>=1);}
++    let r=(w>>(if msb {24-k-len} else {k}))&((1u32<<len)-1);
++    proof {
++        model(s@,at as int,k,len,msb);powers(len);
++        assert(r<(1u32<<len)) by(bit_vector)
++            requires r==extract(w,k,len,msb),k<8,len<=16;
++    }
++    r as usize
++}
++}
+--- a/src/deflate.rs
++++ b/src/deflate.rs
+@@ -92,7 +92,7 @@
+ 
+ pub(super) struct Cursor {
+     pub bits:Bits,pub mode:u8,pub left:usize,pub distance:usize,pub last:bool,pub lit:Huff,pub dist:Huff,
+-    pub ring:[u8;32768],pub produced:usize,pub window:usize,pub a:usize,pub b:usize,
++    pub ring:[u8;32768],pub produced:usize,pub window:usize,pub a:usize,pub b:usize,pub pending:usize,
+     pub history:Ghost<Seq<u8>>,
+ }
+ impl Cursor {
+@@ -106,17 +106,21 @@
+         &&& self.mode<=5 && self.lit.valid() && self.dist.valid()
+         &&& 1<=self.window<=32768 && self.left<=65535
+         &&& self.history@.len()==self.produced && self.produced<=cap
+-        &&& self.a==adler1(self.history@) && self.b==adler2(self.history@) && self.a<65521 && self.b<65521
++        &&& self.a%65521==adler1(self.history@) && self.b%65521==adler2(self.history@)
++            && self.pending<=256 && self.a<=65520+self.pending*255 && self.b<=65520+self.pending*130800
+         &&& forall|k:int| 0<=k<self.produced && self.produced as int-32768<=k ==> self.ring@[k%32768]==self.history@[k]
+     }
++    #[inline(always)]
+     fn emit(&mut self,byte:u8,cap:usize) -> (r:Result<(),Error>)
+         requires old(self).produced==old(self).history@.len(),old(self).produced<=cap,
+-            old(self).a==adler1(old(self).history@),old(self).b==adler2(old(self).history@),old(self).a<65521,old(self).b<65521,
++            old(self).a%65521==adler1(old(self).history@),old(self).b%65521==adler2(old(self).history@),
++            old(self).pending<=256,old(self).a<=65520+old(self).pending*255,old(self).b<=65520+old(self).pending*130800,
+             forall|k:int| 0<=k<old(self).produced && old(self).produced as int-32768<=k ==> old(self).ring@[k%32768]==old(self).history@[k],
+         ensures r.is_ok()==(old(self).produced<cap),
+             r.is_ok() ==> final(self).produced==old(self).produced+1 && final(self).produced<=cap,
+             r.is_ok() ==> final(self).model()==append(old(self).model(),byte),
+-            r.is_ok() ==> final(self).a==adler1(final(self).history@) && final(self).b==adler2(final(self).history@) && final(self).a<65521 && final(self).b<65521,
++            r.is_ok() ==> final(self).a%65521==adler1(final(self).history@) && final(self).b%65521==adler2(final(self).history@)
++                && final(self).pending<=256 && final(self).a<=65520+final(self).pending*255 && final(self).b<=65520+final(self).pending*130800,
+             r.is_ok() ==> forall|k:int| 0<=k<final(self).produced && final(self).produced as int-32768<=k ==> final(self).ring@[k%32768]==final(self).history@[k],
+             final(self).bits==old(self).bits,final(self).lit==old(self).lit,final(self).dist==old(self).dist,
+             r.is_ok() ==> final(self).history@.len()==final(self).produced,
+@@ -124,7 +128,16 @@
+         if self.produced==cap {return Err(Error::Invalid);}
+         let at=self.produced%32768;
+         self.ring[at]=byte;
+-        self.a=(self.a+byte as usize)%65521;self.b=(self.b+self.a)%65521;
++        // Accumulate bounded chunks; reduction is needed only every 256 bytes.
++        if self.pending==256 {
++            self.a=self.a%65521;self.b=self.b%65521;self.pending=0;
++        }
++        let ghost prior_a=self.a;let ghost prior_b=self.b;
++        self.a=self.a+byte as usize;self.b=self.b+self.a;self.pending=self.pending+1;
++        proof {
++            assert(self.a%65521==(prior_a%65521+byte as int)%65521);
++            assert(self.b%65521==(prior_b%65521+self.a%65521)%65521);
++        }
+         proof {self.history=Ghost(self.history@.push(byte));}
+         self.produced=self.produced+1;
+         proof {
+@@ -151,6 +164,7 @@
+         Ok(())
+     }
+     pub(super) fn done(&self) -> (r:bool) ensures r==(self.model().mode==5) {self.mode==5}
++    #[inline(always)]
+     pub(super) fn step(&mut self,s:&[u8],cap:usize) -> (r:Result<Option<u8>,Error>)
+         requires old(self).valid(s@,cap as int),old(self).mode<5,
+         ensures r.is_ok()==transition(s@,old(self).end(),cap as int,old(self).model()).is_some(),
+@@ -206,7 +220,7 @@
+             if (self.bits.at!=self.bits.end && self.bits.end-self.bits.at!=1)
+                 || (self.bits.at!=self.bits.end && self.bits.bit==0) {return Err(Error::Invalid);}
+             let checksum=read32(s,self.bits.end,false)?;
+-            if checksum as usize!=self.b*65536+self.a {return Err(Error::Invalid);}
++            if checksum as usize!=(self.b%65521)*65536+self.a%65521 {return Err(Error::Invalid);}
+             self.mode=5;Ok(None)
+         }
+     }
+@@ -245,7 +259,7 @@
+         assert(blank.model()==huff(Seq::new(288,|i:int|0u8)));
+         let history=Ghost(Seq::empty());
+         Ok(Self {bits:Bits {at:start+2,bit:0,end:start+count-4},mode:0,left:0,distance:0,last:false,
+-            lit:blank,dist:blank,ring:[0u8;32768],produced:0,window,a:1,b:0,history})
++            lit:blank,dist:blank,ring:[0u8;32768],produced:0,window,a:1,b:0,pending:0,history})
+     }
+ }
+ proof fn zero_number(i:int,n:nat)
+@@ -300,16 +314,41 @@
+         r.is_ok() ==> r.unwrap()==result(s@,start as int,count as int,cap as int,fuel as nat).unwrap().len(),
+         r.is_ok() ==> r.unwrap()<=cap,
+ {
++    let mut output=[0u8;0];
++    process(s,start,count,cap,fuel,&mut output,0)
++}
++
++// Validate and emit in the same traversal. The original validator uses an
++// empty sink; TIFF's combined path supplies the visible strip buffer.
++pub(super) fn process(s:&[u8],start:usize,count:usize,cap:usize,fuel:usize,output:&mut [u8],write:usize) -> (r:Result<usize,Error>)
++    requires write<=old(output).len(),
++    ensures r.is_ok()==result(s@,start as int,count as int,cap as int,fuel as nat).is_some(),
++        r.is_ok() ==> r.unwrap()==result(s@,start as int,count as int,cap as int,fuel as nat).unwrap().len(),
++        r.is_ok() ==> r.unwrap()<=cap,
++        final(output).len()==old(output).len(),
++        r.is_ok() ==> forall|k:int| 0<=k<write && k<r.unwrap() ==> final(output)@[k]==result(s@,start as int,count as int,cap as int,fuel as nat).unwrap()[k],
++        forall|k:int| write<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
++{
+     reveal(result);
+     let mut c=Cursor::new(s,start,count,cap)?;
+     let mut left=fuel;
+     while !c.done() && left>0
+         invariant c.valid(s@,cap as int),left<=fuel,c.end()==start as int+count-4,
+             result(s@,start as int,count as int,cap as int,fuel as nat)==finish(s@,c.end(),cap as int,c.model(),left as nat),
++            output.len()==old(output).len(),write<=output.len(),
++            forall|k:int| 0<=k<write && k<c.produced ==> output@[k]==c.history@[k],
++            forall|k:int| write<=k<output.len() ==> output@[k]==old(output)@[k],
+         decreases left,
+     {
+         reveal_with_fuel(finish,1);
+-        c.step(s,cap)?;left=left-1;
++        let pos=c.produced;let ghost previous=c.history@;
++        let next=c.step(s,cap)?;left=left-1;
++        if let Some(byte)=next {
++            if pos<write {output[pos]=byte;}
++            assert forall|k:int| 0<=k<write && k<c.produced implies output@[k]==c.history@[k] by {
++                if k==pos {assert(c.history@[k]==byte);} else {assert(c.history@[k]==previous[k]);}
++            }
++        }
+     }
+     reveal_with_fuel(finish,1);
+     if !c.done() {return Err(Error::Limit);}
+--- a/src/deflate_bits.rs
++++ b/src/deflate_bits.rs
+@@ -36,6 +36,7 @@
+     pub(super) open spec fn valid(self,s:Seq<u8>) -> bool {
+         self.at<=self.end<=s.len() && self.bit<8 && (self.at==self.end ==> self.bit==0)
+     }
++    #[inline(always)]
+     pub(super) fn read(&mut self,s:&[u8],n:usize) -> (r:Result<usize,Error>)
+         requires old(self).valid(s@),n<=16,
+         ensures final(self).valid(s@),final(self).end==old(self).end,
+@@ -50,6 +51,13 @@
+             proof {aligned_byte(s@,self.at as int);}
+             let byte=s[self.at];self.at=self.at+1;
+             return Ok(byte as usize);
++        }
++        if n>1 && self.end-self.at>=3 {
++            let v=crate::bit_window::read(s,self.at,self.bit,n,false);
++            let next=self.bit+n;
++            proof {quotient_remainder(next as int,8);}
++            self.at=self.at+next/8;self.bit=next%8;
++            return Ok(v);
+         }
+         let mut v=0usize;let mut weight=1usize;let mut i=0usize;
+         reveal_with_fuel(field,1);
+@@ -271,6 +279,7 @@
+     }
+ }
+ impl Huff {
++    #[inline(always)]
+     pub(super) fn read(&self,s:&[u8],bits:&mut Bits) -> (r:Result<usize,Error>)
+         requires self.valid(),old(bits).valid(s@),
+         ensures final(bits).valid(s@),final(bits).end==old(bits).end,
+@@ -279,6 +288,7 @@
+             r.is_ok() ==> (r.unwrap() as int,final(bits).pos())==symbol(s@,old(bits).pos(),old(bits).end as int,self.model(),1,0,0).unwrap(),
+             r.is_ok() ==> r.unwrap()<288 && final(bits).pos()>old(bits).pos(),
+     {
++        if bits.end-bits.at>=3 {return self.read_window(s,bits);}
+         let mut n=1usize;let mut code=0usize;let mut first=0usize;
+         while n<=15
+             invariant 1<=n<=16,self.valid(),bits.valid(s@),bits.end==old(bits).end,
+@@ -302,5 +312,48 @@
+         reveal_with_fuel(symbol,1);
+         Err(Error::Invalid)
+     }
+-}
+-}
++    #[inline(always)]
++    fn read_window(&self,s:&[u8],bits:&mut Bits) -> (r:Result<usize,Error>)
++        requires self.valid(),old(bits).valid(s@),old(bits).end-old(bits).at>=3,
++        ensures final(bits).valid(s@),final(bits).end==old(bits).end,final(bits).pos()>=old(bits).pos(),
++            r.is_ok()==symbol(s@,old(bits).pos(),old(bits).end as int,self.model(),1,0,0).is_some(),
++            r.is_ok() ==> (r.unwrap() as int,final(bits).pos())==symbol(s@,old(bits).pos(),old(bits).end as int,self.model(),1,0,0).unwrap(),
++            r.is_ok() ==> r.unwrap()<288 && final(bits).pos()>old(bits).pos(),
++    {
++        let at=bits.at;let skip=bits.bit;
++        let look=crate::bit_window::read(s,at,skip,16,false);
++        proof {crate::bit_window::model(s@,at as int,skip as u32,16,false);}
++        let mut n=1usize;let mut code=0usize;let mut first=0usize;
++        while n<=15
++            invariant 1<=n<=16,self.valid(),bits.valid(s@),*bits==*old(bits),at==bits.at,skip==bits.bit,bits.end-at>=3,
++                look<65536,look as int==field(s@,bits.pos(),16),
++                look as u32==crate::bit_window::extract(crate::bit_window::word(s@[at as int],s@[at as int+1],s@[at as int+2],false),skip as u32,16,false),
++                code<pow(n as int-1),first<=576*(pow(n as int-1)-1),
++                symbol(s@,old(bits).pos(),old(bits).end as int,self.model(),1,0,0)
++                    ==symbol(s@,bits.pos()+n-1,bits.end as int,self.model(),n as nat,code as int,first as int),
++            decreases 16-n,
++        {
++            reveal_with_fuel(symbol,1);
++            let bit=(look>>(n-1))&1;
++            proof {
++                crate::bit_window::digit(s@,at as int,skip as u32,16,(n-1) as u32);
++                assert(bit as u32==((look as u32>>((n-1) as u32))&1)) by(bit_vector)
++                    requires look<65536,1<=n<=15,bit==((look>>((n-1) as usize))&1);
++                assert(bit<=1) by(bit_vector) requires bit==((look>>((n-1) as usize))&1);
++                pow_bound(n as int);number_bound(self.lens@,n as int,288);
++            }
++            code=code*2+bit;let count=self.counts[n];
++            if code>=first && code-first<count {
++                let found=self.find(n,code-first)?;
++                let next=skip+n;
++                proof {quotient_remainder(next as int,8);}
++                bits.at=at+next/8;bits.bit=next%8;
++                return Ok(found);
++            }
++            first=(first+count)*2;n=n+1;
++        }
++        reveal_with_fuel(symbol,1);Err(Error::Invalid)
++    }
++
++}
++}
+--- a/src/deflate_plane.rs
++++ b/src/deflate_plane.rs
+@@ -105,6 +105,32 @@
+     &&& 0<=work_prefix(s,g,segment_count(g) as nat)<=usize::MAX
+ }
+ 
++proof fn strip_position(g:Geometry,k:int)
++    requires g.positive(),!g.bilevel,!g.tiled,g.block_width==g.width,
++        g.across as int==(g.width as int-1)/(g.block_width as int)+1,
++        0<=k<g.width as int*g.height*g.channels,
++    ensures g.across==1,
++        k==g.segment(k)*(g.block_height as int)*g.row_bytes()+g.local(k),
++        0<=g.local(k)<g.block_height as int*g.row_bytes(),
++{
++    let row=g.width as int*g.channels;let y=k/row;let i=k%row;
++    assert(row>0) by(nonlinear_arith) requires g.width>0,g.channels>0,row==g.width as int*g.channels;
++    quotient_remainder(k,row);
++    assert(k==y*row+i) by(nonlinear_arith) requires k==row*y+i;
++    assert(y<g.height) by(nonlinear_arith)
++        requires k<g.width as int*g.height*g.channels,row==g.width as int*g.channels,k==row*y+i,i>=0,row>0;
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(g.width as int-1,g.width as int,0,g.width as int-1);
++    assert(k==y*g.width*g.channels+i) by(nonlinear_arith) requires k==row*y+i,row==g.width as int*g.channels;
++    strip_row_mapping(g,y,i);quotient_remainder(y,g.block_height as int);
++    assert(g.local(k)==(y%(g.block_height as int))*row+i) by(nonlinear_arith)
++        requires g.local(k)==(y%(g.block_height as int))*g.width*g.channels+i,row==g.width as int*g.channels;
++    assert(k==g.segment(k)*(g.block_height as int)*row+g.local(k)) by(nonlinear_arith)
++        requires k==y*row+i,g.segment(k)==y/(g.block_height as int),g.local(k)==(y%(g.block_height as int))*row+i,
++            y==g.block_height as int*(y/(g.block_height as int))+y%(g.block_height as int);
++    assert(0<=g.local(k)<g.block_height as int*row) by(nonlinear_arith)
++        requires g.local(k)==(y%(g.block_height as int))*row+i,0<=y%(g.block_height as int)<g.block_height,0<=i<row,row>0;
++}
++
+ pub(super) fn validate(s:&[u8],g:Geometry,len:usize,max_output:usize,budget:&mut Budget) -> (r:Result<usize,Error>)
+     requires g.positive(),!g.bilevel,!g.lsb,!g.white,g.alpha==0,!g.packbits,!g.lzw,
+         len as int==g.width as int*g.height*g.channels,0<len,
+@@ -114,6 +140,27 @@
+     ensures final(budget).remaining<=old(budget).remaining,r.is_ok() ==> ready(s@,g,len as int),
+         old(budget).remaining as int-final(budget).remaining<=segment_count(g)*(quota(s.len() as int,max_output as int)+1),
+         r.is_ok() ==> r.unwrap() as int==work_prefix(s@,g,segment_count(g) as nat),
++        r.is_ok() ==> r.unwrap() as int==old(budget).remaining as int-final(budget).remaining,
++        profile(s@,g,max_output) && old(budget).remaining as int>=segment_count(g)*(quota(s.len() as int,max_output as int)+1) ==> r.is_ok(),
++{
++    let mut output=[0u8;0];
++    validate_into(s,g,len,max_output,budget,&mut output,false)
++}
++
++pub(super) fn validate_into(s:&[u8],g:Geometry,len:usize,max_output:usize,budget:&mut Budget,output:&mut [u8],write:bool) -> (r:Result<usize,Error>)
++    requires write ==> !g.tiled && len<=old(output).len(),
++        g.positive(),!g.bilevel,!g.lsb,!g.white,g.alpha==0,!g.packbits,!g.lzw,
++        len as int==g.width as int*g.height*g.channels,0<len,
++        g.across as int==(g.width as int-1)/(g.block_width as int)+1,
++        !g.tiled ==> g.block_width==g.width,
++        g.offsets.count==segment_count(g),g.counts.count==segment_count(g),segment_count(g)<=usize::MAX,
++    ensures final(output).len()==old(output).len(),
++        forall|k:int| 0<=k<old(output).len() && (!write || k>=len) ==> final(output)@[k]==old(output)@[k],
++        r.is_ok() && write ==> forall|k:int| 0<=k<len ==> final(output)@[k]==raw(s@,g,k),
++        final(budget).remaining<=old(budget).remaining,r.is_ok() ==> ready(s@,g,len as int),
++        old(budget).remaining as int-final(budget).remaining<=segment_count(g)*(quota(s.len() as int,max_output as int)+1),
++        r.is_ok() ==> r.unwrap() as int==work_prefix(s@,g,segment_count(g) as nat),
++        r.is_ok() ==> r.unwrap() as int==old(budget).remaining as int-final(budget).remaining,
+         profile(s@,g,max_output) && old(budget).remaining as int>=segment_count(g)*(quota(s.len() as int,max_output as int)+1) ==> r.is_ok(),
+ {
+     let ghost eligible=profile(s@,g,max_output) && budget.remaining as int>=segment_count(g)*(quota(s.len() as int,max_output as int)+1);
+@@ -128,7 +175,7 @@
+         invariant initial==old(budget).remaining,eligible==(profile(s@,g,max_output) && old(budget).remaining as int>=segment_count(g)*unit),
+             unit==quota(s.len() as int,max_output as int)+1,unit>0,cap<=max_output,
+             old(budget).remaining as int-budget.remaining<=j as int*unit,
+-            work as int==work_prefix(s@,g,j as nat),
++            work as int==work_prefix(s@,g,j as nat),work as int==old(budget).remaining as int-budget.remaining,
+             eligible ==> profile(s@,g,max_output),
+             j<=g.counts.count,g.positive(),!g.bilevel,!g.lsb,!g.white,g.alpha==0,!g.packbits,!g.lzw,
+             len as int==g.width as int*g.height*g.channels,0<len,
+@@ -138,6 +185,9 @@
+             cap as int==capacity(g),0<g.row_bytes()<=cap,stride as int==g.row_bytes(),
+             budget.remaining<=old(budget).remaining,
+             forall|q:int| 0<=q<j ==> segment_ok(s@,g,q),
++            output.len()==old(output).len(),write ==> !g.tiled && len<=output.len(),
++            forall|k:int| 0<=k<output.len() && (!write || k>=len) ==> output@[k]==old(output)@[k],
++            write ==> forall|k:int| 0<=k<len && g.segment(k)<j ==> output@[k]==raw(s@,g,k),
+         decreases g.counts.count-j,
+     {
+         reveal(profile);
+@@ -156,7 +206,7 @@
+         let fuel=work_size(count,cap)?;
+         let charged=add(fuel,1)?;
+         spend(budget,fuel)?;
+-        let actual=deflate::validate(s,start,count,cap,fuel)?;
++
+         proof {if eligible && !g.tiled {
+             vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(g.width as int-1,g.width as int,0,g.width as int-1);
+             vstd::arithmetic::div_mod::lemma_fundamental_div_mod(g.height as int-1,g.block_height as int);
+@@ -178,9 +228,50 @@
+             requires stride as int==g.block_width as int*g.channels,rows as int==stored_rows(g,g.tiled,j as int),!g.bilevel;
+         let needed=mul(stride,rows)?;
+         assert(needed as int==storage_bytes(g,g.tiled,j as int)) by(nonlinear_arith) requires needed as int==stride as int*rows,stride as int==g.block_width as int*g.channels,rows as int==stored_rows(g,g.tiled,j as int),!g.bilevel;
++        let ghost previous=output@;
++        let actual=if write {
++            let first=mul(j,g.block_height)?;
++            if first>=g.height {return Err(Error::Invalid);}
++            proof {
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(g.width as int-1,g.width as int,0,g.width as int-1);
++                assert(first as int*stride<=len) by(nonlinear_arith)
++                    requires first<g.height,stride as int==g.width as int*g.channels,len as int==g.width as int*g.height*g.channels;
++                assert(needed as int==rows as int*stride) by(nonlinear_arith) requires needed as int==stride as int*rows;
++            }
++            let begin=mul(first,stride)?;
++            proof {
++                assert(g.across==1);
++                assert(begin as int+needed<=len) by(nonlinear_arith)
++                    requires begin as int==first as int*stride,needed as int==rows as int*stride,
++                        rows<=g.height-first,len as int==g.width as int*g.height*g.channels,stride as int==g.width as int*g.channels;
++            }
++            let (_,tail)=output.split_at_mut(begin);let (part,_)=tail.split_at_mut(needed);
++            let actual=deflate::process(s,start,count,cap,fuel,part,needed)?;
++            assert forall|k:int| 0<=k<len && g.segment(k)<j implies output@[k]==previous[k] by {
++                strip_position(g,k);
++                assert(k<begin) by(nonlinear_arith)
++                    requires k==g.segment(k)*(g.block_height as int)*stride+g.local(k),
++                        0<=g.local(k)<g.block_height as int*stride,g.segment(k)<j,
++                        begin as int==first as int*stride,first as int==j as int*g.block_height,stride>0,g.block_height>0;
++            }
++            assert forall|k:int| 0<=k<len && g.segment(k)==j && g.local(k)<actual implies output@[k]==raw(s@,g,k) by {
++                strip_position(g,k);
++                assert(begin as int==j as int*g.block_height*stride) by(nonlinear_arith)
++                    requires begin as int==first as int*stride,first as int==j as int*g.block_height;
++                covers(g,k);
++                assert(output@[k]==decoded(s@,g,j as int).unwrap()[g.local(k)]);
++            }
++            actual
++        } else {deflate::validate(s,start,count,cap,fuel)?};
+         if actual<needed {return Err(Error::Invalid);}
+         assert(segment_ok(s@,g,j as int));
+         proof {
++            if write {
++                assert forall|k:int| 0<=k<len && g.segment(k)<j as int+1 implies output@[k]==raw(s@,g,k) by {
++                    if g.segment(k)==j {covers(g,k);assert(g.local(k)<needed);}
++                    else {assert(output@[k]==previous[k]);}
++                }
++            }
+             if eligible {work_monotone(s@,g,(j+1) as nat,segment_count(g) as nat);}
+             work_step(s@,g,j as nat);
+         }
+@@ -201,6 +292,50 @@
+     assert(segment_ok(s@,g,j as int));
+     let start=value(s,g.offsets,j,g.le)?;let count=value(s,g.counts,j,g.le)?;
+     let fuel=work_size(count,cap)?;
++    if !g.tiled {
++        proof {
++            vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(g.width as int-1,g.width as int,0,g.width as int-1);
++            quotient_remainder(g.height as int-1,g.block_height as int);
++            assert(0<=j as int*g.block_height<g.height) by(nonlinear_arith)
++                requires g.across==1,j<segment_count(g),g.block_height>0,
++                    segment_count(g)==g.across as int*((g.height as int-1)/(g.block_height as int)+1),
++                    g.height as int-1==g.block_height as int*((g.height as int-1)/(g.block_height as int))+(g.height as int-1)%(g.block_height as int),
++                    0<=(g.height as int-1)%(g.block_height as int)<g.block_height;
++        }
++        let first=j*g.block_height;
++        let rows=if g.height-first<g.block_height {g.height-first} else {g.block_height};
++        proof {
++            assert(0<=first as int*stride<=first as int*stride+rows as int*stride<=len) by(nonlinear_arith)
++                requires first<g.height,0<rows<=g.height-first,stride as int==g.width as int*g.channels,
++                    len as int==g.width as int*g.height*g.channels;
++        }
++        let begin=first*stride;let needed=rows*stride;
++        assert(needed as int==storage_bytes(g,false,j as int)) by(nonlinear_arith)
++            requires stride as int==g.block_width as int*g.channels,rows as int==stored_rows(g,false,j as int),needed as int==rows as int*stride,!g.bilevel;
++        {
++            let (_,tail)=output.split_at_mut(begin);let (part,_)=tail.split_at_mut(needed);
++            let actual=deflate::process(s,start,count,cap,fuel,part,needed)?;
++            assert(actual>=needed);
++            assert forall|i:int| 0<=i<needed implies part@[i]==decoded(s@,g,j as int).unwrap()[i] by {};
++        }
++        assert forall|k:int| 0<=k<len implies output@[k]==if g.segment(k)==j {raw(s@,g,k)} else {old(output)@[k]} by {
++            strip_position(g,k);covers(g,k);
++            assert(begin as int==j as int*g.block_height*stride) by(nonlinear_arith)
++                requires begin as int==first as int*stride,first as int==j as int*g.block_height;
++            if g.segment(k)==j {
++                assert(k==begin as int+g.local(k)) by(nonlinear_arith)
++                    requires k==g.segment(k)*(g.block_height as int)*stride+g.local(k),g.segment(k)==j,begin as int==j as int*g.block_height*stride;
++                assert(output@[k]==decoded(s@,g,j as int).unwrap()[g.local(k)]);
++            } else {
++                assert(k<begin || k>=begin as int+needed) by(nonlinear_arith)
++                    requires k==g.segment(k)*(g.block_height as int)*stride+g.local(k),
++                        g.segment(k)!=j,0<=g.local(k)<g.block_height as int*stride,
++                        begin as int==j as int*g.block_height*stride,needed as int==rows as int*stride,
++                        0<rows<=g.block_height,stride>0,g.block_height>0;
++            }
++        }
++        return Ok(());
++    }
+     reveal(deflate::result);
+     let mut c=deflate::Cursor::new(s,start,count,cap)?;
+     let mut left=fuel;
+--- a/src/extended_image.rs
++++ b/src/extended_image.rs
+@@ -173,12 +173,61 @@
+         assert(scratch@.subrange(0,l.scratch_len as int)==self.native_bytes()) by {
+             assert(scratch@.subrange(0,l.scratch_len as int) =~= self.native_bytes());
+         }
++        self.render_native(scratch,output);
++        Ok(())
++    }
++    fn render_native(&self,scratch:&[u8],output:&mut [u8])
++        requires self.well_formed(),scratch.len()>=self.scratch_size(),old(output).len()>=self.byte_len(),
++            forall|k:int| 0<=k<self.scratch_size() ==> scratch@[k]==self.raw_byte(k),
++        ensures final(output).len()==old(output).len(),
++            forall|k:int| 0<=k<self.byte_len() ==> final(output)@[k]==self.decoded_byte(k),
++            forall|k:int| self.byte_len()<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
++    {
++        let l=self.layout;
++        assert(scratch@.subrange(0,l.scratch_len as int) =~= self.native_bytes());
+         if l.bytes==8 {
+             let g=self.geometry[0];
+             if self.format.compression==8 || self.format.compression==32946 {assert(dp::ready(self.input@,g,l.plane_len as int));}
+             else {assert(plane_ready(self.input@,g,l.plane_len as int));}
+             crate::float64::convert(l,scratch,g.block_width,self.format.predictor==2,output);
+-            return Ok(());
++            return;
++        }
++        if l.bytes==1 && l.slots==1 && !l.palette && !l.separate && !l.white && l.alpha!=1 {
++            proof {l.identity(self.input@,self.native_bytes());}
++            let native:&[u8]=scratch;
++            let (source,_)=native.split_at(l.output_len);
++            let (dest,_)=output.split_at_mut(l.output_len);
++            dest.copy_from_slice(source);
++            assert forall|k:int| 0<=k<self.byte_len() implies output@[k]==self.decoded_byte(k) by {
++                assert(k<l.output_len);
++                assert(output@[k]==native@[k]);
++                assert(native@[k]==scratch@[k]);
++                assert(self.decoded_byte(k)==l.converted(self.input@,self.native_bytes(),k));
++                assert(scratch@[k]==self.raw_byte(k));
++                assert(self.native_bytes()[k]==scratch@[k]);
++                assert(l.converted(self.input@,self.native_bytes(),k)==scratch@[k]);
++            }
++            return;
++        }
++        if l.bytes==2 && l.slots==1 && !l.palette && !l.separate && !l.white {
++            proof {l.interleaved16(self.input@,self.native_bytes());}
++            let mut k=0usize;
++            while k<l.output_len
++                invariant self.well_formed(),l==self.layout,l.bytes==2,l.slots==1,!l.palette,!l.separate,!l.white,
++                    k<=l.output_len,k%2==0,l.output_len%2==0,l.scratch_len==l.output_len,
++                    scratch.len()>=l.scratch_len,output.len()==old(output).len(),l.output_len<=output.len(),
++                    forall|i:int| 0<=i<l.scratch_len ==> scratch@[i]==self.raw_byte(i),
++                    forall|i:int| 0<=i<l.output_len ==> self.decoded_byte(i)==self.native_bytes()[if l.le {i+1-2*(i%2)} else {i}],
++                    forall|i:int| 0<=i<k ==> output@[i]==self.decoded_byte(i),
++                    forall|i:int| l.output_len<=i<output.len() ==> output@[i]==old(output)@[i],
++                decreases l.output_len-k,
++            {
++                assert(k+1<l.output_len);
++                output[k]=scratch[if l.le {k+1} else {k}];
++                output[k+1]=scratch[if l.le {k} else {k+1}];
++                k=k+2;
++            }
++            return;
+         }
+         let mut k=0usize;
+         while k<l.output_len
+@@ -186,9 +235,8 @@
+                 output.len()==old(output).len(),
+                 forall|i:int| 0<=i<k ==> output@[i]==self.decoded_byte(i),
+                 forall|i:int| l.output_len<=i<output.len() ==> output@[i]==old(output)@[i],
+-                scratch.len()==old(scratch).len(),scratch.len()>=l.scratch_len,
++                scratch.len()>=l.scratch_len,
+                 forall|i:int| 0<=i<l.scratch_len ==> scratch@[i]==self.raw_byte(i),
+-                forall|i:int| l.scratch_len<=i<scratch.len() ==> scratch@[i]==old(scratch)@[i],
+             decreases l.output_len-k,
+         {
+             output[k]=l.convert(self.input,scratch,k);
+@@ -197,8 +245,8 @@
+             }
+             k=k+1;
+         }
+-        Ok(())
+-    }
++    }
++
+ }
+ 
+ 
+@@ -303,6 +351,22 @@
+     &&& geometry_profile(s,d,le,l,limits)
+     &&& storage_profile(s,d,le,l,limits)
+ }
++pub closed spec fn supported_deflate_profile(s:Seq<u8>,page:usize,limits:Limits) -> bool {
++    let le=s[0]==73;
++    let d=directory_model(s,nth_ifd(s,word32(s,4,le),le,page as nat),le);
++    supported_extended_profile(s,page,limits) && is_deflate(s,d,le)
++}
++pub open spec fn deflate_decode_work_bound(page:usize,limits:Limits) -> int {
++    2*extended_inspection_work_bound(page,limits)+2*(limits.max_output as int)
++}
++pub fn deflate_decode_work_limit(page:usize,limits:&Limits) -> (r:Result<usize,Error>)
++    ensures r.is_ok()==(deflate_decode_work_bound(page,*limits)<=usize::MAX),
++        r.is_ok() ==> r.unwrap()==deflate_decode_work_bound(page,*limits),
++{
++    let inspect=extended_inspection_work_limit(page,limits)?;
++    add(mul(inspect,2)?,mul(limits.max_output,2)?)
++}
++
+ pub open spec fn extended_inspection_work_bound(page:usize,limits:Limits) -> int {
+     (page as int+1)*(limits.max_tags as int+1)+20*limits.max_tags+4
+         +4*((limits.max_segments as int)*(8*(limits.max_input as int)+2*(limits.max_output as int)+65))
+@@ -431,24 +495,47 @@
+         r.is_ok() ==> r.unwrap().byte_len()<=limits.max_output,
+         r.is_ok() ==> r.unwrap().scratch_size()<=limits.max_output,
+ {
+-    let ghost eligible=supported_extended_profile(s@,page,*limits) && budget.remaining as int>=extended_inspection_work_bound(page,*limits);
++    let mut scratch=[0u8;0];
++    inspect_extended_capture(s,page,limits,budget,&mut scratch,false)
++}
++
++fn inspect_extended_capture<'a>(s:&'a [u8],page:usize,limits:&Limits,budget:&mut Budget,scratch:&mut [u8],capture:bool) -> (r:Result<ExtendedImage<'a>,Error>)
++    ensures final(scratch).len()==old(scratch).len(),
++        forall|k:int| 0<=k<old(scratch).len() && (!capture || k>=limits.max_output) ==> final(scratch)@[k]==old(scratch)@[k],
++        r.is_ok() && capture ==> r.unwrap().source_compression()==8 || r.unwrap().source_compression()==32946,
++        r.is_ok() && capture ==> old(scratch).len()>=r.unwrap().scratch_size(),
++        r.is_ok() && capture ==> forall|k:int| 0<=k<r.unwrap().scratch_size() ==> final(scratch)@[k]==r.unwrap().raw_byte(k),
++        r.is_ok() && capture ==> forall|k:int| r.unwrap().scratch_size()<=k<old(scratch).len() ==> final(scratch)@[k]==old(scratch)@[k],
++        final(budget).remaining<=old(budget).remaining,
++        r.is_ok() ==> old(budget).remaining as int-final(budget).remaining<=extended_inspection_work_bound(page,*limits),
++        r.is_ok() && capture ==> r.unwrap().work_len()<=extended_inspection_work_bound(page,*limits)+2*(limits.max_output as int),
++        supported_extended_profile(s@,page,*limits) && old(budget).remaining as int>=extended_inspection_work_bound(page,*limits)
++            && (!capture || (supported_deflate_profile(s@,page,*limits) && old(scratch).len()>=limits.max_output)) ==> r.is_ok(),
++        r.is_ok() ==> r.unwrap().well_formed(),
++        r.is_ok() ==> r.unwrap().metadata_matches_source(),
++        r.is_ok() ==> r.unwrap().selected_page()==page,
++        r.is_ok() ==> r.unwrap().byte_len()<=limits.max_output,
++        r.is_ok() ==> r.unwrap().scratch_size()<=limits.max_output,
++{
++    let ghost eligible=(!capture || (supported_deflate_profile(s@,page,*limits) && old(scratch).len()>=limits.max_output)) && supported_extended_profile(s@,page,*limits) && budget.remaining as int>=extended_inspection_work_bound(page,*limits);
+     let ghost unit=8*(limits.max_input as int)+2*(limits.max_output as int)+65;
+     let ghost plane_bound=(limits.max_segments as int)*unit;
+     let ghost tail=20*(limits.max_tags as int)+4+4*plane_bound;
+-    reveal(supported_extended_profile);
++    reveal(supported_extended_profile);reveal(supported_deflate_profile);
+     if s.len()>limits.max_input || page>=limits.max_directories {return Err(Error::Limit);}
+     let header=header(s)?;let le=header.little_endian;
+     let mut off=header.first_ifd;let mut p=0usize;
+     while p<page
+         invariant p<=page,budget.remaining<=old(budget).remaining,
+-            eligible==(supported_extended_profile(s@,page,*limits) && old(budget).remaining as int>=extended_inspection_work_bound(page,*limits)),
++            plane_bound==(limits.max_segments as int)*unit,unit==8*(limits.max_input as int)+2*(limits.max_output as int)+65,
++            eligible==((!capture || (supported_deflate_profile(s@,page,*limits) && old(scratch).len()>=limits.max_output)) && supported_extended_profile(s@,page,*limits) && old(budget).remaining as int>=extended_inspection_work_bound(page,*limits)),
+             tail==20*(limits.max_tags as int)+4+4*((limits.max_segments as int)*(8*(limits.max_input as int)+2*(limits.max_output as int)+65)),
+             old(budget).remaining as int-budget.remaining<=p as int*(limits.max_tags as int+1),
+             header_valid(s@),le==(s@[0]==73),header.first_ifd==word32(s@,4,le),
+             off==nth_ifd(s@,header.first_ifd as int,le,p as nat),
+         decreases page-p,
+     {
+-        reveal(supported_extended_profile);
++        reveal(supported_extended_profile);reveal(supported_deflate_profile);
+         assert(eligible ==> directory_valid(s@,off as int,le,*limits));
+         proof {if eligible {traversal_budget(old(budget).remaining as int,budget.remaining as int,p as int,page as int,limits.max_tags as int,tail);}}
+         if off==0 {return Err(Error::PageNotFound);}
+@@ -458,12 +545,16 @@
+     }
+     if off==0 {return Err(Error::PageNotFound);}
+     proof {if eligible {traversal_budget(old(budget).remaining as int,budget.remaining as int,p as int,page as int,limits.max_tags as int,tail);}}
++    assert((page as int+1)*(limits.max_tags as int+1)==page as int*(limits.max_tags as int+1)+limits.max_tags+1) by(nonlinear_arith);
+     let d=directory(s,off,le,limits,budget)?;
++    assert(old(budget).remaining as int-budget.remaining<=(page as int+1)*(limits.max_tags as int+1));
+     assert(eligible ==> budget.remaining as int>=tail);
+     let f=read_ext_format(s,d,le,limits,budget)?;
++    if capture && f.compression!=8 && f.compression!=32946 {return Err(Error::Unsupported);}
+     reveal(ext_fields);
+     let l=read_raster_layout(s,d,le,f,limits,budget)?;
+     let base=read_extended_geometry(s,d,le,f,l,limits,budget)?;
++    if capture && scratch.len()<l.scratch_len {return Err(Error::OutputTooSmall);}
+     let encoded_width=l.encoded_width;let plane_channels=l.plane_channels;let planes=l.planes;
+     let plane_len=l.plane_len;let scratch_len=l.scratch_len;let output_len=l.output_len;
+     let offsets=base.offsets;let counts=base.counts;
+@@ -471,6 +562,7 @@
+     assert(eligible ==> l==layout_model(s@,d,le));
+     assert(eligible ==> budget.remaining as int>=4*plane_bound);
+     let ghost before_planes=budget.remaining;
++    assert(old(budget).remaining as int-before_planes<=extended_inspection_work_bound(page,*limits)-4*plane_bound);
+     reveal(storage_profile);reveal(plane_work);
+     proof {if eligible {
+         assert forall|q:int| 0<=q<planes implies 0<=#[trigger] plane_work(s@,d,le,l,q) by {
+@@ -486,12 +578,14 @@
+     let mut decode_work=add(scratch_len,output_len)?;
+     let mut plane=0usize;
+     while plane<planes
+-        invariant eligible==(supported_extended_profile(s@,page,*limits) && old(budget).remaining as int>=extended_inspection_work_bound(page,*limits)),
++        invariant eligible==((!capture || (supported_deflate_profile(s@,page,*limits) && old(scratch).len()>=limits.max_output)) && supported_extended_profile(s@,page,*limits) && old(budget).remaining as int>=extended_inspection_work_bound(page,*limits)),
+             eligible ==> geometry_profile(s@,d,le,l,*limits) && storage_profile(s@,d,le,l,*limits),
+             eligible ==> forall|q:int| 0<=q<planes ==> 0<=#[trigger] plane_work(s@,d,le,l,q),
+             eligible ==> before_planes as int>=4*plane_bound,
+             eligible ==> forall|q:int| 0<=q<planes ==> window_valid(offsets,q,n as int) && window_valid(counts,q,n as int),
+             before_planes as int-budget.remaining<=plane as int*plane_bound,
++            old(budget).remaining as int-before_planes<=extended_inspection_work_bound(page,*limits)-4*plane_bound,
++            capture ==> decode_work as int<=scratch_len as int+output_len+plane as int*plane_bound,
+             plane_bound==(limits.max_segments as int)*unit,unit==8*(limits.max_input as int)+2*(limits.max_output as int)+65,
+             0<n<=limits.max_segments,s.len()<=limits.max_input,
+             base.tiled==lookup(s@,d,324,le).is_some(),
+@@ -500,7 +594,8 @@
+             base.offsets==lookup(s@,d,if base.tiled {324} else {273},le).unwrap(),
+             base.counts==lookup(s@,d,if base.tiled {325} else {279},le).unwrap(),
+             plane<=planes,1<=planes<=4,plane_len>0,l.valid(),layout_matches(l,f,le),
+-            scratch_len==l.scratch_len,output_len==l.output_len,planes==l.planes,
++            scratch_len==l.scratch_len,output_len==l.output_len,planes==l.planes,plane_len==l.plane_len,
++            scratch_len<=limits.max_output,output_len<=limits.max_output,
+             base.positive(),!base.bilevel,!base.lsb,!base.white,base.alpha==0,
+             base.width==encoded_width,base.height==f.height,base.channels==plane_channels,
+             base.packbits==(f.compression==32773),base.lzw==(f.compression==5),
+@@ -512,6 +607,9 @@
+             forall|q:int| 0<=q<plane ==> if f.compression==8 || f.compression==32946 {dp::ready(s@,geometry@[q],plane_len as int)} else {plane_ready(s@,geometry@[q],plane_len as int)},
+             forall|q:int| 0<=q<planes ==> (Geometry {offsets:window(offsets,q,n as int),counts:window(counts,q,n as int),..base})==geom_model(s@,d,le,l,q),
+             budget.remaining<=old(budget).remaining,
++            scratch.len()==old(scratch).len(),capture ==> scratch.len()>=scratch_len && (f.compression==8 || f.compression==32946),
++            forall|k:int| 0<=k<scratch.len() && (!capture || k>=scratch_len) ==> scratch@[k]==old(scratch)@[k],
++            capture ==> forall|k:int| 0<=k<plane as int*plane_len ==> scratch@[k]==dp::raw(s@,geometry@[k/(plane_len as int)],k%(plane_len as int)),
+         decreases planes-plane,
+     {
+         reveal(geometry_profile);reveal(storage_profile);reveal(plane_work);
+@@ -529,17 +627,81 @@
+         let g=Geometry {offsets,counts,..base};
+         assert(eligible ==> storage_plane_profile(s@,d,le,l,plane as int,*limits));
+         reveal(storage_plane_profile);
+-        let work=if f.compression==8 || f.compression==32946 {dp::validate(s,g,plane_len,limits.max_output,budget)?} else {validate_plane(s,g,plane_len,budget)?};
++        let ghost prior_scratch=scratch@;
++        let work=if capture {
++            assert(0<=plane as int*plane_len<=scratch_len) by(nonlinear_arith)
++                requires plane<planes,plane_len>0,scratch_len as int==plane_len as int*planes;
++            let start=mul(plane,plane_len)?;
++            assert(start as int+plane_len<=scratch_len) by(nonlinear_arith)
++                requires plane<planes,scratch_len as int==plane_len as int*planes,start as int==plane as int*plane_len;
++            let (head,tail)=scratch.split_at_mut(start);let (part,rest)=tail.split_at_mut(plane_len);
++            assert(head@==prior_scratch.subrange(0,start as int));
++            assert(rest@==prior_scratch.subrange(start as int+plane_len,prior_scratch.len() as int));
++            let work=if !g.tiled {dp::validate_into(s,g,plane_len,limits.max_output,budget,part,true)?}
++                else {let work=dp::validate(s,g,plane_len,limits.max_output,budget)?;dp::decode(s,g,plane_len,part)?;work};
++            assert forall|k:int| 0<=k<plane_len implies part@[k]==dp::raw(s@,g,k) by {};
++            work
++        } else if f.compression==8 || f.compression==32946 {dp::validate(s,g,plane_len,limits.max_output,budget)?} else {validate_plane(s,g,plane_len,budget)?};
+         proof {
+             if eligible {planes_work_monotone(s@,d,le,l,(plane+1) as nat,planes as nat);}
+             planes_work_step(s@,d,le,l,plane as nat);
+         }
++        assert(capture ==> work as int<=plane_bound);
+         decode_work=add(decode_work,work)?;
+         assert((plane as int+1)*plane_bound==plane as int*plane_bound+plane_bound) by(nonlinear_arith);
+         geometry[plane]=g;
++        proof {
++            if capture {
++                assert forall|k:int| 0<=k<(plane as int+1)*plane_len implies scratch@[k]==dp::raw(s@,geometry@[k/(plane_len as int)],k%(plane_len as int)) by {
++                    quotient_remainder(k,plane_len as int);
++                    assert(0<=k/(plane_len as int)<=plane) by(nonlinear_arith)
++                        requires plane_len>0,k==plane_len as int*(k/(plane_len as int))+k%(plane_len as int),
++                            0<=k%(plane_len as int)<plane_len,0<=k<(plane as int+1)*plane_len;
++                    if k<plane as int*plane_len {
++                        assert(k/(plane_len as int)<plane) by(nonlinear_arith)
++                            requires plane_len>0,k==plane_len as int*(k/(plane_len as int))+k%(plane_len as int),
++                                0<=k%(plane_len as int)<plane_len,k<plane as int*plane_len;
++                        assert(scratch@[k]==prior_scratch[k]);
++                    }
++                    else {
++                        assert(0<=k-plane as int*plane_len<plane_len) by(nonlinear_arith)
++                            requires plane as int*plane_len<=k<(plane as int+1)*plane_len;
++                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,plane_len as int,plane as int,k-plane as int*plane_len);
++                    }
++                }
++            }
++        }
+         plane=plane+1;
+     }
++    assert(0<=plane as int*plane_bound<=4*plane_bound) by(nonlinear_arith)
++        requires plane<=4,plane_bound>=0;
++    assert(plane as int*plane_len==scratch_len) by(nonlinear_arith)
++        requires plane==planes,planes==l.planes,plane_len==l.plane_len,scratch_len==l.scratch_len,l.scratch_len as int==l.plane_len as int*l.planes;
+     Ok(ExtendedImage {input:s,format:f,layout:l,geometry,directory:d,page,limits:*limits,decode_work})
+ }
+ 
+-}
++/// Decode a Deflate TIFF into caller-owned buffers while validating strips.
++/// Other compressions return Unsupported before writing. Errors may leave a
++/// partial scratch prefix; output is unchanged on failure. The original inspection
++/// API retains its prevalidation contract. Use deflate_decode_work_limit for a
++/// sufficient budget and buffers of limits.max_output for sufficient capacity.
++pub fn decode_deflate_into<'a>(s:&'a [u8],page:usize,limits:&Limits,output:&mut [u8],scratch:&mut [u8],budget:&mut Budget) -> (r:Result<ExtendedImage<'a>,Error>)
++    ensures final(budget).remaining<=old(budget).remaining,
++        supported_deflate_profile(s@,page,*limits) && old(budget).remaining as int>=deflate_decode_work_bound(page,*limits)
++            && old(scratch).len()>=limits.max_output && old(output).len()>=limits.max_output ==> r.is_ok(),
++        r.is_err() ==> final(output)@==old(output)@,
++        final(output).len()==old(output).len(),final(scratch).len()==old(scratch).len(),
++        r.is_ok() ==> r.unwrap().well_formed() && r.unwrap().metadata_matches_source(),
++        r.is_ok() ==> r.unwrap().selected_page()==page && r.unwrap().byte_len()<=limits.max_output && r.unwrap().scratch_size()<=limits.max_output,
++        r.is_ok() ==> forall|k:int| 0<=k<r.unwrap().byte_len() ==> final(output)@[k]==r.unwrap().decoded_byte(k),
++        r.is_ok() ==> forall|k:int| r.unwrap().byte_len()<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
++        forall|k:int| limits.max_output<=k<old(scratch).len() ==> final(scratch)@[k]==old(scratch)@[k],
++{
++    let image=inspect_extended_capture(s,page,limits,budget,scratch,true)?;
++    if output.len()<image.output_len() {return Err(Error::OutputTooSmall);}
++    spend(budget,image.decode_work_limit())?;
++    image.render_native(scratch,output);
++    Ok(image)
++}
++
++}
+--- a/src/jpeg.rs
++++ b/src/jpeg.rs
+@@ -69,25 +69,105 @@
+         if output.len()<self.output || scratch.len()<self.scratch {return Err(Error::OutputTooSmall);}
+         spend(budget,self.work)?;
+         js::decode_blocks(self.input,self.v,self.bits,self.count,self.legacy,scratch)?;
+-        let mut k=0usize;
+-        while k<self.output
+-            invariant self.well_formed(),k<=self.output,output.len()==old(output).len(),output.len()>=self.output,
+-                scratch.len()>=self.scratch,
++        self.render(scratch,output);
++        Ok(())
++    }
++    fn render(&self,scratch:&[u8],output:&mut [u8])
++        requires self.well_formed(),scratch.len()>=self.scratch,old(output).len()>=self.output,
++            forall|j:int| 0<=j<self.scratch ==> scratch@[j]==crate::jpeg_transform::sample(self.coefficient_blocks()[j/64],j%64),
++        ensures final(output).len()==old(output).len(),
++            forall|j:int| 0<=j<self.output ==> final(output)@[j]==self.decoded_byte(j),
++            forall|j:int| self.output<=j<old(output).len() ==> final(output)@[j]==old(output)@[j],
++    {
++        let w=self.v[12];let h=self.v[13];let ch=self.v[14];let hs=self.v[15];
++        assert(w as int*ch<=self.output) by(nonlinear_arith)
++            requires self.output as int==w as int*h*ch,h>0,w>0,ch>0;
++        let row=w*ch;let mut y=0usize;
++        assert(self.output as int==h as int*row) by(nonlinear_arith)
++            requires self.output as int==w as int*h*ch,row as int==w as int*ch;
++        while y<h
++            invariant self.well_formed(),w==self.v@[12],h==self.v@[13],ch==self.v@[14],hs==self.v@[15],
++                row as int==w as int*ch,y<=h,self.output as int==h as int*row,
++                scratch.len()>=self.scratch,output.len()==old(output).len(),output.len()>=self.output,
+                 forall|j:int| 0<=j<self.scratch ==> scratch@[j]==crate::jpeg_transform::sample(self.coefficient_blocks()[j/64],j%64),
+-                forall|j:int| 0<=j<k ==> output@[j]==self.decoded_byte(j),
+-                forall|j:int| k<=j<output.len() ==> output@[j]==old(output)@[j],
+-            decreases self.output-k,
++                forall|j:int| 0<=j<y as int*row ==> output@[j]==self.decoded_byte(j),
++                forall|j:int| self.output<=j<output.len() ==> output@[j]==old(output)@[j],
++            decreases h-y,
+         {
+-            let c=k%self.v[14];let x=(k/self.v[14])%self.v[12];let y=(k/self.v[14])/self.v[12];
+-            assert(y<self.v@[13]) by(nonlinear_arith) requires k<self.output,self.output==self.v@[12] as int*self.v@[13]*self.v@[14],self.v@[12]>0,self.v@[14]>0,y==(k/self.v@[14])/self.v@[12];
+-            let value=if self.ycbcr && self.v[14]==3 {
+-                let a=crate::jpeg_layout::source(&self.v,x,y,0);let b=crate::jpeg_layout::source(&self.v,x,y,1);let d=crate::jpeg_layout::source(&self.v,x,y,2);
+-                crate::jpeg_color::convert(scratch[a],scratch[b],scratch[d],c,self.limited)
+-            } else {let a=crate::jpeg_layout::source(&self.v,x,y,c);scratch[a]};
+-            output[k]=value;k=k+1;
++            let mut x=0usize;
++            while x<w
++                invariant self.well_formed(),w==self.v@[12],h==self.v@[13],ch==self.v@[14],hs==self.v@[15],
++                    row as int==w as int*ch,y<h,self.output as int==h as int*row,
++                    x<=w,x<w ==> x%8==0,
++                    scratch.len()>=self.scratch,output.len()==old(output).len(),output.len()>=self.output,
++                    forall|j:int| 0<=j<self.scratch ==> scratch@[j]==crate::jpeg_transform::sample(self.coefficient_blocks()[j/64],j%64),
++                    forall|j:int| 0<=j<y as int*row+x as int*ch ==> output@[j]==self.decoded_byte(j),
++                    forall|j:int| self.output<=j<output.len() ==> output@[j]==old(output)@[j],
++                decreases w-x,
++            {
++                let n=if w-x<8 {w-x} else {8};let count=n*ch;
++                let a=crate::jpeg_layout::source(&self.v,x,y,0);
++                let ae=crate::jpeg_layout::source(&self.v,x+n-1,y,0);
++                let b=if ch==3 {crate::jpeg_layout::source(&self.v,x,y,1)} else {a};
++                let be=if ch==3 {crate::jpeg_layout::source(&self.v,x+n-1,y,1)} else {ae};
++                let d=if ch==3 {crate::jpeg_layout::source(&self.v,x,y,2)} else {a};
++                let de=if ch==3 {crate::jpeg_layout::source(&self.v,x+n-1,y,2)} else {ae};
++                let phase=(x%(hs*8))%hs;
++                proof {
++                    crate::jpeg_layout::run_index(self.v@,x as int,y as int,0,n as int-1);
++                    if ch==3 {
++                        crate::jpeg_layout::run_index(self.v@,x as int,y as int,1,n as int-1);
++                        crate::jpeg_layout::run_index(self.v@,x as int,y as int,2,n as int-1);
++                    }
++                    assert(y as int*row+x as int*ch+count<=self.output) by(nonlinear_arith)
++                        requires y<h,x+n<=w,row as int==w as int*ch,count as int==n as int*ch,self.output as int==h as int*row,ch>0;
++                }
++                let dst=y*row+x*ch;let mut i=0usize;
++                while i<count
++                    invariant self.well_formed(),w==self.v@[12],h==self.v@[13],ch==self.v@[14],hs==self.v@[15],
++                        row as int==w as int*ch,y<h,x<w,x%8==0,0<n<=8,x+n<=w,
++                        dst as int==y as int*row+x as int*ch,count as int==n as int*ch,dst as int+count<=self.output,i<=count,
++                        a==crate::jpeg_layout::index(self.v@,x as int,y as int,0),a as int+n<=self.scratch,
++                        ch==3 ==> b==crate::jpeg_layout::index(self.v@,x as int,y as int,1) && d==crate::jpeg_layout::index(self.v@,x as int,y as int,2)
++                            && b as int+(phase as int+n-1)/(hs as int)<self.scratch && d as int+(phase as int+n-1)/(hs as int)<self.scratch,
++                        phase as int==(x as int%(hs as int*8))%(hs as int),phase<hs,
++                        scratch.len()>=self.scratch,output.len()==old(output).len(),output.len()>=self.output,
++                        forall|j:int| 0<=j<self.scratch ==> scratch@[j]==crate::jpeg_transform::sample(self.coefficient_blocks()[j/64],j%64),
++                        forall|j:int| 0<=j<dst as int+i ==> output@[j]==self.decoded_byte(j),
++                        forall|j:int| self.output<=j<output.len() ==> output@[j]==old(output)@[j],
++                    decreases count-i,
++                {
++                    let c=i%ch;let col=i/ch;
++                    proof {
++                        quotient_remainder(i as int,ch as int);
++                        assert(col<n) by(nonlinear_arith) requires i<count,count as int==n as int*ch,i as int==ch as int*col+c,c>=0,ch>0;
++                        let k=dst as int+i;let p=y as int*w+x+col;
++                        assert(k==p*ch+c) by(nonlinear_arith) requires k==dst as int+i,dst as int==y as int*row+x as int*ch,row as int==w as int*ch,i as int==ch as int*col+c,p==y as int*w+x+col;
++                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,ch as int,p,c as int);
++                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p,w as int,y as int,x as int+col);
++                        crate::jpeg_layout::run_index(self.v@,x as int,y as int,0,col as int);
++                        if ch==3 {
++                            crate::jpeg_layout::run_index(self.v@,x as int,y as int,1,col as int);
++                            crate::jpeg_layout::run_index(self.v@,x as int,y as int,2,col as int);
++                            vstd::arithmetic::div_mod::lemma_div_is_ordered(phase as int+col,phase as int+n-1,hs as int);
++                        }
++                    }
++                    let value=if self.ycbcr && ch==3 {
++                        let off=(phase+col)/hs;
++                        crate::jpeg_color::convert(scratch[a+col],scratch[b+off],scratch[d+off],c,self.limited)
++                    } else {scratch[if c==0 {a+col} else if c==1 {b+(phase+col)/hs} else {d+(phase+col)/hs}]};
++                    assert(value==self.decoded_byte(dst as int+i));
++                    output[dst+i]=value;i=i+1;
++                }
++                x=x+n;
++                assert(x<w ==> x%8==0);
++            }
++            assert(y as int*row+w as int*ch==(y as int+1)*row) by(nonlinear_arith)
++                requires row as int==w as int*ch;
++            y=y+1;
+         }
+-        Ok(())
+-    }
++    }
++
+ }
+ pub(super) open spec fn sample(s:Seq<u8>,v:Seq<usize>,bits:Bits,legacy:bool,x:int,y:int,c:int) -> u8 {
+     let blocks=js::finish(s,v,js::initial(bits),js::total(v) as nat,legacy).unwrap().blocks;
+--- a/src/jpeg_bits.rs
++++ b/src/jpeg_bits.rs
+@@ -20,7 +20,7 @@
+         else {Some((1usize,Bits {at:(b.at+2) as usize,byte:255,left:7,..b}))}
+     } else {Some(((s[b.at as int]/128) as usize,Bits {at:(b.at+1) as usize,byte:s[b.at as int],left:7,..b}))}
+ }
+-#[inline]
++#[inline(always)]
+ pub(super) fn bit(s:&[u8],b:Bits) -> (r:Result<(usize,Bits),Error>)
+     requires b.valid(s@),
+     ensures r.is_ok()==one(s@,b).is_some(),r.is_ok() ==> r.unwrap()==one(s@,b).unwrap(),
+@@ -28,8 +28,11 @@
+ {
+     reveal(one);
+     if b.left>0 {
+-        let div=bit_divisor(b.left-1) as usize;
+-        Ok((((b.byte as usize)/div)%2,Bits {left:b.left-1,..b}))
++        let shift=b.left-1;let byte=b.byte as usize;
++        proof {shift_power(byte,shift);}
++        let v=(byte>>shift)&1;
++        assert(v==(byte>>shift)%2) by(bit_vector) requires v==(byte>>shift)&1;
++        Ok((v,Bits {left:b.left-1,..b}))
+     } else {
+         if b.at==b.end {return Err(Error::Truncated);}
+         let v=s[b.at];
+@@ -47,6 +50,73 @@
+             if c.is_none() {None} else {Some(((2*v+c.unwrap().0) as usize,c.unwrap().1))}}
+     }
+ }
++proof fn properties(s:Seq<u8>,b:Bits,n:nat)
++    requires b.valid(s),n<=16,
++    ensures field(s,b,n).is_some() ==> field(s,b,n).unwrap().1.valid(s) && field(s,b,n).unwrap().0<db::pow(n as int),
++    decreases n,
++{
++    reveal_with_fuel(field,1);reveal(one);
++    if n>0 {properties(s,b,(n-1) as nat);db::pow_bound(n as int-1);}
++}
++proof fn join(s:Seq<u8>,b:Bits,i:nat,n:nat)
++    requires b.valid(s),i+n<=16,field(s,b,i).is_some(),
++    ensures field(s,b,i+n)==match field(s,field(s,b,i).unwrap().1,n) {
++        None=>None,
++        Some((w,r))=>Some(((field(s,b,i).unwrap().0 as int*db::pow(n as int)+w) as usize,r)),
++    },
++    decreases n,
++{
++    reveal_with_fuel(field,1);
++    properties(s,b,i);let q=field(s,b,i).unwrap().1;
++    let a=field(s,b,i).unwrap().0 as int;
++    if n>0 {
++        join(s,b,i,(n-1) as nat);properties(s,q,(n-1) as nat);properties(s,b,(i+n-1) as nat);
++        db::pow_bound(n as int-1);
++        if field(s,q,(n-1) as nat).is_some() {
++            let (w,t)=field(s,q,(n-1) as nat).unwrap();let p=db::pow(n as int-1);
++            assert(0<=a*p+w<32768) by(nonlinear_arith)
++                requires 0<=a<db::pow(i as int),0<=w<p,p==db::pow(n as int-1),i+n<=16,0<=i,0<n<=16;
++            assert(field(s,b,(i+n-1) as nat)==Some(((a*p+w) as usize,t)));
++            reveal(one);
++            if one(s,t).is_some() {
++                let (c,r)=one(s,t).unwrap();assert(c<=1);
++                assert(field(s,b,i+n)==Some(((2*(a*p+w)+c) as usize,r)));
++                assert(field(s,q,n)==Some(((2*w+c) as usize,r)));
++                assert(2*(a*p+w)+c==a*(2*p)+(2*w+c)) by(nonlinear_arith);
++            }
++        }
++    }
++}
++pub(super) proof fn shift_power(value:usize,shift:usize)
++    requires shift<=16,
++    ensures (value>>shift) as int==value as int/db::pow(shift as int),
++{
++    crate::bit_window::powers(shift as u32);
++    assert((1usize<<shift)==(1u32<<(shift as u32)) as usize) by(bit_vector) requires shift<=16;
++    assert((value>>shift)==value/(1usize<<shift)) by(bit_vector) requires shift<=16;
++}
++proof fn buffered(s:Seq<u8>,b:Bits,n:u32)
++    requires b.valid(s),n<=b.left,
++    ensures field(s,b,n as nat)==Some((((b.byte as u32>>((b.left-n) as u32))&(((1u32<<n)-1) as u32)) as usize,
++        Bits {left:(b.left-n) as usize,..b})),
++    decreases n,
++{
++    reveal_with_fuel(field,1);reveal(one);
++    crate::bit_window::powers(n);
++    let byte=b.byte as u32;let left=b.left as u32;
++    if n==0 {
++        assert(((byte>>left)&(((1u32<<n)-1) as u32))==0) by(bit_vector) requires n==0,left<=8;
++    } else {
++        buffered(s,b,(n-1) as u32);crate::bit_window::powers((left-n) as u32);
++        assert(((byte>>((left-n) as u32))&(((1u32<<n)-1) as u32)) as u32
++            ==2*((byte>>((left-n+1) as u32))&(((1u32<<((n-1) as u32))-1) as u32))
++                +(byte/(1u32<<((left-n) as u32)))%2) by(bit_vector)
++            requires byte<=255,0<n<=left<=8;
++        assert(((byte>>((left-n+1) as u32))&(((1u32<<((n-1) as u32))-1) as u32))<=255) by(bit_vector)
++            requires byte<=255,0<n<=left<=8;
++    }
++}
++#[inline(always)]
+ pub(super) fn read(s:&[u8],b:Bits,n:usize) -> (r:Result<(usize,Bits),Error>)
+     requires b.valid(s@),n<=16,
+     ensures r.is_ok()==field(s@,b,n as nat).is_some(),
+@@ -56,10 +126,34 @@
+     let mut q=b;let mut v=0usize;let mut i=0usize;
+     reveal_with_fuel(field,1);
+     while i<n
+-        invariant i<=n,n<=16,q.valid(s@),v<db::pow(i as int),
++        invariant i<=n,n<=16,b.valid(s@),q.valid(s@),v<db::pow(i as int),
+             field(s@,b,i as nat)==Some((v,q)),
+         decreases n-i,
+     {
++        if q.left>0 {
++            let take=if q.left<n-i {q.left} else {n-i};
++            let shift=q.left-take;
++            let factor=power(take);
++            let c=((q.byte as usize)>>shift)&(factor-1);
++            let qb=q.byte;let qleft=q.left;
++            proof {
++                buffered(s@,q,take as u32);properties(s@,q,take as nat);
++                crate::bit_window::powers(take as u32);
++                assert(c as u32==((qb as u32>>((qleft-take) as u32))&(((1u32<<(take as u32))-1) as u32))) by(bit_vector)
++                    requires qleft<=8,0<take<=qleft,shift==qleft-take,factor==(1u32<<(take as u32)) as usize,
++                        c==((qb as usize)>>shift)&((factor-1) as usize);
++                assert(c<factor) by(bit_vector)
++                    requires factor>=1,factor<=256,c==((qb as usize)>>shift)&((factor-1) as usize),
++                        factor==(1u32<<(take as u32)) as usize,take<=8;
++                join(s@,b,i as nat,take as nat);
++                properties(s@,b,(i+take) as nat);
++            }
++            let next=Bits {left:q.left-take,..q};
++            assert(v as int*factor+c<65536) by(nonlinear_arith)
++                requires v<db::pow(i as int),c<factor,factor as int==db::pow(take as int),i+take<=16,0<=i,0<take<=8;
++            v=v*factor+c;q=next;i=i+take;
++            continue;
++        }
+         let a=bit(s,q);
+         if a.is_err() {
+             proof {field_failure(s@,b,i as nat,n as nat);}
+--- a/src/jpeg_block.rs
++++ b/src/jpeg_block.rs
+@@ -12,6 +12,7 @@
+     let a=&[0usize,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63];a[k]
+ }
+ pub(super) open spec fn extend(v:int,n:int) -> int {if n==0 {0} else if v<db::pow(n-1) {v+1-db::pow(n)} else {v}}
++#[inline(always)]
+ fn amplitude(s:&[u8],b:Bits,n:usize) -> (r:Result<(i64,Bits),Error>)
+     requires b.valid(s@),n<=11,
+     ensures r.is_ok()==field(s@,b,n as nat).is_some(),
+--- a/src/jpeg_huffman.rs
++++ b/src/jpeg_huffman.rs
+@@ -70,6 +70,7 @@
+         }
+     }
+ }
++#[inline(always)]
+ pub(super) fn decode(s:&[u8],b:Bits,h:Huff) -> (r:Result<(u8,Bits),Error>)
+     requires b.valid(s@),h.valid(s@),
+     ensures r.is_ok()==symbol(s@,b,h.base as int,1,0,0,0).is_some(),
+--- a/src/jpeg_layout.rs
++++ b/src/jpeg_layout.rs
+@@ -43,4 +43,32 @@
+         b*64+(ry/t)*8+rx/h
+     }
+ }
++// Within an aligned eight-pixel run, component samples are contiguous or
++// repeated by the horizontal chroma factor. Compute the expensive base once.
++pub(super) proof fn run_index(v:Seq<usize>,x:int,y:int,c:int,i:int)
++    requires frame_ok(v),0<=x<v[12],0<=y<v[13],0<=c<v[14],x%8==0,
++        0<=i<8,x+i<v[12],
++    ensures index(v,x+i,y,c)==index(v,x,y,c)+(if c==0 {i} else {((x%(8*(v[15] as int)))%(v[15] as int)+i)/(v[15] as int)}),
++{
++    let h=v[15] as int;let mw=8*h;
++    quotient_remainder(x,mw);quotient_remainder(x,8);
++    let q=x/mw;let rx=x%mw;
++    assert(rx==8*(x/8-h*q)) by(nonlinear_arith)
++        requires x==mw*q+rx,mw==8*h,x==8*(x/8);
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(rx,8,x/8-h*q,0);
++    quotient_remainder(rx,8);
++    assert(rx+i<mw) by(nonlinear_arith)
++        requires rx==8*(rx/8),rx<mw,mw==8*h,0<=i<8;
++    assert(x+i==q*mw+(rx+i)) by(nonlinear_arith) requires x==mw*q+rx;
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x+i,mw,q,rx+i);
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(rx+i,8,rx/8,i);
++    if c>0 {
++        quotient_remainder(rx,h);quotient_remainder(rx%h+i,h);
++        let q=(rx%h+i)/h;let r=(rx%h+i)%h;
++        assert(rx+i==h*(rx/h+q)+r) by(nonlinear_arith)
++            requires rx==h*(rx/h)+rx%h,rx%h+i==h*q+r;
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(rx+i,h,rx/h+q,r);
++    }
+ }
++
++}
+--- a/src/jpeg_transform.rs
++++ b/src/jpeg_transform.rs
+@@ -3,9 +3,6 @@
+ use super::*;
+ verus! {
+ pub(super) open spec fn basis(k:int) -> int {seq![11585int,16069,15137,13623,11585,9102,6270,3196,11585,13623,6270,-3196,-11585,-16069,-15137,-9102,11585,9102,-6270,-16069,-11585,3196,15137,13623,11585,3196,-15137,-9102,11585,13623,-6270,-16069,11585,-3196,-15137,9102,11585,-13623,-6270,16069,11585,-9102,-6270,16069,-11585,-3196,15137,-13623,11585,-13623,6270,3196,-11585,16069,-15137,9102,11585,-16069,15137,-13623,11585,-9102,6270,-3196][k]}
+-fn weight(k:usize) -> (r:i64) requires k<64, ensures r as int==basis(k as int),-16384<=r<=16384, {
+-    let a=&[11585i64,16069,15137,13623,11585,9102,6270,3196,11585,13623,6270,-3196,-11585,-16069,-15137,-9102,11585,9102,-6270,-16069,-11585,3196,15137,13623,11585,3196,-15137,-9102,11585,13623,-6270,-16069,11585,-3196,-15137,9102,11585,-13623,-6270,16069,11585,-9102,-6270,16069,-11585,-3196,15137,-13623,11585,-13623,6270,3196,-11585,16069,-15137,9102,11585,-16069,15137,-13623,11585,-9102,6270,-3196];a[k]
+-}
+ pub(super) open spec fn row(c:Seq<i64>,v:int,x:int,n:nat) -> int decreases n {
+     if n==0 {0} else {row(c,v,x,(n-1) as nat)+c[v*8+n-1] as int*basis(x*8+n-1)}
+ }
+@@ -16,52 +13,117 @@
+     let v=col(c,k/8,k%8,8)+137975824384;
+     if v<=0 {0u8} else if v>=273804165120 {255u8} else {(v/1073741824) as u8}
+ }
++spec fn line(c:Seq<i64>,x:int,n:nat) -> int decreases n {
++    if n==0 {0} else {line(c,x,(n-1) as nat)+c[n-1] as int*basis(x*8+n-1)}
++}
++// Exact factorization of our existing integer matrix, including its rounding.
++// Mirror symmetry shares even/odd terms; constant blocks bypass the AC work.
++#[inline(always)]
++#[verifier::spinoff_prover]
++fn transform(c:[i64;8],limit:i64) -> (out:[i64;8])
++    requires 0<=limit<=68719476736,forall|i:int| 0<=i<8 ==> -limit<=#[trigger] c@[i]<=limit,
++    ensures forall|i:int| 0<=i<8 ==> out@[i] as int==line(c@,i,8)
++        && -(limit as int)*131072<=out@[i]<=(limit as int)*131072,
++{
++    assert(-limit<=c[0]<=limit);assert(-limit<=c[1]<=limit);
++    assert(-limit<=c[2]<=limit);assert(-limit<=c[3]<=limit);
++    assert(-limit<=c[4]<=limit);assert(-limit<=c[5]<=limit);
++    assert(-limit<=c[6]<=limit);assert(-limit<=c[7]<=limit);
++    if c[1]==0 && c[2]==0 && c[3]==0 && c[4]==0 && c[5]==0 && c[6]==0 && c[7]==0 {
++        let dc=c[0]*11585;
++        let out=[dc;8];
++        assert forall|i:int| 0<=i<8 implies out@[i] as int==line(c@,i,8)
++            && -(limit as int)*131072<=out@[i]<=(limit as int)*131072 by {
++            reveal_with_fuel(line,9);
++            if i==0 {} else if i==1 {} else if i==2 {} else if i==3 {} else if i==4 {} else if i==5 {} else if i==6 {} else {}
++        }
++        return out;
++    }
++    let a=(c[0]+c[4])*11585;let b=(c[0]-c[4])*11585;
++    let e=c[2]*15137+c[6]*6270;let f=c[2]*6270-c[6]*15137;
++    let e0=a+e;let e1=b+f;let e2=b-f;let e3=a-e;
++    let o0=c[1]*16069+c[3]*13623+c[5]*9102+c[7]*3196;
++    let o1=c[1]*13623-c[3]*3196-c[5]*16069-c[7]*9102;
++    let o2=c[1]*9102-c[3]*16069+c[5]*3196+c[7]*13623;
++    let o3=c[1]*3196-c[3]*9102+c[5]*13623-c[7]*16069;
++    let out=[e0+o0,e1+o1,e2+o2,e3+o3,e3-o3,e2-o2,e1-o1,e0-o0];
++    assert forall|i:int| 0<=i<8 implies out@[i] as int==line(c@,i,8)
++        && -(limit as int)*131072<=out@[i]<=(limit as int)*131072 by {
++        reveal_with_fuel(line,9);
++        if i==0 {} else if i==1 {} else if i==2 {} else if i==3 {} else if i==4 {} else if i==5 {} else if i==6 {} else {}
++    }
++    out
++}
++proof fn line_row(c:Seq<i64>,v:int,x:int,n:nat)
++    requires c.len()==64,0<=v<8,0<=x<8,n<=8,
++    ensures line(Seq::new(8,|i:int| c[v*8+i]),x,n)==row(c,v,x,n),
++    decreases n,
++{if n>0 {line_row(c,v,x,(n-1) as nat);}}
++proof fn line_col(c:Seq<i64>,t:Seq<i64>,x:int,y:int,n:nat)
++    requires c.len()==64,t.len()==64,0<=x<8,0<=y<8,n<=8,
++        forall|j:int| 0<=j<64 ==> t[j] as int==row(c,j/8,j%8,8),
++    ensures line(Seq::new(8,|i:int| t[i*8+x]),y,n)==col(c,y,x,n),
++    decreases n,
++{
++    if n>0 {
++        line_col(c,t,x,y,(n-1) as nat);
++        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse((n as int-1)*8+x,8,n as int-1,x);
++    }
++}
+ pub(super) fn idct(c:[i64;64]) -> (out:[u8;64])
+     requires forall|k:int| 0<=k<64 ==> -524288<=#[trigger] c@[k]<=524288,
+     ensures forall|k:int| 0<=k<64 ==> out@[k]==sample(c@,k),
+ {
+-    let mut t=[0i64;64];let mut k=0usize;
+-    while k<64
+-        invariant k<=64,forall|j:int| 0<=j<64 ==> -524288<=#[trigger] c@[j]<=524288,
+-            forall|j:int| 0<=j<k ==> t@[j] as int==row(c@,j/8,j%8,8) && -68719476736<=t@[j]<=68719476736,
+-        decreases 64-k,
++    let mut t=[0i64;64];let mut v=0usize;
++    while v<8
++        invariant v<=8,forall|j:int| 0<=j<64 ==> -524288<=#[trigger] c@[j]<=524288,
++            forall|j:int| 0<=j<v as int*8 ==> t@[j] as int==row(c@,j/8,j%8,8) && -68719476736<=t@[j]<=68719476736,
++        decreases 8-v,
+     {
+-        let mut n=0usize;let mut v=0i64;
+-        while n<8
+-            invariant n<=8,k<64,v as int==row(c@,k as int/8,k as int%8,n as nat),
+-                -(n as int)*8589934592<=v<=(n as int)*8589934592,
++        let i=v*8;
++        let a=[c[i],c[i+1],c[i+2],c[i+3],c[i+4],c[i+5],c[i+6],c[i+7]];
++        assert(a@ =~= Seq::new(8,|j:int| c@[v as int*8+j]));
++        let r=transform(a,524288);let mut x=0usize;
++        while x<8
++            invariant v<8,i==v*8,x<=8,a@==Seq::new(8,|j:int| c@[v as int*8+j]),
+                 forall|j:int| 0<=j<64 ==> -524288<=#[trigger] c@[j]<=524288,
+-            decreases 8-n,
++                forall|j:int| 0<=j<8 ==> r@[j] as int==line(a@,j,8) && -68719476736<=r@[j]<=68719476736,
++                forall|j:int| 0<=j<v as int*8+x ==> t@[j] as int==row(c@,j/8,j%8,8) && -68719476736<=t@[j]<=68719476736,
++            decreases 8-x,
+         {
+-            let a=c[k/8*8+n];let b=weight(k%8*8+n);
+-            assert(-8589934592<=a as int*b as int<=8589934592) by(nonlinear_arith)
+-                requires -524288<=a<=524288,-16384<=b<=16384;
+-            v=v+a*b;n=n+1;
++            proof {
++                line_row(c@,v as int,x as int,8);
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(i as int+x,8,v as int,x as int);
++            }
++            t[i+x]=r[x];x=x+1;
+         }
+-        t[k]=v;k=k+1;
++        v=v+1;
+     }
+-    let mut out=[0u8;64];k=0;
+-    while k<64
+-        invariant k<=64,
++    let mut out=[0u8;64];let mut x=0usize;
++    while x<8
++        invariant x<=8,
+             forall|j:int| 0<=j<64 ==> t@[j] as int==row(c@,j/8,j%8,8) && -68719476736<=t@[j]<=68719476736,
+-            forall|j:int| 0<=j<k ==> out@[j]==sample(c@,j),
+-        decreases 64-k,
++            forall|j:int| 0<=j<64 && j%8<x ==> out@[j]==sample(c@,j),
++        decreases 8-x,
+     {
+-        let mut n=0usize;let mut v=0i64;
+-        while n<8
+-            invariant n<=8,k<64,v as int==col(c@,k as int/8,k as int%8,n as nat),
+-                -(n as int)*1125899906842624<=v<=(n as int)*1125899906842624,
++        let a=[t[x],t[8+x],t[16+x],t[24+x],t[32+x],t[40+x],t[48+x],t[56+x]];
++        assert(a@ =~= Seq::new(8,|j:int| t@[j*8+x]));
++        let r=transform(a,68719476736);let mut y=0usize;
++        while y<8
++            invariant x<8,y<=8,a@==Seq::new(8,|j:int| t@[j*8+x]),
+                 forall|j:int| 0<=j<64 ==> t@[j] as int==row(c@,j/8,j%8,8) && -68719476736<=t@[j]<=68719476736,
+-            decreases 8-n,
++                forall|j:int| 0<=j<8 ==> r@[j] as int==line(a@,j,8) && -9007199254740992<=r@[j]<=9007199254740992,
++                forall|j:int| 0<=j<64 && (j%8<x || (j%8==x && j/8<y)) ==> out@[j]==sample(c@,j),
++            decreases 8-y,
+         {
+-            let a=t[n*8+k%8];let b=weight(k/8*8+n);
+-            assert(-1125899906842624<=a as int*b as int<=1125899906842624) by(nonlinear_arith)
+-                requires -68719476736<=a<=68719476736,-16384<=b<=16384;
+-            v=v+a*b;n=n+1;
++            let k=y*8+x;
++            proof {line_col(c@,t@,x as int,y as int,8);
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k as int,8,y as int,x as int);}
++            let v=r[y];let shifted=v+137975824384;
++            out[k]=if shifted<=0 {0} else if shifted>=273804165120 {255} else {(shifted/1073741824) as u8};
++            y=y+1;
+         }
+-        let shifted=v+137975824384;
+-        out[k]=if shifted<=0 {0} else if shifted>=273804165120 {255} else {(shifted/1073741824) as u8};
+-        k=k+1;
++        x=x+1;
+     }
+     out
+ }
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -28,6 +28,7 @@
+ mod fax_tiff;
+ mod fax_witness;
+ pub use fax_tiff::*;
++mod bit_window;
+ mod jpeg_bits;
+ mod jpeg_huffman;
+ mod jpeg_transform;
+@@ -542,6 +543,14 @@
+         forall|i:int| 0<=i<n ==> final(output)@[i]==output_pixel(_s@,g,i),
+         forall|i:int| n<=i<old(output).len() ==> final(output)@[i]==old(output)@[i],
+ {
++    // Straight, non-inverted samples already have the requested representation.
++    // Keep the conservative public quota; avoid a redundant image traversal.
++    if g.alpha!=1 && !g.white {
++        assert forall|i:int| 0<=i<n implies output@[i]==output_pixel(_s@,g,i) by {
++            alpha_index_bounds(g,i);
++        }
++        return;
++    }
+     let mut k=0usize;
+     while k<n
+         invariant g.positive(), g.alpha!=0, n as int==g.width as int*g.height*g.channels,
+@@ -660,6 +669,16 @@
+             r.is_ok() ==> r.unwrap() as int == lz_wire_bits(s@,old(self).pos(),n as nat,old(self).legacy),
+             r.is_ok() ==> r.unwrap() < 4096,
+     {
++        if self.end-self.at>=3 {
++            let v=bit_window::read(s,self.at,self.bit,n,!self.legacy);
++            let next=self.bit+n;
++            proof {
++                quotient_remainder(next as int,8);
++                assert(deflate_bits::pow(n as int)<=4096);
++            }
++            self.at=self.at+next/8;self.bit=next%8;
++            return Ok(v);
++        }
+         let mut v=0usize;
+         proof { reveal_with_fuel(lz_bits,1); reveal_with_fuel(lz_lsb_bits,1); }
+         let mut i=0usize;
+@@ -1888,6 +1907,46 @@
+     if g.white && g.alpha==0 { (255-value) as u8 } else { value }
+ }
+ 
++// One coordinate calculation covers all visible bits of a storage byte.
++#[inline(always)]
++fn bilevel_span(g:Geometry,j:usize,i:usize,stride:usize) -> (r:(usize,usize))
++    requires g.positive(),g.bilevel,stride as int==g.row_bytes(),
++        g.width as int*g.height*g.channels<=usize::MAX,
++    ensures r.1<=8,r.0 as int+r.1<=g.width as int*g.height*g.channels,
++        forall|b:int| 0<=b<8 ==> (target_valid(g,j as int,i as int,b)==(b<r.1)),
++        forall|b:int| 0<=b<r.1 ==> target_index(g,j as int,i as int,b)==r.0 as int+b,
++{
++    let base=match storage_target(g,j,i,0,stride) {
++        Some(k)=>k,
++        None=>{
++            assert forall|b:int| 0<=b<8 implies !target_valid(g,j as int,i as int,b) by {
++                assert(target_x(g,j as int,i as int,b)==target_x(g,j as int,i as int,0)+b);
++                assert(target_x(g,j as int,i as int,0)>=0) by(nonlinear_arith)
++                    requires g.across>0,g.block_width>0,0<=j as int%(g.across as int),0<=i as int%(stride as int),
++                        target_x(g,j as int,i as int,0)==(j as int%(g.across as int))*g.block_width+(i as int%(stride as int))*8;
++            }
++            return (0,0);
++        }
++    };
++    assert(target_valid(g,j as int,i as int,0));
++    let ghost x=target_x(g,j as int,i as int,0);let ghost y=target_y(g,j as int,i as int);
++    proof {vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(base as int,g.width as int,y,x);}
++    let col=(i%stride)*8;
++    let room=g.width-base%g.width;
++    let tile_room=g.block_width-col;
++    let n=if room<8 {room} else {8};
++    let n=if tile_room<n {tile_room} else {n};
++    assert(base as int+n<=g.width as int*g.height*g.channels) by(nonlinear_arith)
++        requires base as int==y*g.width+x,0<=y<g.height,0<=x<g.width,0<n<=g.width as int-x,g.width>0,g.channels==1;
++    assert forall|b:int| 0<=b<8 implies target_valid(g,j as int,i as int,b)==(b<n) by {
++        assert(target_x(g,j as int,i as int,b)==x+b);
++    }
++    assert forall|b:int| 0<=b<n implies target_index(g,j as int,i as int,b)==base as int+b by {
++        assert(target_x(g,j as int,i as int,b)==x+b);
++    }
++    (base,n)
++}
++
+ #[inline(always)]
+ fn scatter_byte(g: Geometry, j: usize, i: usize, stride: usize, byte: u8, output: &mut [u8])
+     requires g.positive(), stride as int == g.row_bytes(),
+@@ -1902,9 +1961,13 @@
+             final(output)@[k] == old(output)@[k],
+ {
+     let slots=if g.bilevel { 8usize } else { 1usize };
++    let (span_start,span_len)=if g.bilevel {bilevel_span(g,j,i,stride)} else {(0usize,0usize)};
+     let mut b=0usize;
+     while b<slots
+-        invariant b<=slots, slots == if g.bilevel { 8usize } else { 1usize },
++        invariant g.bilevel ==> span_len<=8 && span_start as int+span_len<=g.width as int*g.height*g.channels,
++            g.bilevel ==> forall|q:int| 0<=q<8 ==> (target_valid(g,j as int,i as int,q)==(q<span_len)),
++            g.bilevel ==> forall|q:int| 0<=q<span_len ==> target_index(g,j as int,i as int,q)==span_start as int+q,
++            b<=slots, slots == if g.bilevel { 8usize } else { 1usize },
+             g.positive(), stride as int == g.row_bytes(),
+             g.across as int == (g.width as int-1)/(g.block_width as int)+1,
+             output.len() == old(output).len(),
+@@ -1919,7 +1982,10 @@
+     {
+         let ghost prior_output=output@;
+         let ghost prior_b=b;
+-        let target=storage_target(g,j,i,b,stride);
++        let target=if g.bilevel {if b<span_len {Some(span_start+b)} else {None}}
++            else {storage_target(g,j,i,b,stride)};
++        assert(target.is_some()==target_valid(g,j as int,i as int,b as int));
++        assert(target.is_some() ==> target.unwrap()==target_index(g,j as int,i as int,b as int));
+         proof {
+             if target.is_some() { target_maps_to_sample(g,j as int,i as int,b as int); }
+             assert forall|k: int| 0 <= k < g.width as int*g.height*g.channels
+@@ -1931,7 +1997,14 @@
+         if let Some(k)=target {
+             let value=if g.bilevel {
+                 let shift=if g.lsb { b } else { 7-b };
+-                if (byte/bit_divisor(shift))%2 == 0 { 0u8 } else { 255u8 }
++                let digit=((byte as u32)>>(shift as u32))&1;
++                proof {
++                    bit_window::powers(shift as u32);
++                    assert(deflate_bits::pow(shift as int)==power2(shift as int));
++                    assert(digit==((byte as u32)/(1u32<<(shift as u32)))%2) by(bit_vector)
++                        requires shift<8,digit==((byte as u32)>>(shift as u32))&1;
++                }
++                if digit==0 {0u8} else {255u8}
+             } else { byte };
+             let final_value=if g.white && g.alpha==0 {255-value} else {value};
+             assert(final_value == normalized(byte,g,k as int));
+@@ -2680,6 +2753,29 @@
+         requires g.local(k)==((y%(g.block_height as int))*w+x)*ch+c,i==ch*x+c;
+ }
+ 
++// Any visible run confined to one tile row is contiguous in storage.
++proof fn tile_row_mapping(g:Geometry,y:int,x:int,n:int,i:int)
++    requires g.positive(),!g.bilevel,0<=y<g.height,0<=x<g.width,
++        0<n<=g.width as int-x,x%(g.block_width as int)+n<=g.block_width,
++        0<=i<n*g.channels,
++    ensures g.segment((y*g.width+x)*g.channels+i)==y/(g.block_height as int)*g.across+x/(g.block_width as int),
++        g.local((y*g.width+x)*g.channels+i)==((y%(g.block_height as int))*g.block_width+x%(g.block_width as int))*g.channels+i,
++{
++    let w=g.width as int;let ch=g.channels as int;let bw=g.block_width as int;
++    let ix=i/ch;let c=i%ch;let xx=x+ix;let p=y*w+xx;let k=(y*w+x)*ch+i;
++    quotient_remainder(i,ch);quotient_remainder(x,bw);
++    assert(0<=ix<n) by(nonlinear_arith)
++        requires 0<ch,0<n,0<=i<n*ch,i==ch*ix+c,0<=c<ch,0<=ix;
++    assert(k==p*ch+c) by(nonlinear_arith)
++        requires k==(y*w+x)*ch+i,p==y*w+x+ix,i==ch*ix+c;
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,ch,p,c);
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p,w,y,xx);
++    assert(xx==bw*(x/bw)+(x%bw+ix));
++    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(xx,bw,x/bw,x%bw+ix);
++    assert(g.local(k)==((y%(g.block_height as int))*bw+x%bw)*ch+i) by(nonlinear_arith)
++        requires g.local(k)==((y%(g.block_height as int))*bw+x%bw+ix)*ch+c,i==ch*ix+c;
++}
++
+ fn copy_byte_run(input:&[u8],src:usize,output:&mut [u8],dst:usize,n:usize,invert:bool)
+     requires src as int+n<=input.len(),dst as int+n<=old(output).len(),
+     ensures final(output).len()==old(output).len(),
+@@ -2870,8 +2966,9 @@
+             forall|i:int| 0<=i<self.byte_len() ==> final(output)@[i]==storage_pixel(self.input@,self.geometry,i),
+             forall|i:int| self.byte_len()<=i<old(output).len() ==> final(output)@[i]==old(output)@[i],
+     {
+-        if !self.geometry.bilevel && !self.geometry.tiled {
+-            return self.decode_uncompressed_rows(output);
++        if !self.geometry.bilevel {
++            if !self.geometry.tiled {return self.decode_uncompressed_rows(output);}
++            return self.decode_uncompressed_tile_rows(output);
+         }
+         let mut k=0usize;
+         while k<self.output_len
+@@ -2883,6 +2980,73 @@
+         {
+             output[k]=sample(self.input,self.geometry,k)?;
+             k=k+1;
++        }
++        Ok(())
++    }
++
++    fn decode_uncompressed_tile_rows(&self,output:&mut [u8]) -> (r:Result<(),Error>)
++        requires self.well_formed(),!self.geometry.packbits && !self.geometry.lzw,
++            !self.geometry.bilevel,old(output).len()>=self.byte_len(),
++        ensures r.is_ok(),final(output).len()==old(output).len(),
++            forall|i:int| 0<=i<self.byte_len() ==> final(output)@[i]==storage_pixel(self.input@,self.geometry,i),
++            forall|i:int| self.byte_len()<=i<old(output).len() ==> final(output)@[i]==old(output)@[i],
++    {
++        let g=self.geometry;let mut k=0usize;
++        while k<self.output_len
++            invariant self.well_formed(),g==self.geometry,!g.bilevel,!g.packbits,!g.lzw,
++                k<=self.output_len,k%g.channels==0,
++                output.len()==old(output).len(),output.len()>=self.output_len,
++                forall|i:int| 0<=i<k ==> output@[i]==storage_pixel(self.input@,g,i),
++                forall|i:int| self.output_len<=i<output.len() ==> output@[i]==old(output)@[i],
++            decreases self.output_len-k,
++        {
++            let p=k/g.channels;let x=p%g.width;let y=p/g.width;
++            proof {
++                quotient_remainder(k as int,g.channels as int);
++                quotient_remainder(p as int,g.width as int);
++                assert(p as int==y as int*g.width+x) by(nonlinear_arith)
++                    requires p as int==g.width as int*y+x;
++                assert(p<g.width as int*g.height) by(nonlinear_arith)
++                    requires k<self.output_len,self.output_len as int==g.width as int*g.height*g.channels,
++                        k as int==p as int*g.channels,g.channels>0;
++                assert(y<g.height) by(nonlinear_arith)
++                    requires p<g.width as int*g.height,p as int==y as int*g.width+x,x>=0,g.width>0;
++            }
++            let tile_left=g.block_width-x%g.block_width;
++            let image_left=g.width-x;
++            let pixels=if tile_left<image_left {tile_left} else {image_left};
++            proof {
++                assert(pixels>0);
++                assert(pixels as int*g.channels>0) by(nonlinear_arith) requires pixels>0,g.channels>0;
++                assert(k as int+pixels as int*g.channels<=self.output_len) by(nonlinear_arith)
++                    requires k as int==p as int*g.channels,p as int==y as int*g.width+x,
++                        pixels<=g.width-x,y<g.height,g.channels>0,
++                        self.output_len as int==g.width as int*g.height*g.channels;
++                tile_row_mapping(g,y as int,x as int,pixels as int,0);
++                tile_row_mapping(g,y as int,x as int,pixels as int,pixels as int*g.channels-1);
++                assert(sample_valid(self.input@,g,k as int));
++                assert(sample_valid(self.input@,g,k as int+pixels as int*g.channels-1));
++            }
++            let count=mul(pixels,g.channels)?;
++            let block=add(mul(y/g.block_height,g.across)?,x/g.block_width)?;
++            let off=value(self.input,g.offsets,block,g.le)?;
++            let local=mul(add(mul(y%g.block_height,g.block_width)?,x%g.block_width)?,g.channels)?;
++            let src=add(off,local)?;
++            assert(src as int+count<=self.input.len());
++            let ghost before=output@;let ghost old_k=k;
++            copy_byte_run(self.input,src,output,k,count,g.white && g.alpha==0);
++            k=k+count;
++            proof {
++                assert(k as int==(p as int+pixels)*g.channels) by(nonlinear_arith)
++                    requires k as int==old_k as int+count,old_k as int==p as int*g.channels,count as int==pixels as int*g.channels;
++                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k as int,g.channels as int,p as int+pixels,0);
++                assert forall|i:int| 0<=i<k implies output@[i]==storage_pixel(self.input@,g,i) by {
++                    if i>=old_k {
++                        tile_row_mapping(g,y as int,x as int,pixels as int,i-old_k);
++                        assert(sample_address(self.input@,g,i)==src as int+i-old_k);
++                    }
++                }
++            }
+         }
+         Ok(())
+     }
+--- a/src/raster_layout.rs
++++ b/src/raster_layout.rs
+@@ -114,6 +114,43 @@
+             straight_color(v,raw[self.source_index(k-k%(self.ch as int)+self.ch-1)],self.alpha==1,self.white)
+         } else if self.white && self.alpha==0 {(255-v) as u8} else {v}
+     }
++    pub(super) proof fn identity(self,s:Seq<u8>,raw:Seq<u8>)
++        requires self.valid(),self.bytes==1,self.slots==1,!self.palette,!self.separate,!self.white,self.alpha!=1,
++            raw.len()>=self.scratch_len,
++        ensures self.scratch_len==self.output_len,
++            forall|k:int| 0<=k<self.output_len ==> self.converted(s,raw,k)==raw[k],
++    {
++        assert(self.scratch_len==self.output_len) by(nonlinear_arith)
++            requires self.encoded_width==self.w,self.plane_channels==self.ch,self.planes==1,
++                self.scratch_len==self.plane_len,self.plane_len as int==self.w as int*self.h*self.ch,
++                self.output_len as int==self.w as int*self.h*self.ch;
++        assert forall|k:int| 0<=k<self.output_len implies self.converted(s,raw,k)==raw[k] by {
++            quotient_remainder(k,self.ch as int);
++            assert(self.source_index(k)==k) by(nonlinear_arith)
++                requires self.source_index(k)==k/(self.ch as int)*self.ch+k%(self.ch as int),
++                    k==self.ch as int*(k/(self.ch as int))+k%(self.ch as int);
++        }
++    }
++    pub(super) proof fn interleaved16(self,s:Seq<u8>,raw:Seq<u8>)
++        requires self.valid(),self.bytes==2,self.slots==1,!self.palette,!self.separate,!self.white,
++            raw.len()>=self.scratch_len,
++        ensures self.scratch_len==self.output_len,self.output_len%2==0,
++            forall|k:int| 0<=k<self.output_len ==> self.converted(s,raw,k)==raw[if self.le {k+1-2*(k%2)} else {k}],
++    {
++        assert(self.scratch_len==self.output_len && self.output_len%2==0) by(nonlinear_arith)
++            requires self.encoded_width==self.w,self.plane_channels as int==self.ch as int*2,self.planes==1,
++                self.scratch_len==self.plane_len,self.plane_len as int==self.w as int*self.h*self.plane_channels,
++                self.output_len as int==self.w as int*self.h*self.ch*2;
++        assert forall|k:int| 0<=k<self.output_len implies self.converted(s,raw,k)==raw[if self.le {k+1-2*(k%2)} else {k}] by {
++            let stride=self.ch as int*2;
++            quotient_remainder(k,stride);
++            vstd::arithmetic::div_mod::lemma_mod_mod(k,2,self.ch as int);
++            assert(k%stride%2==k%2);
++            assert(self.source_index(k)==if self.le {k+1-2*(k%2)} else {k}) by(nonlinear_arith)
++                requires k==stride*(k/stride)+k%stride,k%stride%2==k%2,
++                    self.source_index(k)==k/stride*stride+(if self.le {k%stride+1-2*(k%stride%2)} else {k%stride});
++        }
++    }
+     pub(super) fn convert(self,s:&[u8],raw:&[u8],k:usize) -> (r:u8)
+         requires self.valid(),self.bytes!=8,k<self.output_len,raw.len()>=self.scratch_len,
+             self.palette ==> range_ok(s.len() as int,self.map.data as int,6*(self.colors as int)),
+@@ -142,9 +179,13 @@
+             proof {
+                 quotient_remainder(k as int,self.ch as int);
+                 let pixels=self.w as int*self.h;
++                let q=k as int/(self.ch as int);
++                assert(q<pixels) by(nonlinear_arith)
++                    requires k as int==self.ch as int*q+c,0<=c,self.ch>0,k<self.output_len,
++                        self.output_len as int==pixels*self.ch;
+                 assert(k as int-c+self.ch-1<self.output_len) by(nonlinear_arith)
+-                    requires self.output_len as int==pixels*self.ch,k<self.output_len,
+-                        k as int==self.ch as int*(k/self.ch)+c,0<=c<self.ch,self.ch>0;
++                    requires k as int==self.ch as int*q+c,q+1<=pixels,self.ch>0,
++                        self.output_len as int==pixels*self.ch;
+ 
+             }
+             let a=raw[self.index(k-c+self.ch-1)];

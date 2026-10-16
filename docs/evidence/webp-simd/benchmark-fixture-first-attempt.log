@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/017cea9a2f6e/verified-tiff/benchmarks/webp-simd.py", line 169, in <module>
+    if __name__ == '__main__': main()
+                               ^^^^^^
+  File "/workspace/scratch/017cea9a2f6e/verified-tiff/benchmarks/webp-simd.py", line 78, in main
+    cmd([READER/'encode',path,50001,8,ch,noise,tiled,1,w,h,64,1,2,0,lossless])
+  File "/workspace/scratch/017cea9a2f6e/verified-tiff/benchmarks/webp-simd.py", line 20, in cmd
+    return subprocess.run(list(map(str, args)), capture_output=True, text=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/workspace/scratch/017cea9a2f6e/verified-tiff/target/reader-benchmark/encode', '/workspace/scratch/017cea9a2f6e/verified-tiff/target/webp-simd/webp-lossy-odd.tif', '50001', '8', '4', '0', '0', '1', '257', '259', '64', '1', '2', '0', '0']' died with <Signals.SIGABRT: 6>.

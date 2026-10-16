@@ -1,0 +1,97 @@
+Exact before/after: main gray-none native
+Exact before/after: main gray-none scan
+Exact before/after: main gray-none rgba
+Exact before/after: main rgb-none native
+Exact before/after: main rgb-none rgba
+Exact before/after: main rgb-none crop
+Exact before/after: main gray-packbits native
+Exact before/after: main gray-packbits scan
+Exact before/after: main gray-packbits rgba
+Exact before/after: main gray-lzw native
+Exact before/after: main gray-lzw scan
+Exact before/after: main gray-lzw rgba
+Exact before/after: main rgb-lzw native
+Exact before/after: main rgb-lzw rgba
+Exact before/after: main rgb-lzw crop
+Exact before/after: main gray-deflate native
+Exact before/after: main gray-deflate scan
+Exact before/after: main gray-deflate rgba
+Exact before/after: main rgb-deflate native
+Exact before/after: main rgb-deflate rgba
+Exact before/after: main rgb-deflate crop
+Exact before/after: main gray-zstd native
+Exact before/after: main gray-zstd scan
+Exact before/after: main gray-zstd rgba
+Exact before/after: main rgb-zstd native
+Exact before/after: main rgb-zstd rgba
+Exact before/after: main rgb-zstd crop
+Exact before/after: main noise-lzw native
+Exact before/after: main noise-deflate native
+Exact before/after: main noise-zstd native
+Exact before/after: main jpeg-smooth native
+Exact before/after: main jpeg-smooth rgba
+Exact before/after: main jpeg-texture native
+Exact before/after: main jpeg-texture rgba
+Exact before/after: main rgb-tiled-lzw native
+Exact before/after: main rgb-tiled-lzw rgba
+Exact before/after: main rgb-tiled-lzw crop
+Exact before/after: main gray16-deflate-p2 native
+Exact before/after: main gray16-deflate-p2 scan
+Exact before/after: main float32-deflate-p3 native
+Exact before/after: main float32-deflate-p3 scan
+Exact before/after: main float16-deflate-p3 native
+Exact before/after: main float16-deflate-p3 scan
+Exact before/after: main complex64-lzw native
+Exact before/after: main complex64-lzw scan
+Exact before/after: main fax-rle native
+Exact before/after: main fax-rle rgba
+Exact before/after: main fax-g3 native
+Exact before/after: main fax-g3 rgba
+Exact before/after: main fax-g4 native
+Exact before/after: main fax-g4 rgba
+Exact before/after: main webp-lossless native
+Exact before/after: main webp-lossless rgba
+Exact before/after: main webp-lossy native
+Exact before/after: main webp-lossy rgba
+main lerc-float-plain native {'before': 45.9108, 'after': 33.8329, 'libtiff': 2.15}
+main lerc-float-deflate native {'before': 50.9874, 'after': 43.0366, 'libtiff': 3.1223}
+main lerc-float-zstd native {'before': 48.3344, 'after': 39.1418, 'libtiff': 2.9847}
+Exact before/after: main cmyk-deflate rgba
+Exact before/after: main cmyk-deflate crop
+Exact before/after: main lab-deflate rgba
+Exact before/after: main lab-deflate crop
+Exact before/after: main large-strip-none firstrow
+Exact before/after: main large-strip-none crop
+Exact before/after: main large-strip-lzw firstrow
+Exact before/after: main large-strip-lzw crop
+Exact before/after: main large-strip-deflate firstrow
+Exact before/after: main large-strip-deflate crop
+Exact before/after: main many-strips open
+Exact before/after: main many-strips lookup
+Exact before/after: main many-strips open-lazy
+Exact before/after: main many-strips lookup-lazy
+Exact before/after: main original-lzw-single-strip.tiff native
+Exact before/after: main original-lzw-single-strip.tiff rgba
+Exact before/after: main original-testfax4.tiff native
+Exact before/after: main original-testfax4.tiff rgba
+Exact before/after: main original-quad-lzw-compat.tiff native
+Exact before/after: main original-quad-lzw-compat.tiff rgba
+main lerc-float64-tiled native {'before': 45.4538, 'after': 33.456, 'libtiff': 2.3921}
+main lerc-uint16-tiled native {'before': 48.5302, 'after': 37.6262, 'libtiff': 2.2809}
+main lerc-int16-tiled native {'before': 47.7615, 'after': 37.4607, 'libtiff': 2.3071}
+main lerc-float32-strips native {'before': 42.7737, 'after': 32.6159, 'libtiff': 2.1373}
+Exact before/after: layout layout-rgb-deflate-16 native
+Exact before/after: layout layout-rgb-deflate-16 crop
+Exact before/after: layout layout-rgb-deflate-32 native
+Exact before/after: layout layout-rgb-deflate-32 crop
+Exact before/after: layout layout-rgb-deflate-64 native
+Exact before/after: layout layout-rgb-deflate-64 crop
+Exact before/after: layout layout-rgb-deflate-256 native
+Exact before/after: layout layout-rgb-deflate-256 crop
+Exact before/after: defaults large-strip-none firstrow
+Exact before/after: defaults large-strip-none crop
+Exact before/after: defaults large-strip-lzw firstrow
+Exact before/after: defaults large-strip-lzw crop
+Exact before/after: defaults large-strip-deflate firstrow
+Exact before/after: defaults large-strip-deflate crop
+Completed 96 workloads; all before/after output bytes exact

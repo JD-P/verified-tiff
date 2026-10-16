@@ -1,0 +1,8 @@
+16 native {'verified': 11.154, 'libtiff': 1.528}
+16 crop {'verified': 1.75, 'libtiff': 0.199}
+32 native {'verified': 111.171, 'libtiff': 1.307}
+32 crop {'verified': 14.621, 'libtiff': 0.185}
+64 native {'verified': 114.75, 'libtiff': 1.222}
+64 crop {'verified': 15.116, 'libtiff': 0.183}
+256 native {'verified': 120.076, 'libtiff': 1.229}
+256 crop {'verified': 44.548, 'libtiff': 0.382}

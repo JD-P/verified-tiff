@@ -1,0 +1,297 @@
+--- a/src/deflate.rs
++++ b/src/deflate.rs
+@@ -17,14 +17,14 @@
+     requires 257<=c<=285,
+     ensures r.0==lb(c as int),r.1==lext(c as int),3<=r.0<=258,r.1<=5,r.0+pow(r.1 as int)-1<=258,
+ {
+-    let base=[3usize,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
++    let base=&[3usize,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+     (base[c-257],if c<=264 || c==285 {0} else {(c-261)/4})
+ }
+ fn distance_info(c:usize) -> (r:(usize,usize))
+     requires c<30,
+     ensures r.0==db(c as int),r.1==dext(c as int),1<=r.0<=24577,r.1<=13,r.0+pow(r.1 as int)-1<=32768,
+ {
+-    let base=[1usize,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
++    let base=&[1usize,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+     (base[c],if c<4 {0} else {c/2-1})
+ }
+ pub(super) open spec fn adler1(b:Seq<u8>) -> int decreases b.len() {
+@@ -240,7 +240,7 @@
+         assert forall|i:int| 0<=i<16 implies counts@[i]==number(lens@,i,288) by {
+             zero_number(i,288);
+         }
+-        let blank=Huff {lens,counts};
++        let blank=Huff {lens,counts,offsets:[0usize;16],symbols:[0u16;288]};
+         assert(counts@==huff(lens@).counts);
+         assert(blank.model()==huff(Seq::new(288,|i:int|0u8)));
+         let history=Ghost(Seq::empty());
+--- a/src/deflate_bits.rs
++++ b/src/deflate_bits.rs
+@@ -17,6 +17,17 @@
+ #[verifier::opaque]
+ pub(super) open spec fn field(s:Seq<u8>,p:int,n:nat) -> int decreases n {
+     if n==0 {0} else {field(s,p,(n-1) as nat)+pow(n as int-1)*((s[(p+n-1)/8] as int / power2((p+n-1)%8))%2)}
++}
++// An aligned eight-bit field is exactly the stored byte.
++proof fn aligned_byte(s:Seq<u8>,at:int)
++    requires 0<=at<s.len(),
++    ensures field(s,at*8,8)==s[at] as int,
++{
++    let v=s[at] as u64;
++    assert(v==v%2+2*((v/2)%2)+4*((v/4)%2)+8*((v/8)%2)
++        +16*((v/16)%2)+32*((v/32)%2)+64*((v/64)%2)+128*((v/128)%2)) by(bit_vector)
++        requires v<=255;
++    reveal_with_fuel(field,9);
+ }
+ #[derive(Clone,Copy)]
+ pub(super) struct Bits {pub at:usize,pub bit:usize,pub end:usize}
+@@ -34,6 +45,12 @@
+             r.is_ok() ==> r.unwrap() as int==field(s@,old(self).pos(),n as nat),
+             r.is_ok() ==> r.unwrap()<pow(n as int),
+     {
++        if n==8 && self.bit==0 {
++            if self.at==self.end {return Err(Error::Truncated);}
++            proof {aligned_byte(s@,self.at as int);}
++            let byte=s[self.at];self.at=self.at+1;
++            return Ok(byte as usize);
++        }
+         let mut v=0usize;let mut weight=1usize;let mut i=0usize;
+         reveal_with_fuel(field,1);
+         while i<n
+@@ -91,12 +108,55 @@
+ pub(super) open spec fn huff(l:Seq<u8>) -> HModel {
+     HModel {lens:l,counts:Seq::new(16,|i:int| number(l,i,288) as usize)}
+ }
++// Count code lengths below a bucket. Used only to prove cache capacity.
++spec fn below(l:Seq<u8>,v:int,n:nat) -> int decreases n {
++    if n==0 {0} else {below(l,v,(n-1) as nat)+if l[n as int-1]<v {1int} else {0int}}
++}
++proof fn below_step(l:Seq<u8>,v:int,n:nat)
++    requires n<=l.len(),v>=0,
++    ensures 0<=below(l,v,n)<=n,below(l,0,n)==0,
++        below(l,v+1,n)==below(l,v,n)+number(l,v,n),
++        below(l,v,n)+number(l,v,n)<=n,
++    decreases n,
++{ if n>0 {below_step(l,v,(n-1) as nat);} }
++proof fn number_monotone(l:Seq<u8>,v:int,a:nat,b:nat)
++    requires a<=b<=l.len(),
++    ensures 0<=number(l,v,a)<=number(l,v,b),
++    decreases b,
++{ if b>0 {number_monotone(l,v,if a<b {a} else {(a-1) as nat},(b-1) as nat);} }
++// The i-th symbol is the symbol with its count of earlier peers as rank.
++proof fn ranked_at(l:Seq<u8>,v:int,i:nat,start:nat)
++    requires start<=i<l.len(),l[i as int]==v,
++    ensures ranked(l,v,number(l,v,i)-number(l,v,start),start)==i,
++    decreases i-start,
++{
++    if start<i {ranked_at(l,v,i,start+1);number_monotone(l,v,start+1,i);}
++    reveal_with_fuel(ranked,1);reveal_with_fuel(number,1);
++}
++proof fn ranked_absent(l:Seq<u8>,v:int,r:int,start:nat)
++    requires start<=l.len(),r>=number(l,v,l.len())-number(l,v,start),
++    ensures ranked(l,v,r,start)==-1,
++    decreases l.len()-start,
++{
++    if start<l.len() {
++        number_monotone(l,v,start+1,l.len());
++        ranked_absent(l,v,r-if l[start as int]==v {1int} else {0int},start+1);
++    }
++    reveal_with_fuel(ranked,1);reveal_with_fuel(number,1);
++}
+ #[derive(Clone,Copy)]
+-pub(super) struct Huff {pub lens:[u8;288],pub counts:[usize;16]}
++pub(super) struct Huff {
++    pub lens:[u8;288],pub counts:[usize;16],
++    pub offsets:[usize;16],pub symbols:[u16;288],
++}
+ impl Huff {
+     pub(super) open spec fn model(self) -> HModel {HModel {lens:self.lens@,counts:self.counts@}}
+     pub(super) open spec fn valid(self) -> bool {
+-        forall|i:int| 0<=i<16 ==> self.counts@[i]==number(self.lens@,i,288)
++        &&& forall|i:int| 0<=i<16 ==> self.counts@[i]==number(self.lens@,i,288)
++        &&& forall|i:int| 1<=i<16 ==> self.offsets@[i] as int+self.counts@[i]<=288
++        &&& forall|i:int,r:int| 1<=i<16 && 0<=r<self.counts@[i] ==>
++            #[trigger] self.symbols@[self.offsets@[i] as int+r] == ranked(self.lens@,i,r,0)
++            && self.symbols@[self.offsets@[i] as int+r]<288
+     }
+     pub(super) fn build(lens:[u8;288],strict:bool) -> (r:Result<Self,Error>)
+         ensures r.is_ok() == tree_ok(lens@,strict),
+@@ -135,30 +195,67 @@
+         // Empty distance alphabets are represented, but cannot decode a symbol.
+         // A one-symbol length-one alphabet is the permitted incomplete tree.
+         if left!=0 && (strict || (counts[0]!=288 && !(counts[0]==287 && counts[1]==1))) {return Err(Error::Invalid);}
+-        assert(Self {lens,counts}.model()==huff(lens@)) by {
+-            assert(counts@==huff(lens@).counts);
+-        }
+-        Ok(Self {lens,counts})
+-    }
+-    pub(super) fn find(self,len:usize,rank:usize) -> (r:Result<usize,Error>)
++        let (offsets,symbols)=ordered(lens,counts);
++        let out=Self {lens,counts,offsets,symbols};
++        assert(out.model()==huff(lens@)) by {assert(counts@==huff(lens@).counts);}
++        Ok(out)
++    }
++    pub(super) fn find(&self,len:usize,rank:usize) -> (r:Result<usize,Error>)
+         requires self.valid(),1<=len<=15,
+         ensures r.is_ok()==(ranked(self.lens@,len as int,rank as int,0)>=0),
+             r.is_ok() ==> r.unwrap()==ranked(self.lens@,len as int,rank as int,0),
+             r.is_ok() ==> r.unwrap()<288,
+     {
+-        let mut i=0usize;let mut r=rank;
++        if rank>=self.counts[len] {
++            proof {ranked_absent(self.lens@,len as int,rank as int,0);}
++            return Err(Error::Invalid);
++        }
++        Ok(self.symbols[self.offsets[len]+rank] as usize)
++    }
++}
++
++// Stable counting order, built once per Huffman table. The pure `ranked`
++// specification remains the original independent linear definition.
++fn ordered(lens:[u8;288],counts:[usize;16]) -> (out:([usize;16],[u16;288]))
++    requires forall|i:int| 0<=i<16 ==> counts@[i]==number(lens@,i,288),
++    ensures forall|i:int| 1<=i<16 ==> out.0@[i] as int+counts@[i]<=288,
++        forall|i:int,r:int| 1<=i<16 && 0<=r<counts@[i] ==>
++            #[trigger] out.1@[out.0@[i] as int+r]==ranked(lens@,i,r,0) && out.1@[out.0@[i] as int+r]<288,
++{
++    let mut offsets=[0usize;16];let mut symbols=[0u16;288];
++    let mut len=0usize;let mut base=0usize;
++    proof {below_step(lens@,0,288);}
++    while len<16
++        invariant len<=16,base<=288,base as int==below(lens@,len as int,288),
++            forall|i:int| 0<=i<16 ==> counts@[i]==number(lens@,i,288),
++            forall|i:int| 0<=i<len ==> offsets@[i] as int+counts@[i]<=base,
++            forall|i:int,r:int| 0<=i<len && 0<=r<counts@[i] ==>
++                #[trigger] symbols@[offsets@[i] as int+r]==ranked(lens@,i,r,0) && symbols@[offsets@[i] as int+r]<288,
++        decreases 16-len,
++    {
++        proof {below_step(lens@,len as int,288);}
++        offsets[len]=base;
++        let mut i=0usize;let mut rank=0usize;
+         while i<288
+-            invariant i<=288,r<=rank,1<=len<=15,
+-                ranked(self.lens@,len as int,rank as int,0)==ranked(self.lens@,len as int,r as int,i as nat),
++            invariant i<=288,len<16,base<=288,base as int+counts@[len as int]<=288,
++                rank as int==number(lens@,len as int,i as nat),rank<=counts@[len as int],offsets@[len as int]==base,
++                forall|j:int| 0<=j<16 ==> counts@[j]==number(lens@,j,288),
++                forall|j:int| 0<=j<len ==> offsets@[j] as int+counts@[j]<=base,
++                forall|j:int,r:int| 0<=j<len && 0<=r<counts@[j] ==>
++                    #[trigger] symbols@[offsets@[j] as int+r]==ranked(lens@,j,r,0) && symbols@[offsets@[j] as int+r]<288,
++                forall|r:int| 0<=r<rank ==> #[trigger] symbols@[base as int+r]==ranked(lens@,len as int,r,0) && symbols@[base as int+r]<288,
+             decreases 288-i,
+         {
+-            reveal_with_fuel(ranked,1);
+-            if self.lens[i] as usize==len {if r==0 {return Ok(i);} r=r-1;}
++            if lens[i] as usize==len {
++                proof {number_monotone(lens@,len as int,(i+1) as nat,288);ranked_at(lens@,len as int,i as nat,0);}
++                symbols[base+rank]=i as u16;rank=rank+1;
++            }
+             i=i+1;
+-        }
+-        reveal_with_fuel(ranked,1);
+-        Err(Error::Invalid)
+-    }
++            proof {number_monotone(lens@,len as int,i as nat,288);}
++        }
++        base=base+rank;len=len+1;
++    }
++    (offsets,symbols)
+ }
+ 
+ #[verifier::opaque]
+@@ -174,7 +271,7 @@
+     }
+ }
+ impl Huff {
+-    pub(super) fn read(self,s:&[u8],bits:&mut Bits) -> (r:Result<usize,Error>)
++    pub(super) fn read(&self,s:&[u8],bits:&mut Bits) -> (r:Result<usize,Error>)
+         requires self.valid(),old(bits).valid(s@),
+         ensures final(bits).valid(s@),final(bits).end==old(bits).end,
+             final(bits).pos()>=old(bits).pos(),
+--- a/src/jpeg.rs
++++ b/src/jpeg.rs
+@@ -81,9 +81,9 @@
+             let c=k%self.v[14];let x=(k/self.v[14])%self.v[12];let y=(k/self.v[14])/self.v[12];
+             assert(y<self.v@[13]) by(nonlinear_arith) requires k<self.output,self.output==self.v@[12] as int*self.v@[13]*self.v@[14],self.v@[12]>0,self.v@[14]>0,y==(k/self.v@[14])/self.v@[12];
+             let value=if self.ycbcr && self.v[14]==3 {
+-                let a=crate::jpeg_layout::source(self.v,x,y,0);let b=crate::jpeg_layout::source(self.v,x,y,1);let d=crate::jpeg_layout::source(self.v,x,y,2);
++                let a=crate::jpeg_layout::source(&self.v,x,y,0);let b=crate::jpeg_layout::source(&self.v,x,y,1);let d=crate::jpeg_layout::source(&self.v,x,y,2);
+                 crate::jpeg_color::convert(scratch[a],scratch[b],scratch[d],c,self.limited)
+-            } else {let a=crate::jpeg_layout::source(self.v,x,y,c);scratch[a]};
++            } else {let a=crate::jpeg_layout::source(&self.v,x,y,c);scratch[a]};
+             output[k]=value;k=k+1;
+         }
+         Ok(())
+--- a/src/jpeg_bits.rs
++++ b/src/jpeg_bits.rs
+@@ -3,7 +3,7 @@
+ use crate::deflate_bits as db;
+ verus! {
+ pub(super) fn power(n:usize) -> (r:usize) requires n<=16, ensures r==db::pow(n as int),1<=r<=65536, {
+-    let p=[1usize,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536];p[n]
++    let p=&[1usize,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536];p[n]
+ }
+ 
+ #[derive(Clone,Copy)]
+@@ -20,6 +20,7 @@
+         else {Some((1usize,Bits {at:(b.at+2) as usize,byte:255,left:7,..b}))}
+     } else {Some(((s[b.at as int]/128) as usize,Bits {at:(b.at+1) as usize,byte:s[b.at as int],left:7,..b}))}
+ }
++#[inline]
+ pub(super) fn bit(s:&[u8],b:Bits) -> (r:Result<(usize,Bits),Error>)
+     requires b.valid(s@),
+     ensures r.is_ok()==one(s@,b).is_some(),r.is_ok() ==> r.unwrap()==one(s@,b).unwrap(),
+@@ -27,7 +28,7 @@
+ {
+     reveal(one);
+     if b.left>0 {
+-        let div=power(b.left-1);
++        let div=bit_divisor(b.left-1) as usize;
+         Ok((((b.byte as usize)/div)%2,Bits {left:b.left-1,..b}))
+     } else {
+         if b.at==b.end {return Err(Error::Truncated);}
+--- a/src/jpeg_block.rs
++++ b/src/jpeg_block.rs
+@@ -9,7 +9,7 @@
+     seq![0int,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63][k]
+ }
+ fn zigzag(k:usize) -> (r:usize) requires k<64,ensures r==zig(k as int),r<64, {
+-    let a=[0usize,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63];a[k]
++    let a=&[0usize,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63];a[k]
+ }
+ pub(super) open spec fn extend(v:int,n:int) -> int {if n==0 {0} else if v<db::pow(n-1) {v+1-db::pow(n)} else {v}}
+ fn amplitude(s:&[u8],b:Bits,n:usize) -> (r:Result<(i64,Bits),Error>)
+--- a/src/jpeg_layout.rs
++++ b/src/jpeg_layout.rs
+@@ -9,7 +9,7 @@
+     if c==0 {(b+(ry/8)*h+rx/8)*64+(ry%8)*8+rx%8}
+     else {(b+h*t+c-1)*64+(ry/t)*8+rx/h}
+ }
+-pub(super) fn source(v:[usize;32],x:usize,y:usize,c:usize) -> (r:usize)
++pub(super) fn source(v:&[usize;32],x:usize,y:usize,c:usize) -> (r:usize)
+     requires frame_ok(v@),x<v@[12],y<v@[13],c<v@[14],total(v@)*64<=usize::MAX,
+     ensures r as int==index(v@,x as int,y as int,c as int),(r as int)<total(v@)*64,
+ {
+--- a/src/jpeg_transform.rs
++++ b/src/jpeg_transform.rs
+@@ -4,7 +4,7 @@
+ verus! {
+ pub(super) open spec fn basis(k:int) -> int {seq![11585int,16069,15137,13623,11585,9102,6270,3196,11585,13623,6270,-3196,-11585,-16069,-15137,-9102,11585,9102,-6270,-16069,-11585,3196,15137,13623,11585,3196,-15137,-9102,11585,13623,-6270,-16069,11585,-3196,-15137,9102,11585,-13623,-6270,16069,11585,-9102,-6270,16069,-11585,-3196,15137,-13623,11585,-13623,6270,3196,-11585,16069,-15137,9102,11585,-16069,15137,-13623,11585,-9102,6270,-3196][k]}
+ fn weight(k:usize) -> (r:i64) requires k<64, ensures r as int==basis(k as int),-16384<=r<=16384, {
+-    let a=[11585i64,16069,15137,13623,11585,9102,6270,3196,11585,13623,6270,-3196,-11585,-16069,-15137,-9102,11585,9102,-6270,-16069,-11585,3196,15137,13623,11585,3196,-15137,-9102,11585,13623,-6270,-16069,11585,-3196,-15137,9102,11585,-13623,-6270,16069,11585,-9102,-6270,16069,-11585,-3196,15137,-13623,11585,-13623,6270,3196,-11585,16069,-15137,9102,11585,-16069,15137,-13623,11585,-9102,6270,-3196];a[k]
++    let a=&[11585i64,16069,15137,13623,11585,9102,6270,3196,11585,13623,6270,-3196,-11585,-16069,-15137,-9102,11585,9102,-6270,-16069,-11585,3196,15137,13623,11585,3196,-15137,-9102,11585,13623,-6270,-16069,11585,-3196,-15137,9102,11585,-13623,-6270,16069,11585,-9102,-6270,16069,-11585,-3196,15137,-13623,11585,-13623,6270,3196,-11585,16069,-15137,9102,11585,-16069,15137,-13623,11585,-9102,6270,-3196];a[k]
+ }
+ pub(super) open spec fn row(c:Seq<i64>,v:int,x:int,n:nat) -> int decreases n {
+     if n==0 {0} else {row(c,v,x,(n-1) as nat)+c[v*8+n-1] as int*basis(x*8+n-1)}
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1888,7 +1888,7 @@
+     if g.white && g.alpha==0 { (255-value) as u8 } else { value }
+ }
+ 
+-#[inline]
++#[inline(always)]
+ fn scatter_byte(g: Geometry, j: usize, i: usize, stride: usize, byte: u8, output: &mut [u8])
+     requires g.positive(), stride as int == g.row_bytes(),
+         g.across as int == (g.width as int-1)/(g.block_width as int)+1,

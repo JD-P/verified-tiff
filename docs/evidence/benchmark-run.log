@@ -1,0 +1,22 @@
+gray-none {'rust_inspect': 30.466, 'adapter_rgba': 85.99, 'libtiff_total': 0.034, 'system_rgba': 0.787, 'libtiff_decode': 0.029, 'rust_decode': 21.147, 'libtiff_rgba': 0.54, 'rust_total': 50.407}
+gray-packbits {'rust_inspect': 0.292, 'adapter_rgba': 17.575, 'libtiff_total': 1.23, 'system_rgba': 1.857, 'libtiff_decode': 1.209, 'rust_decode': 13.175, 'libtiff_rgba': 1.687, 'rust_total': 13.688}
+gray-lzw {'rust_inspect': 4.691, 'adapter_rgba': 27.52, 'libtiff_total': 0.925, 'system_rgba': 1.608, 'libtiff_decode': 0.914, 'rust_decode': 16.907, 'libtiff_rgba': 1.419, 'rust_total': 21.843}
+gray-deflate {'rust_inspect': 7.961, 'adapter_rgba': 41.408, 'libtiff_total': 0.451, 'system_rgba': 0.815, 'libtiff_decode': 0.439, 'rust_decode': 22.069, 'libtiff_rgba': 0.918, 'rust_total': 29.906}
+rgb-none {'rust_inspect': 89.577, 'adapter_rgba': 249.848, 'libtiff_total': 0.086, 'system_rgba': 0.814, 'libtiff_decode': 0.079, 'rust_decode': 61.886, 'libtiff_rgba': 0.805, 'rust_total': 149.358}
+rgb-lzw {'rust_inspect': 17.855, 'adapter_rgba': 87.418, 'libtiff_total': 3.041, 'system_rgba': 3.437, 'libtiff_decode': 2.88, 'rust_decode': 53.198, 'libtiff_rgba': 3.458, 'rust_total': 73.47}
+rgb-deflate {'rust_inspect': 21.805, 'adapter_rgba': 119.147, 'libtiff_total': 1.228, 'system_rgba': 0.893, 'libtiff_decode': 1.242, 'rust_decode': 64.092, 'libtiff_rgba': 1.785, 'rust_total': 84.886}
+rgb-jpeg {'rust_inspect': 12.427, 'adapter_rgba': 698.173, 'libtiff_total': 3.249, 'system_rgba': 2.879, 'libtiff_decode': 3.382, 'rust_decode': 635.742, 'libtiff_rgba': 3.815, 'rust_total': 653.191}
+rgb-tile-lzw {'rust_inspect': 8.175, 'adapter_rgba': 79.835, 'libtiff_total': 3.335, 'system_rgba': 3.936, 'libtiff_decode': 3.192, 'rust_decode': 58.085, 'libtiff_rgba': 4.151, 'rust_total': 65.41}
+gray16-deflate {'rust_inspect': 216.996, 'adapter_rgba': 693.721, 'libtiff_total': 8.303, 'system_rgba': 5.835, 'libtiff_decode': 8.337, 'rust_decode': 236.067, 'libtiff_rgba': 8.418, 'rust_total': 464.828}
+float64-lzw-p2 {'libtiff_decode': 12.497, 'rust_inspect': 4.839, 'rust_total': 178.188, 'rust_decode': 167.594, 'libtiff_total': 12.745}
+noise-lzw {'rust_inspect': 28.238, 'adapter_rgba': 80.153, 'libtiff_total': 2.329, 'system_rgba': 3.182, 'libtiff_decode': 2.367, 'rust_decode': 35.177, 'libtiff_rgba': 2.895, 'rust_total': 62.226}
+noise-deflate {'rust_inspect': 12.031, 'adapter_rgba': 55.456, 'libtiff_total': 0.393, 'system_rgba': 0.925, 'libtiff_decode': 0.391, 'rust_decode': 27.73, 'libtiff_rgba': 1.116, 'rust_total': 39.655}
+fax3 {'rust_inspect': 6.375, 'adapter_rgba': 37.831, 'libtiff_total': 1.77, 'system_rgba': 0.755, 'libtiff_decode': 1.735, 'rust_decode': 20.868, 'libtiff_rgba': 0.765, 'rust_total': 27.187}
+fax4 {'rust_inspect': 3.898, 'adapter_rgba': 31.793, 'libtiff_total': 1.961, 'system_rgba': 0.882, 'libtiff_decode': 1.867, 'rust_decode': 18.897, 'libtiff_rgba': 0.843, 'rust_total': 24.379}
+webp {'rust_inspect': 1.253, 'adapter_rgba': 76.363, 'libtiff_total': 1.363, 'system_rgba': 1.909, 'libtiff_decode': 1.216, 'rust_decode': 60.204, 'libtiff_rgba': 1.985, 'rust_total': 61.228}
+logluv {'libtiff_decode': 1.209, 'rust_inspect': 0.039, 'rust_total': 27.781, 'rust_decode': 27.824, 'libtiff_total': 1.159}
+original-quad-lzw-compat.tiff {'rust_inspect': 3.086, 'adapter_rgba': 18.703, 'libtiff_total': 1.264, 'system_rgba': 1.443, 'libtiff_decode': 1.296, 'rust_decode': 11.08, 'libtiff_rgba': 1.38, 'rust_total': 14.352}
+original-lzw-single-strip.tiff {'rust_inspect': 1.546, 'adapter_rgba': 238.466, 'libtiff_total': 30.482, 'system_rgba': 7.749, 'libtiff_decode': 30.911, 'rust_decode': 114.36, 'libtiff_rgba': 7.523, 'rust_total': 114.058}
+original-testfax4.tiff {'rust_inspect': 6.248, 'adapter_rgba': 166.041, 'libtiff_total': 12.224, 'system_rgba': 4.25, 'libtiff_decode': 11.894, 'rust_decode': 120.456, 'libtiff_rgba': 4.384, 'rust_total': 129.178}
+original-deflate-last-strip-extra-data.tiff {'rust_inspect': 3.484, 'adapter_rgba': 15.216, 'libtiff_total': 0.246, 'system_rgba': 0.332, 'libtiff_decode': 0.213, 'rust_decode': 7.059, 'libtiff_rgba': 0.368, 'rust_total': 10.591}
+rgb-jpeg-textured {'rust_inspect': 330.449, 'adapter_rgba': 1611.366, 'libtiff_total': 25.107, 'system_rgba': 19.735, 'libtiff_decode': 25.778, 'rust_decode': 940.341, 'libtiff_rgba': 25.525, 'rust_total': 1278.87}

@@ -1,0 +1,9 @@
+LERC C API: 384 native TIFF combinations matched independent samples
+test_alpha_and_float_bands (__main__.LercCompatibility.test_alpha_and_float_bands) ... ok
+test_native_matrix (__main__.LercCompatibility.test_native_matrix) ... ok
+test_shared_mask_bands (__main__.LercCompatibility.test_shared_mask_bands) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 2.709s
+
+OK

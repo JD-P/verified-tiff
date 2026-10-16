@@ -1,0 +1,38 @@
+patching file compat/src/color.rs
+patching file compat/src/decoder.rs
+patching file compat/src/stream.rs
+patching file compat/tests/reader_features.py
+patching file src/deflate.rs
+patching file src/fax_bits.rs
+patching file src/fax_tables.rs
+patching file src/jpeg_bits.rs
+patching file src/jpeg_block.rs
+patching file src/lerc_block.rs
+patching file src/lerc_numeric.rs
+patching file src/lerc_samples.rs
+patching file src/lib.rs
+patching file src/native_fp.rs
+patching file src/native_samples.rs
+patching file src/native_stream.rs
+patching file src/vp8_color.rs
+patching file src/vp8_filter_kernel.rs
+patching file src/vp8_predict.rs
+patching file src/vp8_transform.rs
+patching file src/webp_inverse.rs
+patching file src/webp_pixels.rs
+patching file src/webp_predict.rs
+kernel restored all 150 archived hashes
+patching file src/lib.rs
+patching file src/native_rgba.rs
+patching file compat/src/decoder.rs
+patching file compat/src/storage.rs
+patching file compat/src/stream.rs
+patching file compat/tests/reader_features.c
+patching file compat/tests/reader_features.py
+rgba restored all 149 archived hashes
+patching file src/lerc_numeric.rs
+patching file src/native_stream.rs
+patching file compat/src/stream.rs
+patching file compat/tests/reader_features.py
+patching file compat/tests/reader_features.c
+reader restored all 149 archived hashes

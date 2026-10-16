@@ -1,0 +1,301 @@
+Making check in port
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/port'
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/port'
+Making check in libtiff
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/libtiff'
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/libtiff'
+Making check in tools
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/tools'
+make  rgb2ycbcr thumbnail
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/tools'
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I../port -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT rgb2ycbcr.o -MD -MP -MF .deps/rgb2ycbcr.Tpo -c -o rgb2ycbcr.o rgb2ycbcr.c
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I../port -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT thumbnail.o -MD -MP -MF .deps/thumbnail.Tpo -c -o thumbnail.o thumbnail.c
+mv -f .deps/rgb2ycbcr.Tpo .deps/rgb2ycbcr.Po
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o rgb2ycbcr rgb2ycbcr.o ../libtiff/libtiff.la ../port/libport.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o rgb2ycbcr rgb2ycbcr.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a ../port/.libs/libport.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+mv -f .deps/thumbnail.Tpo .deps/thumbnail.Po
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o thumbnail thumbnail.o ../libtiff/libtiff.la ../port/libport.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o thumbnail thumbnail.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a ../port/.libs/libport.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/tools'
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/tools'
+Making check in build
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/build'
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/build'
+make[2]: Nothing to be done for 'check-am'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/build'
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/build'
+Making check in contrib
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib'
+Making check in addtiffo
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/addtiffo'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/addtiffo'
+Making check in dbs
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/dbs'
+Making check in xtiff
+make[3]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/dbs/xtiff'
+make[3]: Nothing to be done for 'check'.
+make[3]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/dbs/xtiff'
+make[3]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/dbs'
+make[3]: Nothing to be done for 'check-am'.
+make[3]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/dbs'
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/dbs'
+Making check in iptcutil
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/iptcutil'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/iptcutil'
+Making check in mfs
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/mfs'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/mfs'
+Making check in pds
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/pds'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/pds'
+Making check in ras
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/ras'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/ras'
+Making check in stream
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/stream'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/stream'
+Making check in tags
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/tags'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/tags'
+Making check in win_dib
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/win_dib'
+make[2]: Nothing to be done for 'check'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib/win_dib'
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib'
+make[2]: Nothing to be done for 'check-am'.
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib'
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/contrib'
+Making check in test
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+make  ascii_tag long_tag short_tag strip_rw rewrite custom_dir custom_dir_EXIF_231 defer_strile_loading defer_strile_writing test_directory test_IFD_enlargement test_open_options test_append_to_strip test_ifd_loop_detection test_RGBAImage testtypes test_signed_tags raw_decode rational_precision2double test_write_read_tags test_transferfunction_write_read
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT ascii_tag.o -MD -MP -MF .deps/ascii_tag.Tpo -c -o ascii_tag.o ascii_tag.c
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT long_tag.o -MD -MP -MF .deps/long_tag.Tpo -c -o long_tag.o long_tag.c
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT check_tag.o -MD -MP -MF .deps/check_tag.Tpo -c -o check_tag.o check_tag.c
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT short_tag.o -MD -MP -MF .deps/short_tag.Tpo -c -o short_tag.o short_tag.c
+mv -f .deps/long_tag.Tpo .deps/long_tag.Po
+mv -f .deps/check_tag.Tpo .deps/check_tag.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT strip_rw.o -MD -MP -MF .deps/strip_rw.Tpo -c -o strip_rw.o strip_rw.c
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT strip.o -MD -MP -MF .deps/strip.Tpo -c -o strip.o strip.c
+mv -f .deps/ascii_tag.Tpo .deps/ascii_tag.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_arrays.o -MD -MP -MF .deps/test_arrays.Tpo -c -o test_arrays.o test_arrays.c
+mv -f .deps/short_tag.Tpo .deps/short_tag.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT rewrite_tag.o -MD -MP -MF .deps/rewrite_tag.Tpo -c -o rewrite_tag.o rewrite_tag.c
+mv -f .deps/test_arrays.Tpo .deps/test_arrays.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT custom_dir.o -MD -MP -MF .deps/custom_dir.Tpo -c -o custom_dir.o custom_dir.c
+mv -f .deps/strip_rw.Tpo .deps/strip_rw.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT custom_dir_EXIF_231.o -MD -MP -MF .deps/custom_dir_EXIF_231.Tpo -c -o custom_dir_EXIF_231.o custom_dir_EXIF_231.c
+mv -f .deps/strip.Tpo .deps/strip.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT defer_strile_loading.o -MD -MP -MF .deps/defer_strile_loading.Tpo -c -o defer_strile_loading.o defer_strile_loading.c
+mv -f .deps/custom_dir.Tpo .deps/custom_dir.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT defer_strile_writing.o -MD -MP -MF .deps/defer_strile_writing.Tpo -c -o defer_strile_writing.o defer_strile_writing.c
+mv -f .deps/rewrite_tag.Tpo .deps/rewrite_tag.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_directory.o -MD -MP -MF .deps/test_directory.Tpo -c -o test_directory.o test_directory.c
+mv -f .deps/defer_strile_writing.Tpo .deps/defer_strile_writing.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_IFD_enlargement.o -MD -MP -MF .deps/test_IFD_enlargement.Tpo -c -o test_IFD_enlargement.o test_IFD_enlargement.c
+mv -f .deps/defer_strile_loading.Tpo .deps/defer_strile_loading.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_open_options.o -MD -MP -MF .deps/test_open_options.Tpo -c -o test_open_options.o test_open_options.c
+mv -f .deps/test_open_options.Tpo .deps/test_open_options.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_append_to_strip.o -MD -MP -MF .deps/test_append_to_strip.Tpo -c -o test_append_to_strip.o test_append_to_strip.c
+mv -f .deps/custom_dir_EXIF_231.Tpo .deps/custom_dir_EXIF_231.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include  -DSOURCE_DIR=\".\" -g -O2 -Wall -W -MT test_ifd_loop_detection-test_ifd_loop_detection.o -MD -MP -MF .deps/test_ifd_loop_detection-test_ifd_loop_detection.Tpo -c -o test_ifd_loop_detection-test_ifd_loop_detection.o `test -f 'test_ifd_loop_detection.c' || echo './'`test_ifd_loop_detection.c
+mv -f .deps/test_append_to_strip.Tpo .deps/test_append_to_strip.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_RGBAImage.o -MD -MP -MF .deps/test_RGBAImage.Tpo -c -o test_RGBAImage.o test_RGBAImage.c
+mv -f .deps/test_ifd_loop_detection-test_ifd_loop_detection.Tpo .deps/test_ifd_loop_detection-test_ifd_loop_detection.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT testtypes.o -MD -MP -MF .deps/testtypes.Tpo -c -o testtypes.o testtypes.c
+mv -f .deps/testtypes.Tpo .deps/testtypes.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_signed_tags.o -MD -MP -MF .deps/test_signed_tags.Tpo -c -o test_signed_tags.o test_signed_tags.c
+mv -f .deps/test_IFD_enlargement.Tpo .deps/test_IFD_enlargement.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT raw_decode.o -MD -MP -MF .deps/raw_decode.Tpo -c -o raw_decode.o raw_decode.c
+mv -f .deps/test_directory.Tpo .deps/test_directory.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT rational_precision2double.o -MD -MP -MF .deps/rational_precision2double.Tpo -c -o rational_precision2double.o rational_precision2double.c
+mv -f .deps/raw_decode.Tpo .deps/raw_decode.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_write_read_tags.o -MD -MP -MF .deps/test_write_read_tags.Tpo -c -o test_write_read_tags.o test_write_read_tags.c
+mv -f .deps/test_signed_tags.Tpo .deps/test_signed_tags.Po
+gcc -DHAVE_CONFIG_H -I. -I../config -I../libtiff -I../port  -I../libtiff -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/include -I/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/include   -g -O2 -Wall -W -MT test_transferfunction_write_read.o -MD -MP -MF .deps/test_transferfunction_write_read.Tpo -c -o test_transferfunction_write_read.o test_transferfunction_write_read.c
+mv -f .deps/test_RGBAImage.Tpo .deps/test_RGBAImage.Po
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o ascii_tag ascii_tag.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+mv -f .deps/rational_precision2double.Tpo .deps/rational_precision2double.Po
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o long_tag long_tag.o check_tag.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o ascii_tag ascii_tag.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+mv -f .deps/test_transferfunction_write_read.Tpo .deps/test_transferfunction_write_read.Po
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o short_tag short_tag.o check_tag.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o long_tag long_tag.o check_tag.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o strip_rw strip_rw.o strip.o test_arrays.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o short_tag short_tag.o check_tag.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o rewrite rewrite_tag.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o strip_rw strip_rw.o strip.o test_arrays.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o custom_dir custom_dir.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+mv -f .deps/test_write_read_tags.Tpo .deps/test_write_read_tags.Po
+libtool: link: gcc -g -O2 -Wall -W -o rewrite rewrite_tag.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o custom_dir_EXIF_231 custom_dir_EXIF_231.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o custom_dir custom_dir.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o defer_strile_loading defer_strile_loading.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o custom_dir_EXIF_231 custom_dir_EXIF_231.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o defer_strile_writing defer_strile_writing.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_directory test_directory.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o defer_strile_loading defer_strile_loading.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+libtool: link: gcc -g -O2 -Wall -W -o defer_strile_writing defer_strile_writing.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_IFD_enlargement test_IFD_enlargement.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o test_directory test_directory.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_open_options test_open_options.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_append_to_strip test_append_to_strip.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o test_IFD_enlargement test_IFD_enlargement.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+libtool: link: gcc -g -O2 -Wall -W -o test_open_options test_open_options.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc -DSOURCE_DIR=\".\" -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_ifd_loop_detection test_ifd_loop_detection-test_ifd_loop_detection.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o test_append_to_strip test_append_to_strip.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_RGBAImage test_RGBAImage.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o testtypes testtypes.o  -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -DSOURCE_DIR=\".\" -g -O2 -Wall -W -o test_ifd_loop_detection test_ifd_loop_detection-test_ifd_loop_detection.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+libtool: link: gcc -g -O2 -Wall -W -o testtypes testtypes.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+libtool: link: gcc -g -O2 -Wall -W -o test_RGBAImage test_RGBAImage.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_signed_tags test_signed_tags.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W -static -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o rational_precision2double rational_precision2double.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o raw_decode raw_decode.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o test_signed_tags test_signed_tags.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W -static -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_write_read_tags test_write_read_tags.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o rational_precision2double rational_precision2double.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+libtool: link: gcc -g -O2 -Wall -W -o raw_decode raw_decode.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+libtool: link: gcc -g -O2 -Wall -W -o test_write_read_tags test_write_read_tags.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+/bin/bash ../libtool  --tag=CC   --mode=link gcc  -g -O2 -Wall -W -static -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib  -o test_transferfunction_write_read test_transferfunction_write_read.o ../libtiff/libtiff.la -lwebp -ljpeg -lz -lm 
+libtool: link: gcc -g -O2 -Wall -W -o test_transferfunction_write_read test_transferfunction_write_read.o  -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib -L/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/jpeg/lib ../libtiff/.libs/libtiff.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libwebp.a /workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/webp/lib/libsharpyuv.a -ljpeg -lz -lm
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+make  check-TESTS
+make[2]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+make[3]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+PASS: long_tag
+PASS: short_tag
+PASS: ascii_tag
+PASS: strip_rw
+PASS: custom_dir
+PASS: rewrite
+PASS: custom_dir_EXIF_231
+PASS: defer_strile_writing
+PASS: test_open_options
+PASS: test_append_to_strip
+PASS: test_ifd_loop_detection
+PASS: test_directory
+PASS: testtypes
+PASS: test_signed_tags
+PASS: test_IFD_enlargement
+PASS: raw_decode
+PASS: rational_precision2double
+PASS: test_write_read_tags
+PASS: test_transferfunction_write_read
+PASS: ppm2tiff_pbm.sh
+PASS: ppm2tiff_pgm.sh
+PASS: ppm2tiff_ppm.sh
+PASS: fax2tiff.sh
+PASS: tiffcp-g3.sh
+PASS: tiffcp-g3-1d.sh
+PASS: tiffcp-g3-1d-fill.sh
+PASS: tiffcp-g3-2d.sh
+PASS: tiffcp-g3-2d-fill.sh
+PASS: tiffcp-g4.sh
+PASS: tiffcp-logluv.sh
+PASS: tiffcp-thumbnail.sh
+PASS: tiffcp-lzw-compat.sh
+PASS: tiffdump.sh
+PASS: tiffcp-lzw-scanline-decode.sh
+PASS: tiffinfo.sh
+PASS: defer_strile_loading
+PASS: tiffcp-split.sh
+PASS: tiffcp-split-join.sh
+PASS: tiff2ps-PS1.sh
+PASS: tiff2ps-PS2.sh
+PASS: tiff2pdf.sh
+PASS: tiff2ps-PS3.sh
+PASS: tiff2ps-EPS1.sh
+PASS: tiffcrop-doubleflip-logluv-3c-16b.sh
+PASS: tiffcrop-doubleflip-minisblack-1c-16b.sh
+PASS: tiffcrop-doubleflip-minisblack-1c-8b.sh
+PASS: tiffcrop-doubleflip-miniswhite-1c-1b.sh
+PASS: tiffcrop-doubleflip-minisblack-2c-8b-alpha.sh
+PASS: tiffcrop-doubleflip-palette-1c-1b.sh
+PASS: tiffcrop-doubleflip-palette-1c-4b.sh
+PASS: tiffcrop-doubleflip-palette-1c-8b.sh
+PASS: tiffcrop-doubleflip-rgb-3c-16b.sh
+PASS: tiffcrop-doubleflip-rgb-3c-8b.sh
+PASS: tiffcrop-extract-logluv-3c-16b.sh
+PASS: tiffcrop-extract-minisblack-1c-16b.sh
+PASS: tiffcrop-extract-minisblack-1c-8b.sh
+PASS: tiffcrop-extract-minisblack-2c-8b-alpha.sh
+PASS: tiffcrop-extract-miniswhite-1c-1b.sh
+PASS: tiffcrop-extract-palette-1c-1b.sh
+PASS: tiffcrop-extract-palette-1c-4b.sh
+PASS: tiffcrop-extract-palette-1c-8b.sh
+PASS: tiffcrop-extract-rgb-3c-16b.sh
+PASS: tiffcrop-extract-rgb-3c-8b.sh
+PASS: tiffcrop-extractz14-logluv-3c-16b.sh
+PASS: tiffcrop-extractz14-minisblack-1c-16b.sh
+PASS: tiffcrop-extractz14-minisblack-1c-8b.sh
+PASS: tiffcrop-extractz14-minisblack-2c-8b-alpha.sh
+PASS: tiffcrop-extractz14-miniswhite-1c-1b.sh
+PASS: tiffcrop-extractz14-palette-1c-1b.sh
+PASS: tiffcrop-extractz14-palette-1c-4b.sh
+PASS: tiffcrop-extractz14-rgb-3c-16b.sh
+PASS: tiffcrop-extractz14-palette-1c-8b.sh
+PASS: tiffcrop-extractz14-rgb-3c-8b.sh
+PASS: tiffcrop-R90-minisblack-1c-16b.sh
+PASS: tiffcrop-R90-logluv-3c-16b.sh
+PASS: tiffcrop-R90-minisblack-1c-8b.sh
+PASS: tiffcrop-R90-minisblack-2c-8b-alpha.sh
+PASS: tiffcrop-R90-miniswhite-1c-1b.sh
+PASS: tiffcrop-R90-palette-1c-1b.sh
+PASS: tiffcrop-R90-palette-1c-4b.sh
+PASS: tiffcrop-R90-palette-1c-8b.sh
+PASS: tiffcrop-R90-rgb-3c-16b.sh
+PASS: tiffcrop-R90-rgb-3c-8b.sh
+PASS: tiff2bw-palette-1c-8b.sh
+PASS: tiff2bw-quad-lzw-compat.sh
+PASS: tiff2bw-rgb-3c-8b.sh
+PASS: tiff2rgba-logluv-3c-16b.sh
+PASS: tiff2rgba-minisblack-1c-16b.sh
+PASS: tiff2rgba-minisblack-1c-8b.sh
+PASS: tiff2rgba-minisblack-2c-8b-alpha.sh
+PASS: tiff2rgba-miniswhite-1c-1b.sh
+PASS: tiff2rgba-palette-1c-1b.sh
+PASS: tiff2rgba-palette-1c-4b.sh
+PASS: tiff2rgba-palette-1c-8b.sh
+PASS: tiff2rgba-rgb-3c-16b.sh
+PASS: tiff2rgba-rgb-3c-8b.sh
+PASS: testfax3_bug_513.sh
+PASS: testfax3_bug54_1dnoEOL.sh
+PASS: testfax4.sh
+PASS: tiff2rgba-ojpeg_zackthecat_subsamp22_single_strip.sh
+PASS: testdeflatelaststripextradata.sh
+PASS: tiff2rgba-quad-tile.jpg.sh
+PASS: tiff2rgba-32bpp-None-jpeg.sh
+PASS: tiff2rgba-ojpeg_single_strip_no_rowsperstrip.sh
+PASS: tiff2rgba-ojpeg_chewey_subsamp21_multi_strip.sh
+PASS: tiffcp-32bpp-None-jpeg.sh
+PASS: tiffcrop-32bpp-None-jpeg.sh
+PASS: test_RGBAImage
+============================================================================
+Testsuite summary for LibTIFF Software 4.7.1
+============================================================================
+# TOTAL: 108
+# PASS:  108
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+============================================================================
+make[3]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+make[2]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/test'
+Making check in doc
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/doc'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1/doc'
+make[1]: Entering directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1'
+make[1]: Nothing to be done for 'check-am'.
+make[1]: Leaving directory '/workspace/scratch/ecc0c012b313/optimization/verified-tiff/.tools/tiff-4.7.1'
