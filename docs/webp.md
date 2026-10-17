@@ -71,9 +71,9 @@ attempting to interpret their metadata as ordinary raster data.
 ## Memory and work
 
 The core borrows input, has no heap allocation or runtime recursion, and uses
-five fixed-capacity Huffman tables (2,328 lengths and 16 counts each) and a
-2,048-entry RGBA cache. Header parsing temporarily uses additional bounded
-arrays. Exact stack-frame placement and stack exhaustion are not proved.
+five fixed-capacity Huffman tables (counts, offsets and 2,328 ordered symbols
+each) and a 2,048-entry RGBA cache. Header parsing temporarily uses additional
+bounded arrays. Exact stack-frame placement and stack exhaustion are not proved.
 
 Inspection needs no caller raster scratch. The control decisions in this
 profile depend on symbols, lengths and distances, not on decoded pixel

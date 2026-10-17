@@ -56,15 +56,20 @@ pub struct Group {pub(super) g:wh::Huff,pub(super) r:wh::Huff,pub(super) b:wh::H
 impl Group {
     /// Fixed-size workspace. The decoder overwrites it before reading tables.
     pub fn empty() -> Self {
-        let h=wh::Huff {lens:[0u8;2328],counts:[0usize;16]};
+        let h=wh::Huff {lens:Ghost(Seq::new(2328,|i:int| 0u8)),counts:[0usize;16],offsets:[0usize;16],symbols:[0u16;2328]};
         Self {g:h,r:h,b:h,a:h,d:h}
     }
     pub(super) open spec fn valid(&self) -> bool {self.g.valid() && self.r.valid() && self.b.valid() && self.a.valid() && self.d.valid()}
     pub(super) open spec fn model(&self) -> GroupModel {GroupModel {g:self.g.model(),r:self.r.model(),b:self.b.model(),a:self.a.model(),d:self.d.model()}}
 }
 pub(super) open spec fn cache_size(cb:int) -> int {if cb==0 {0} else {db::pow(cb)}}
+#[inline(always)]
 pub(super) fn size(cb:usize) -> (r:usize) requires cb<=11,ensures r as int==cache_size(cb as int),r<=2048, {
-    let a=[0usize,2,4,8,16,32,64,128,256,512,1024,2048];a[cb]
+    if cb==0 {0} else {
+        proof {crate::bit_window::powers(cb as u32);}
+        assert((1usize<<cb)==(1u32<<(cb as u32)) as usize) by(bit_vector) requires 1<=cb<=11;
+        1usize<<cb
+    }
 }
 #[verifier::opaque]
 pub(super) open spec fn group(s:Seq<u8>,p:int,end:int,cb:int) -> Option<(int,GroupModel)> {

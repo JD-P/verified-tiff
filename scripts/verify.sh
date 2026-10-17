@@ -229,3 +229,5 @@ VERUS="$VERUS" python3 scripts/reject-webp-simd.py
 VERUS="$VERUS" python3 scripts/reject-webp-spans.py
 
 VERUS="$VERUS" python3 scripts/reject-adapter.py
+
+VERUS="$VERUS" python3 scripts/reject-run-optimization.py

@@ -11,7 +11,7 @@ def main():
     a=p.parse_args();assert 1<=a.jobs<=4
     source=(ROOT/'scripts/verify.sh').read_text()
     starts=[m.start() for m in re.finditer(r'(?m)^(?:python3 scripts/reject-|VERUS="\$VERUS" python3 scripts/reject-)',source)]
-    assert len(starts)==25, 'verify.sh gate structure changed; review chunk boundaries'
+    assert len(starts)==26, 'verify.sh gate structure changed; review chunk boundaries'
     cuts=[0,*starts,len(source)];folder=ROOT/'target/parallel-verification';folder.mkdir(exist_ok=True)
     chunks=[]
     for i,(b,e) in enumerate(zip(cuts,cuts[1:])):

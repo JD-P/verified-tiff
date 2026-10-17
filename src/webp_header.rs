@@ -30,6 +30,7 @@ fn read_code_lengths(s:&[u8],bits:&mut Bits,n:usize) -> (r:Result<Huff,Error>)
     let ghost model=code_lengths(s@,bits.pos(),bits.end as int,n as nat,0,lens@);
     while i<n
         invariant bits.valid(s@),bits.end==old(bits).end,bits.pos()>=old(bits).pos(),4<=n<=19,i<=n,
+            forall|k:int| 19<=k<2328 ==> lens@[k]==0,
             model==code_lengths(s@,old(bits).pos(),old(bits).end as int,n as nat,0,Seq::new(2328,|i:int|0u8)),
             model==code_lengths(s@,bits.pos(),bits.end as int,n as nat,i as nat,lens@),
         decreases n-i,
@@ -39,7 +40,7 @@ fn read_code_lengths(s:&[u8],bits:&mut Bits,n:usize) -> (r:Result<Huff,Error>)
         lens[code_order(i)]=v as u8;i=i+1;
     }
     reveal_with_fuel(code_lengths,1);
-    Huff::build(lens,false)
+    Huff::build(lens,false,19)
 }
 
 
@@ -69,6 +70,7 @@ fn read_lengths(s:&[u8],bits:&mut Bits,h:Huff,n:usize,left:usize) -> (r:Result<[
     ensures final(bits).valid(s@),final(bits).end==old(bits).end,final(bits).pos()>=old(bits).pos(),
         r.is_ok()==lengths(s@,old(bits).pos(),old(bits).end as int,h.model(),n as int,left as nat,8,Seq::empty()).is_some(),
         r.is_ok() ==> (final(bits).pos(),r.unwrap()@)==lengths(s@,old(bits).pos(),old(bits).end as int,h.model(),n as int,left as nat,8,Seq::empty()).unwrap(),
+        r.is_ok() ==> forall|k:int| n<=k<2328 ==> r.unwrap()@[k]==0,
 {
     let mut buf=[0u8;2328];let mut i=0usize;let mut remain=left;let mut prev=8u8;
     assert(buf@.subrange(0,0)==Seq::<u8>::empty());
@@ -157,7 +159,7 @@ pub(super) fn read_table(s:&[u8],bits:&mut Bits,n:usize) -> (r:Result<Huff,Error
         assert(lens@ =~= Seq::new(2328,|i:int|if i==am || (sub && i==bm) {1u8} else {0u8}));
         assert(table(s@,old(bits).pos(),old(bits).end as int,n as int).is_some()==tree_ok(lens@,false));
         assert(tree_ok(lens@,false) ==> table(s@,old(bits).pos(),old(bits).end as int,n as int).unwrap()==(bits.pos(),huff(lens@)));
-        Huff::build(lens,false)
+        Huff::build(lens,false,n)
     } else {
         let nc=bits.read(s,4)?+4;let cl=read_code_lengths(s,bits,nc)?;
         let left=if bits.read(s,1)?==0 {n} else {let nb=2+2*bits.read(s,3)?;bits.read(s,nb)?+2};
@@ -165,7 +167,7 @@ pub(super) fn read_table(s:&[u8],bits:&mut Bits,n:usize) -> (r:Result<Huff,Error
         let lens=read_lengths(s,bits,cl,n,left)?;
         assert(table(s@,old(bits).pos(),old(bits).end as int,n as int).is_some()==tree_ok(lens@,false));
         assert(tree_ok(lens@,false) ==> table(s@,old(bits).pos(),old(bits).end as int,n as int).unwrap()==(bits.pos(),huff(lens@)));
-        Huff::build(lens,false)
+        Huff::build(lens,false,n)
     }
 }
 }

@@ -9,20 +9,36 @@ pub(super) open spec fn argb(p:[u8;4]) -> int {p@[2] as int+256*p@[1] as int+655
 pub(super) open spec fn bucket(p:[u8;4],cb:int) -> int {
     if cb==0 {0} else {((argb(p)*506832829)%4294967296)/(4294967296int/wc::cache_size(cb))}
 }
+proof fn bucket_divisor(cb:usize)
+    requires 1<=cb<=11,
+    ensures 4294967296int/wc::cache_size(cb as int)==vstd::arithmetic::power2::pow2((32-cb) as nat),
+        wc::cache_size(cb as int)==2 || wc::cache_size(cb as int)==4 || wc::cache_size(cb as int)==8 || wc::cache_size(cb as int)==16
+        || wc::cache_size(cb as int)==32 || wc::cache_size(cb as int)==64 || wc::cache_size(cb as int)==128 || wc::cache_size(cb as int)==256
+        || wc::cache_size(cb as int)==512 || wc::cache_size(cb as int)==1024 || wc::cache_size(cb as int)==2048,
+{
+    vstd::arithmetic::power2::lemma2_to64();
+    if cb==1 {assert(4294967296int/2int==2147483648int) by(compute_only);} else if cb==2 {assert(4294967296int/4int==1073741824int) by(compute_only);} else if cb==3 {assert(4294967296int/8int==536870912int) by(compute_only);} else if cb==4 {assert(4294967296int/16int==268435456int) by(compute_only);} else if cb==5 {assert(4294967296int/32int==134217728int) by(compute_only);} else if cb==6 {assert(4294967296int/64int==67108864int) by(compute_only);} else if cb==7 {assert(4294967296int/128int==33554432int) by(compute_only);} else if cb==8 {assert(4294967296int/256int==16777216int) by(compute_only);} else if cb==9 {assert(4294967296int/512int==8388608int) by(compute_only);} else if cb==10 {assert(4294967296int/1024int==4194304int) by(compute_only);} else {assert(4294967296int/2048int==2097152int) by(compute_only);}
+}
 pub(super) fn hash(p:[u8;4],cb:usize) -> (r:usize)
     requires 1<=cb<=11,ensures r as int==bucket(p,cb as int),r<wc::cache_size(cb as int),r<2048,
 {
     let color=p[2] as u64+256*(p[1] as u64)+65536*(p[0] as u64)+16777216*(p[3] as u64);
     assert(color<=4294967295);
-    let sz=wc::size(cb);let divisor=4294967296u64/(sz as u64);
+    let sz=wc::size(cb);
+    // The divisor is the power of two 2^(32-cb), so the bucket is a shift.
+    let shift=(32-cb) as u64;
+    let ghost divisor=4294967296int/(sz as int);
     proof {
-        if cb==1 {} else if cb==2 {} else if cb==3 {} else if cb==4 {} else if cb==5 {} else if cb==6 {} else if cb==7 {} else if cb==8 {} else if cb==9 {} else if cb==10 {} else {}
-        assert(divisor>0 && divisor as int*sz==4294967296) by(nonlinear_arith)
+        bucket_divisor(cb);
+        assert(divisor>0 && divisor*sz==4294967296) by(nonlinear_arith)
             requires sz==2 || sz==4 || sz==8 || sz==16 || sz==32 || sz==64 || sz==128 || sz==256 || sz==512 || sz==1024 || sz==2048,divisor==4294967296int/(sz as int);
     }
     let mixed=(color*506832829)%4294967296;
-    assert(mixed as int/(divisor as int)<sz) by(nonlinear_arith) requires mixed<4294967296,divisor>0,divisor as int*sz==4294967296;
-    (mixed/divisor) as usize
+    let r=mixed>>shift;
+    proof {vstd::bits::lemma_u64_shr_is_div(mixed,shift);}
+    assert(r as int==mixed as int/divisor);
+    assert(mixed as int/divisor<sz) by(nonlinear_arith) requires mixed<4294967296,divisor>0,divisor*sz==4294967296;
+    r as usize
 }
 pub(super) struct State {pub pos:int,pub left:usize,pub dist:usize,pub pixels:Seq<[u8;4]>,pub cache:Seq<[u8;4]>}
 pub(super) open spec fn initial(p:int) -> State {State {pos:p,left:0,dist:0,pixels:Seq::empty(),cache:Seq::new(2048,|i:int|[0u8,0,0,0])}}
