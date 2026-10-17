@@ -66,7 +66,7 @@ impl Handle{
             let count=product(m.bw,rows)?;let mut pixels=Buf::zeros(count,self.limits.max_output,mem)?;
             verified_tiff::native_rle::decode(&encoded,m.bw,rows,m.fill==2,&mut pixels,budget).map_err(err)?;
             let mut out=Buf::zeros(needed,self.limits.max_output,mem)?;
-            for y in 0..rows{for x in 0..m.bw{out[y*row+x/8]|=(pixels[y*m.bw+x]/255)<<(7-x%8);}}out
+            pack_bilevel(&pixels,m.bw,rows,row,0,&mut out)?;out
         }else{self.special(k,&encoded,budget)?};
         if output.len()!=needed{return Err((NOTIMPL,"special codec native layout mismatch"));}
         Ok(output)
@@ -210,7 +210,7 @@ impl Handle{
         if m.bits==1{
             let rows=m.segment_rows(k)?;let row=m.row_bytes(m.bw)?;
             let mut out=Buf::zeros(product(row,rows)?,self.limits.max_output,&self.source.mem)?;
-            for y in 0..rows{for x in 0..m.bw{let v=pixels[y*m.bw+x]/255;let v=if m.photo==0{1-v}else{v};out[y*row+x/8]|=v<<(7-x%8);}}Ok(out)
+            pack_bilevel(&pixels,m.bw,rows,row,if m.photo==0{0xff}else{0},&mut out)?;Ok(out)
         }else if m.compression==34676 && !self.logluv16{
             let mut out=Buf::zeros(product(pixels.len(),2)?,self.limits.max_output,&self.source.mem)?;
             for (p,q) in pixels.chunks_exact(6).zip(out.chunks_exact_mut(12)){
@@ -301,6 +301,25 @@ impl Handle{
         let at=b.append(renamed.as_ref().map_or(encoded,|s|&**s))?;b.number(273,4,at)?;b.number(279,4,u32::try_from(encoded.len()).map_err(|_|(LIMIT,"special segment length"))?)?;
         b.finish()
     }
+}
+
+// Unverified adapter packing of 0/255 bilevel samples, MSB first. For a u8
+// sample v/255 is exactly v==255. `flip` inverts stored bits; padding stays zero.
+fn pack_bilevel(pixels:&[u8],bw:usize,rows:usize,row:usize,flip:u8,out:&mut[u8])->R<()>{
+    if bw==0 || row<bw.div_ceil(8) || pixels.len()<product(rows,bw)? || out.len()<product(rows,row)?{return Err((INVALID,"bilevel raster size"));}
+    let bit=|p:u8,i:usize|((p==255) as u8)<<(7-i);
+    for (line,dest) in pixels.chunks_exact(bw).take(rows).zip(out.chunks_exact_mut(row)){
+        let mut groups=line.chunks_exact(8);let mut bytes=dest.iter_mut();
+        for (g,d) in (&mut groups).zip(&mut bytes){
+            let mut b=0u8;for i in 0..8{b|=bit(g[i],i);}*d=b^flip;
+        }
+        let rest=groups.remainder();
+        if !rest.is_empty(){if let Some(d)=bytes.next(){
+            let mut b=0u8;for (i,&p) in rest.iter().enumerate(){b|=bit(p,i);}
+            *d=(b^flip)&(0xffu8<<(8-rest.len()));
+        }}
+    }
+    Ok(())
 }
 
 // Presentation-only byte expansion, in the same unverified adapter boundary
