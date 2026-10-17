@@ -14,8 +14,13 @@ impl Input{
         let data=Buf::zeros(count.min(WINDOW),source.input,&source.mem)?;
         let mut s=Self{data,len:0,loaded:0,count,off,at:0,bit:0,reverse};s.ensure(source,WINDOW)?;Ok(s)
     }
+    #[inline(always)]
     fn ensure(&mut self,source:&mut Source,n:usize)->R<()>{
         if self.len-self.at>=n||self.loaded==self.count{return Ok(());}
+        self.refill(source)
+    }
+    #[cold]
+    fn refill(&mut self,source:&mut Source)->R<()>{
         let (rest,n,loaded)=window::refill_plan(self.data.len(),self.len,self.at,self.loaded,self.count).map_err(err)?;
         window::compact(&mut self.data,self.at,self.len).map_err(err)?;
         // Publish cursor updates only after the exact checked source span arrives.
@@ -92,6 +97,12 @@ impl Stream{
                         if code==257{
                             if self.produced!=self.needed||self.input.remaining_bits()?>=8{return Err((INVALID,"LZW ending/length"));}
                             self.done=true;
+                        }else if *len>0{
+                            // Emit at once, charging the unit its own pass would.
+                            let n=(*len).min(out.len()-written);
+                            verified_tiff::spend(&mut self.budget,1).map_err(err)?;
+                            if !self.discard{out[written..written+n].copy_from_slice(&phrase[..n]);}
+                            *at=n;self.produced+=n;written+=n;self.charge(n)?;
                         }
                     }
                 }
