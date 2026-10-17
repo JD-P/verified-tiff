@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA and PackBits paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits and LZW paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -20,6 +20,12 @@ changes={
  'packbits-literal':('lib.rs','copy_byte_run(s, self.data, output, at, n, false);','copy_byte_run(s, self.data, output, at, n, true);','root','PbCursor::take'),
  'packbits-literal-advance':('lib.rs','self.data = self.data + n;\n        }\n        self.run = self.run - n;','self.data = self.data + n - 1;\n        }\n        self.run = self.run - n;','root','PbCursor::take'),
  'fill-byte-run':('lib.rs','target[i]=v;i=i+1;','target[i]=0;i=i+1;','root','fill_byte_run'),
+ 'lzw-tail-acceptance':('lib.rs','        if i==needed && table.prev!=256 && bits.at_tail() { return Ok(()); }\n','','root','lz_decode'),
+ 'lzw-tail-soundness':('lib.rs','if i==needed && table.prev!=256 && bits.at_tail() { return Ok(()); }','if table.prev!=256 && bits.at_tail() { return Ok(()); }','root','lz_decode'),
+ 'lzw-literal':('lib.rs','output[i]=c as u8;','output[i]=0;','root','lz_decode'),
+ 'lzw-entry-position':('lib.rs','if created { pos[slot]=last as u32; }','if created { pos[slot]=i as u32; }','root','lz_decode'),
+ 'lzw-repeat-tail':('lib.rs','output[i+len-1]=output[last];','output[i+len-1]=0;','root','lz_decode'),
+ 'copy-within':('lib.rs','let b=output[src+j];output[dst+j]=b;','let b=output[src+j];output[dst+j]=0;','root','copy_within'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

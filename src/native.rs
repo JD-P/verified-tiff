@@ -69,6 +69,9 @@ pub fn decode(s:&[u8],codec:u16,stride:usize,needed:usize,cap:usize,
             i=i+n;
         }
         assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {}
+    } else if codec==5 && needed<=u32::MAX as usize {
+        lz_decode(s,0,s.len(),needed,output)?;
+        assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {}
     } else if codec==5 {
         let mut probe=Budget {remaining:s.len()};
         lz_validate(s,0,s.len(),needed,&mut probe)?;

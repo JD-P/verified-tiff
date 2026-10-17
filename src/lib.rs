@@ -1037,6 +1037,140 @@ fn lz_validate(s:&[u8],start:usize,count:usize,needed:usize,budget:&mut Budget) 
     }
 }
 
+// Copies an earlier, disjoint range of one buffer forward.
+fn copy_within(output:&mut [u8],src:usize,dst:usize,n:usize)
+    requires src as int+n<=dst,dst as int+n<=old(output).len(),
+    ensures final(output).len()==old(output).len(),
+        forall|i:int| 0<=i<n ==> #[trigger] final(output)@[dst as int+i]==old(output)@[src as int+i],
+        forall|i:int| 0<=i<old(output).len() && !(dst<=i<dst as int+n) ==> final(output)@[i]==old(output)@[i],
+{
+    let mut j=0usize;
+    while j<n
+        invariant j<=n,src as int+n<=dst,dst as int+n<=output.len(),output.len()==old(output).len(),
+            forall|i:int| 0<=i<j ==> #[trigger] output@[dst as int+i]==old(output)@[src as int+i],
+            forall|i:int| 0<=i<output.len() && !(dst<=i<dst as int+j) ==> output@[i]==old(output)@[i],
+        decreases n-j,
+    {
+        let b=output[src+j];output[dst+j]=b;j=j+1;
+    }
+}
+
+// Validates and writes a segment in one pass. Acceptance is exactly
+// lzw_valid and each written byte is lzw_byte. Every dictionary entry is
+// already in the output (its parent's phrase followed by the next phrase's
+// first byte), so a phrase is one copy from its recorded position instead of
+// a prefix-chain walk. Failure may change the first `needed` bytes only.
+fn lz_decode(s:&[u8],start:usize,count:usize,needed:usize,output:&mut [u8]) -> (r:Result<(),Error>)
+    requires range_ok(s.len() as int,start as int,count as int),needed<=old(output).len(),needed<=u32::MAX,
+    ensures final(output).len()==old(output).len(),
+        r.is_ok() == lzw_valid(s@,start as int,start as int+count,needed as int),
+        r.is_ok() ==> forall|k:int| 0<=k<needed ==> final(output)@[k]==lzw_byte(s@,start as int,start as int+count,k),
+        forall|k:int| needed<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
+{
+    reveal(lzw_valid);reveal(lzw_byte);
+    let legacy=lz_is_legacy(s,start,count);
+    let mut bits=LzBits{at:start,bit:0,end:start+count,legacy};
+    if bits.read(s,9)?!=256 { return Err(Error::Invalid); }
+    let mut table=LzTable::new();
+    let mut pos=[0u32;4096];
+    let mut i=0usize;
+    let mut last=0usize;
+    loop
+        invariant bits.valid(s@), table.valid(), bits.end==start+count,
+            bits.legacy==lz_legacy(s@,start as int,start as int+count),
+            i<=needed,needed<=output.len(),output.len()==old(output).len(),needed<=u32::MAX,
+            lzw_valid(s@,start as int,start as int+count,needed as int)
+                == lz_valid(s@,bits.pos(),bits.end as int,table._dict@,table.prev as int,needed-i,bits.legacy),
+            forall|k:int| 0<=k<i ==> output@[k]==#[trigger] lzw_byte(s@,start as int,start as int+count,k),
+            forall|k:int| i<=k<needed ==> #[trigger] lzw_byte(s@,start as int,start as int+count,k)
+                == lz_byte(s@,bits.pos(),bits.end as int,table._dict@,table.prev as int,k-i,bits.legacy),
+            forall|k:int| needed<=k<output.len() ==> #[trigger] output@[k]==old(output)@[k],
+            table.prev!=256 ==> last+table._dict@[table.prev as int].len()==i
+                && forall|k:int| 0<=k<table._dict@[table.prev as int].len()
+                    ==> output@[last+k]==#[trigger] table._dict@[table.prev as int][k],
+            forall|e:int| 258<=e<table.next ==> (#[trigger] pos@[e]) as int+table._dict@[e].len()<=i,
+            forall|e:int,k:int| 258<=e<table.next && 0<=k<table._dict@[e].len()
+                ==> output@[pos@[e] as int+k]==#[trigger] table._dict@[e][k],
+        decreases bits.end as int*8-bits.pos(),
+    {
+        reveal_with_fuel(lz_valid,1);
+        if i==needed && table.prev!=256 && bits.at_tail() { return Ok(()); }
+        let ghost at=bits.pos();
+        let ghost d=table._dict@;
+        let ghost p=table.prev as int;
+        let ghost o=output@;
+        proof { if p!=256 { table.entry(p); } }
+        let c=bits.read(s,table.width(bits.legacy))?;
+        if c==256 {
+            table.clear();
+            proof {
+                assert forall|k:int| i<=k<needed implies #[trigger] lzw_byte(s@,start as int,start as int+count,k)
+                    == lz_byte(s@,bits.pos(),bits.end as int,table._dict@,table.prev as int,k-i,bits.legacy) by {
+                    reveal_with_fuel(lz_byte,1);
+                }
+            }
+        } else if c==257 {
+            if i!=needed || (bits.at<bits.end && bits.end-bits.at>1)
+                || (bits.at<bits.end && bits.bit==0) { return Err(Error::Invalid); }
+            return Ok(());
+        } else {
+            let slot=table.next;
+            let created=table.prev!=256 && table.next<4096;
+            let len=table.data(c,bits.legacy)?;
+            if len>needed-i { return Err(Error::Invalid); }
+            let ghost phrase=table._dict@[c as int];
+            proof {
+                assert(phrase==lz_phrase(d,p,c as int));
+                if c>=258 && c<slot { assert(phrase==d[c as int]); }
+                if c==slot { assert(phrase==d[p].push(d[p][0])); }
+            }
+            if c<256 {
+                output[i]=c as u8;
+            } else if c==slot {
+                copy_within(output,last,i,len-1);
+                output[i+len-1]=output[last];
+            } else {
+                proof {
+                    assert(lz_defined(d,c as int));
+                    assert(pos@[c as int] as int+d[c as int].len()<=i);
+                }
+                copy_within(output,pos[c] as usize,i,len);
+            }
+            proof {
+                assert forall|k:int| 0<=k<len implies output@[i as int+k]==#[trigger] phrase[k] by {
+                    if c<256 {
+                    } else if c==slot {
+                        if k<len-1 { assert(o[last+k]==d[p][k]); }
+                        else { assert(o[last as int]==d[p][0]); }
+                    } else {
+                        assert(o[pos@[c as int] as int+k]==d[c as int][k]);
+                    }
+                }
+            }
+            if created { pos[slot]=last as u32; }
+            proof {
+                assert forall|k:int| i<=k<needed implies #[trigger] lzw_byte(s@,start as int,start as int+count,k)
+                    == (if k-i<len {phrase[k-i]} else {lz_byte(s@,bits.pos(),bits.end as int,table._dict@,c as int,k-i-len,bits.legacy)}) by {
+                    reveal_with_fuel(lz_byte,1);
+                }
+                assert forall|e:int,k:int| 258<=e<table.next && 0<=k<table._dict@[e].len()
+                    implies output@[pos@[e] as int+k]==#[trigger] table._dict@[e][k] by {
+                    if e<slot {
+                        assert(table._dict@[e]==d[e]);
+                        assert(o[pos@[e] as int+k]==d[e][k]);
+                    } else {
+                        assert(table._dict@[e]==d[p].push(phrase[0]));
+                        if k<d[p].len() { assert(o[last+k]==d[p][k]); }
+                        else { assert(output@[i as int+0]==phrase[0]); }
+                    }
+                }
+            }
+            last=i;
+            i=i+len;
+        }
+    }
+}
+
 struct LzCursor {
     table:LzTable, bits:LzBits, buf:[u8;4096], used:usize, len:usize,
     emitted:usize,
