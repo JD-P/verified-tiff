@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead, one-pass JPEG, WebP prefix table, whole-match and stored Deflate and float unshuffle paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead, one-pass JPEG, WebP prefix table, whole-match and stored Deflate, LZW chunk copy and float unshuffle paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -46,6 +46,8 @@ changes={
  'block-checksum':('deflate.rs','a=a+byte as usize;sum=sum+a;','a=a+byte as usize;sum=sum+byte as usize;','deflate','Cursor::append_block'),
  'stored-block-source':('deflate.rs','let (_,tail)=s.split_at(self.bits.at);','let (_,tail)=s.split_at(self.bits.at+1);','deflate','Cursor::stored_block'),
  'stored-block-advance':('deflate.rs','self.left=self.left-n;self.bits.at=self.bits.at+n;','self.left=self.left-n;self.bits.at=self.bits.at+n-1;','deflate','Cursor::stored_block'),
+ 'copy-ahead':('lib.rs','w[0]=b0;w[1]=b1;','w[0]=b1;w[1]=b1;','root','copy_ahead'),
+ 'lzw-copy-limit':('lib.rs','copy_ahead(output,pos[c] as usize,i,len,needed);','copy_ahead(output,pos[c] as usize,i,len,output.len());','root','lz_decode'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

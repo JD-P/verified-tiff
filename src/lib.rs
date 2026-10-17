@@ -1055,6 +1055,32 @@ fn copy_within(output:&mut [u8],src:usize,dst:usize,n:usize)
     }
 }
 
+// Copies an earlier range forward in eight-byte chunks. Unlike copy_within it
+// may also overwrite [dst+n, limit), which the caller writes afterwards.
+#[inline(always)]
+fn copy_ahead(output:&mut [u8],src:usize,dst:usize,n:usize,limit:usize)
+    requires src as int+n<=dst,dst as int+n+7<=limit,limit<=old(output).len(),
+    ensures final(output).len()==old(output).len(),
+        forall|i:int| 0<=i<n ==> #[trigger] final(output)@[dst as int+i]==old(output)@[src as int+i],
+        forall|i:int| 0<=i<old(output).len() && !(dst<=i<limit) ==> final(output)@[i]==old(output)@[i],
+{
+    let mut k=0usize;
+    while k<n
+        invariant k<n+8,src as int+n<=dst,dst as int+n+7<=limit,limit<=output.len(),output.len()==old(output).len(),
+            forall|i:int| 0<=i<k && i<n ==> #[trigger] output@[dst as int+i]==old(output)@[src as int+i],
+            forall|i:int| 0<=i<output.len() && !(dst<=i<limit) ==> output@[i]==old(output)@[i],
+        decreases n+8-k,
+    {
+        // Bytes read past src+n may already be overwritten; they only land
+        // past dst+n.
+        let (_,tail)=output.split_at(src+k);let (a,_)=tail.split_at(8);
+        let (b0,b1,b2,b3)=(a[0],a[1],a[2],a[3]);let (b4,b5,b6,b7)=(a[4],a[5],a[6],a[7]);
+        let (_,tail)=output.split_at_mut(dst+k);let (w,_)=tail.split_at_mut(8);
+        w[0]=b0;w[1]=b1;w[2]=b2;w[3]=b3;w[4]=b4;w[5]=b5;w[6]=b6;w[7]=b7;
+        k=k+8;
+    }
+}
+
 // Validates and writes a segment in one pass. Acceptance is exactly
 // lzw_valid and each written byte is lzw_byte. Every dictionary entry is
 // already in the output (its parent's phrase followed by the next phrase's
@@ -1127,14 +1153,14 @@ fn lz_decode(s:&[u8],start:usize,count:usize,needed:usize,output:&mut [u8]) -> (
             if c<256 {
                 output[i]=c as u8;
             } else if c==slot {
-                copy_within(output,last,i,len-1);
+                if len+7<=needed-i {copy_ahead(output,last,i,len-1,needed);} else {copy_within(output,last,i,len-1);}
                 output[i+len-1]=output[last];
             } else {
                 proof {
                     assert(lz_defined(d,c as int));
                     assert(pos@[c as int] as int+d[c as int].len()<=i);
                 }
-                copy_within(output,pos[c] as usize,i,len);
+                if len+7<=needed-i {copy_ahead(output,pos[c] as usize,i,len,needed);} else {copy_within(output,pos[c] as usize,i,len);}
             }
             proof {
                 assert forall|k:int| 0<=k<len implies output@[i as int+k]==#[trigger] phrase[k] by {
