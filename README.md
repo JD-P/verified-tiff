@@ -7,7 +7,7 @@ Use at your own risk.**
 This is an attempt at a formally verified replacement library for
 [libtiff](https://en.wikipedia.org/wiki/LibTIFF) written in
 [Rust](https://rust-lang.org/) and [Verus](https://www.cs.cmu.edu/~csd-phd-blog/2023/rust-verification-with-verus/).
-It is currently about 5x slower than the C libtiff, but can presumably be brought
+It is currently about 2x slower than the C libtiff, but can presumably be brought
 up to parity with further optimization of either the library itself or Verus.
 I have minimal experience with Rust and zero experience with Verus, so I'm left
 in the strange position of having this artifact but not really knowing if it's any
@@ -26,7 +26,7 @@ improvements, hardening, bug fixes and test coverage (especially in the C shim,
 which is currently the weak point of the whole library), and implementing more of
 the libtiff API. My goal is to eventually reach full parity with the C libtiff.
 
-The library is about 5x slower overall, but it's uneven and some parts of it are
+The library is about 2x slower overall, but it's uneven and some parts of it are
 slower than others, you can consult the benchmark numbers below to get a sense
 of whether you'd like to try this or not:
 
@@ -34,140 +34,110 @@ of whether you'd like to try this or not:
 
 (AI text follows)
 
-Measurements used nine randomized serial batches of at least 200 ms per implementation/workload, pinned to one AMD EPYC 9V74 CPU, with fresh handles and warm memory input. **114 outputs matched exactly; two JPEG outputs differed by at most one channel value.** The reference preserves the previous suite’s JPEG SIMD-disabled configuration; WebP SIMD is enabled.
+Measurements used seven randomized serial rounds of at least 100 ms per implementation/workload, pinned to one CPU of a 4 vCPU KVM guest on an Intel Xeon at 2.80 GHz (Cascade Lake), with fresh handles and warm memory input. Across the 89 decode workloads the reader takes 2.32× as long as libtiff 4.7.1 (geometric mean). **94 outputs matched libtiff exactly; the two textured-JPEG outputs differed by at most one channel value.** The reference keeps JPEG SIMD disabled; WebP SIMD is enabled.
 
-Below, times are **median milliseconds per operation**. Ratio means **ours ÷ libtiff**, so **above 1 favors libtiff**. `native` reads all samples, `scan` reads every scanline, `rgba` converts the full image, and `crop` reads a centered 128×128 RGBA region. This matrix does not time OJPEG or SGILog/LogLuv.
+Below, times are **median milliseconds per operation**. Ratio means **ours ÷ libtiff**, so **above 1 favors libtiff**. `native` reads all samples, `scan` reads every scanline, `rgba` converts the full image, `crop` reads a centered 128×128 RGBA region, and `firstrow` reads one row of a 16 MP strip. This matrix does not time OJPEG or SGILog/LogLuv.
 
-**Main suite — all 102 results**
+**Main suite — all 96 results**
 
 | Fixture | Task | Ours ms | libtiff ms | Ratio |
 |---|---|---:|---:|---:|
-| gray-none | native | 0.0689 | 0.0319 | 2.16× |
-| gray-none | scan | 0.1992 | 0.0624 | 3.19× |
-| gray-none | rgba | 1.560 | 0.5132 | 3.04× |
-| rgb-none | native | 0.2014 | 0.0886 | 2.27× |
-| rgb-none | rgba | 2.117 | 0.7363 | 2.87× |
-| rgb-none | crop | 0.0568 | 0.0959 | 0.59× |
-| gray-packbits | native | 1.312 | 1.187 | 1.11× |
-| gray-packbits | scan | 1.275 | 1.224 | 1.04× |
-| gray-packbits | rgba | 2.573 | 1.672 | 1.54× |
-| gray-lzw | native | 5.763 | 0.9286 | 6.21× |
-| gray-lzw | scan | 5.507 | 0.9500 | 5.80× |
-| gray-lzw | rgba | 6.878 | 1.410 | 4.88× |
-| rgb-lzw | native | 12.402 | 3.214 | 3.86× |
-| rgb-lzw | rgba | 13.441 | 3.512 | 3.83× |
-| rgb-lzw | crop | 3.271 | 0.4438 | 7.37× |
-| gray-deflate | native | 3.595 | 0.4524 | 7.95× |
-| gray-deflate | scan | 3.734 | 0.5124 | 7.29× |
-| gray-deflate | rgba | 5.334 | 0.9220 | 5.78× |
-| rgb-deflate | native | 7.195 | 1.230 | 5.85× |
-| rgb-deflate | rgba | 7.890 | 1.724 | 4.58× |
-| rgb-deflate | crop | 1.804 | 0.1756 | 10.27× |
-| gray-zstd | native | 0.2134 | 0.1064 | 2.01× |
-| gray-zstd | scan | 0.3049 | 0.1163 | 2.62× |
-| gray-zstd | rgba | 1.597 | 0.5678 | 2.81× |
-| rgb-zstd | native | 1.461 | 0.2275 | 6.42× |
-| rgb-zstd | rgba | 1.978 | 0.7754 | 2.55× |
-| rgb-zstd | crop | 0.0610 | 0.0543 | 1.12× |
-| noise-lzw | native | 15.987 | 2.208 | 7.24× |
-| noise-deflate | native | 4.968 | 0.3704 | 13.41× |
-| noise-zstd | native | 0.4459 | 0.0957 | 4.66× |
-| jpeg-smooth | native | 28.852 | 3.079 | 9.37× |
-| jpeg-smooth | rgba | 31.466 | 3.818 | 8.24× |
-| jpeg-texture | native | 134.475 | 25.620 | 5.25× |
-| jpeg-texture | rgba | 129.143 | 26.288 | 4.91× |
-| rgb-tiled-lzw | native | 16.072 | 2.718 | 5.91× |
-| rgb-tiled-lzw | rgba | 17.316 | 3.264 | 5.31× |
-| rgb-tiled-lzw | crop | 0.9499 | 0.1843 | 5.15× |
-| gray16-deflate-p2 | native | 12.268 | 4.347 | 2.82× |
-| gray16-deflate-p2 | scan | 15.206 | 4.437 | 3.43× |
-| float32-deflate-p3 | native | 22.221 | 8.330 | 2.67× |
-| float32-deflate-p3 | scan | 29.475 | 8.641 | 3.41× |
-| float16-deflate-p3 | native | 11.369 | 6.859 | 1.66× |
-| float16-deflate-p3 | scan | 14.838 | 6.873 | 2.16× |
-| complex64-lzw | native | 37.944 | 10.423 | 3.64× |
-| complex64-lzw | scan | 78.943 | 10.584 | 7.46× |
-| fax-rle | native | 3.039 | 0.4592 | 6.62× |
-| fax-rle | rgba | 3.771 | 0.7696 | 4.90× |
-| fax-g3 | native | 7.134 | 0.4944 | 14.43× |
-| fax-g3 | rgba | 7.555 | 0.7655 | 9.87× |
-| fax-g4 | native | 7.072 | 0.5059 | 13.98× |
-| fax-g4 | rgba | 7.616 | 0.7698 | 9.89× |
-| webp-lossless | native | 14.331 | 2.704 | 5.30× |
-| webp-lossless | rgba | 17.990 | 3.903 | 4.61× |
-| webp-lossless | crop | 1.706 | 0.4507 | 3.79× |
-| webp-lossy | native | 41.657 | 6.926 | 6.01× |
-| webp-lossy | rgba | 47.461 | 8.446 | 5.62× |
-| webp-lossy | crop | 5.358 | 1.179 | 4.54× |
-| lerc-float-plain | native | 9.637 | 1.975 | 4.88× |
-| lerc-float-deflate | native | 16.932 | 3.094 | 5.47× |
-| lerc-float-zstd | native | 12.507 | 2.962 | 4.22× |
-| cmyk-deflate | rgba | 28.104 | 4.328 | 6.49× |
-| cmyk-deflate | crop | 2.414 | 0.2580 | 9.36× |
-| lab-deflate | rgba | 43.749 | 20.089 | 2.18× |
-| lab-deflate | crop | 2.311 | 0.5167 | 4.47× |
-| large-strip-none | firstrow | 0.002851 | 1.099 | 0.0026× |
-| large-strip-none | crop | 0.0567 | 14.541 | 0.0039× |
-| large-strip-lzw | firstrow | 66.319 | 0.1727 | 383.98× |
-| large-strip-lzw | crop | 101.631 | 10.878 | 9.34× |
-| large-strip-deflate | firstrow | 37.558 | 0.0209 | 1800.97× |
-| large-strip-deflate | crop | 49.631 | 3.690 | 13.45× |
-| many-strips | open | 0.001924 | 1.106 | 0.0017× |
-| many-strips | lookup | 0.002354 | 1.037 | 0.0023× |
-| many-strips | open-lazy | 0.001896 | 0.004853 | 0.39× |
-| many-strips | lookup-lazy | 0.002340 | 0.8212 | 0.0029× |
-| original-lzw-single-strip.tiff | native | 6.840 | 1.200 | 5.70× |
-| original-lzw-single-strip.tiff | rgba | 62.656 | 8.002 | 7.83× |
-| original-testfax4.tiff | native | 40.897 | 1.810 | 22.59× |
-| original-testfax4.tiff | rgba | 47.076 | 3.974 | 11.84× |
-| original-quad-lzw-compat.tiff | native | 4.652 | 1.316 | 3.53× |
-| original-quad-lzw-compat.tiff | rgba | 4.860 | 1.368 | 3.55× |
-| lerc-float64-tiled | native | 11.406 | 2.298 | 4.96× |
-| lerc-uint16-tiled | native | 12.780 | 2.102 | 6.08× |
-| lerc-int16-tiled | native | 12.317 | 2.154 | 5.72× |
-| lerc-float32-strips | native | 8.765 | 2.078 | 4.22× |
-| webp-lossy-opaque | native | 38.594 | 3.766 | 10.25× |
-| webp-lossy-opaque | rgba | 36.845 | 3.943 | 9.35× |
-| webp-lossy-opaque | crop | 4.384 | 0.4243 | 10.33× |
-| webp-lossy-texture | native | 264.781 | 40.005 | 6.62× |
-| webp-lossy-texture | rgba | 267.357 | 38.066 | 7.02× |
-| webp-lossy-texture | crop | 16.371 | 2.526 | 6.48× |
-| webp-lossy-odd | native | 2.870 | 0.5380 | 5.33× |
-| webp-lossy-odd | rgba | 3.463 | 0.6176 | 5.61× |
-| webp-lossy-odd | crop | 3.100 | 0.6423 | 4.83× |
-| webp-lossless-opaque | native | 13.633 | 2.462 | 5.54× |
-| webp-lossless-opaque | rgba | 15.405 | 3.099 | 4.97× |
-| webp-lossless-opaque | crop | 1.680 | 0.4021 | 4.18× |
-| webp-lossless-texture | native | 597.569 | 12.301 | 48.58× |
-| webp-lossless-texture | rgba | 613.423 | 14.526 | 42.23× |
-| webp-lossless-texture | crop | 37.319 | 0.8472 | 44.05× |
-| webp-lossless-odd | native | 0.9036 | 0.1860 | 4.86× |
-| webp-lossless-odd | rgba | 1.202 | 0.3848 | 3.12× |
-| webp-lossless-odd | crop | 0.9599 | 0.3628 | 2.65× |
-
-**RGB Deflate strip-layout diagnostics**
-
-| Rows per strip | Task | Ours ms | libtiff ms | Ratio |
-|---|---|---:|---:|---:|
-| 16 | native | 10.390 | 1.457 | 7.13× |
-| 16 | crop | 1.367 | 0.2020 | 6.77× |
-| 32 | native | 6.569 | 1.274 | 5.16× |
-| 32 | crop | 1.694 | 0.1834 | 9.24× |
-| 64 | native | 7.123 | 1.208 | 5.90× |
-| 64 | crop | 1.783 | 0.1688 | 10.56× |
-| 256 | native | 6.769 | 1.128 | 6.00× |
-| 256 | crop | 5.530 | 0.3835 | 14.42× |
-
-**Large-strip reads with default strip-chopping behavior**
-
-| Compression | Task | Ours ms | libtiff ms | Ratio |
-|---|---|---:|---:|---:|
-| None | firstrow | 0.002665 | 0.9499 | 0.0028× |
-| None | crop | 0.0522 | 13.196 | 0.0040× |
-| LZW | firstrow | 64.824 | 0.1643 | 394.66× |
-| LZW | crop | 100.618 | 9.963 | 10.10× |
-| Deflate | firstrow | 36.310 | 0.0199 | 1820.38× |
-| Deflate | crop | 46.854 | 3.394 | 13.80× |
+| gray-none | native | 0.1336 | 0.07857 | 1.70× |
+| gray-none | scan | 0.3598 | 0.1186 | 3.03× |
+| gray-none | rgba | 3.331 | 1.058 | 3.15× |
+| rgb-none | native | 0.4444 | 0.2870 | 1.55× |
+| rgb-none | rgba | 3.473 | 1.599 | 2.17× |
+| rgb-none | crop | 0.08109 | 0.2128 | 0.38× |
+| gray-packbits | native | 2.880 | 3.396 | 0.85× |
+| gray-packbits | scan | 2.889 | 3.017 | 0.96× |
+| gray-packbits | rgba | 5.066 | 4.272 | 1.19× |
+| gray-lzw | native | 2.981 | 1.974 | 1.51× |
+| gray-lzw | scan | 2.873 | 2.611 | 1.10× |
+| gray-lzw | rgba | 5.508 | 2.811 | 1.96× |
+| rgb-lzw | native | 9.977 | 5.739 | 1.74× |
+| rgb-lzw | rgba | 12.976 | 6.980 | 1.86× |
+| rgb-lzw | crop | 1.132 | 0.8673 | 1.31× |
+| gray-deflate | native | 1.535 | 0.6572 | 2.34× |
+| gray-deflate | scan | 1.522 | 0.7075 | 2.15× |
+| gray-deflate | rgba | 4.118 | 1.421 | 2.90× |
+| rgb-deflate | native | 4.035 | 1.974 | 2.04× |
+| rgb-deflate | rgba | 6.921 | 2.959 | 2.34× |
+| rgb-deflate | crop | 1.259 | 0.2690 | 4.68× |
+| gray-zstd | native | 0.3633 | 0.1747 | 2.08× |
+| gray-zstd | scan | 0.5940 | 0.2112 | 2.81× |
+| gray-zstd | rgba | 3.548 | 1.118 | 3.17× |
+| rgb-zstd | native | 3.056 | 0.4075 | 7.50× |
+| rgb-zstd | rgba | 3.405 | 1.695 | 2.01× |
+| rgb-zstd | crop | 0.09261 | 0.1142 | 0.81× |
+| noise-lzw | native | 12.087 | 5.494 | 2.20× |
+| noise-deflate | native | 2.250 | 0.7089 | 3.17× |
+| noise-zstd | native | 1.139 | 0.2005 | 5.68× |
+| jpeg-smooth | native | 21.214 | 9.001 | 2.36× |
+| jpeg-smooth | rgba | 25.309 | 6.629 | 3.82× |
+| jpeg-texture | native | 77.873 | 34.888 | 2.23× |
+| jpeg-texture | rgba | 71.360 | 38.579 | 1.85× |
+| rgb-tiled-lzw | native | 5.568 | 9.310 | 0.60× |
+| rgb-tiled-lzw | rgba | 12.548 | 8.366 | 1.50× |
+| rgb-tiled-lzw | crop | 0.4611 | 0.4564 | 1.01× |
+| gray16-deflate-p2 | native | 8.109 | 4.181 | 1.94× |
+| gray16-deflate-p2 | scan | 11.106 | 4.190 | 2.65× |
+| float32-deflate-p3 | native | 25.042 | 9.426 | 2.66× |
+| float32-deflate-p3 | scan | 28.741 | 10.700 | 2.69× |
+| float16-deflate-p3 | native | 12.504 | 8.266 | 1.51× |
+| float16-deflate-p3 | scan | 19.535 | 8.582 | 2.28× |
+| complex64-lzw | native | 35.214 | 22.078 | 1.59× |
+| complex64-lzw | scan | 31.910 | 22.477 | 1.42× |
+| fax-rle | native | 2.363 | 0.9248 | 2.55× |
+| fax-rle | rgba | 4.131 | 1.474 | 2.80× |
+| fax-g3 | native | 5.512 | 1.019 | 5.41× |
+| fax-g3 | rgba | 5.996 | 1.354 | 4.43× |
+| fax-g4 | native | 3.150 | 1.162 | 2.71× |
+| fax-g4 | rgba | 5.458 | 1.671 | 3.27× |
+| webp-lossless | native | 17.172 | 3.972 | 4.32× |
+| webp-lossless | rgba | 24.207 | 7.023 | 3.45× |
+| webp-lossy | native | 55.620 | 17.350 | 3.21× |
+| webp-lossy | rgba | 64.349 | 19.296 | 3.33× |
+| lerc-float-plain | native | 18.996 | 5.774 | 3.29× |
+| lerc-float-deflate | native | 25.405 | 8.183 | 3.10× |
+| lerc-float-zstd | native | 26.318 | 8.097 | 3.25× |
+| cmyk-deflate | rgba | 13.528 | 6.457 | 2.10× |
+| cmyk-deflate | crop | 1.424 | 0.3272 | 4.35× |
+| lab-deflate | rgba | 59.777 | 45.787 | 1.31× |
+| lab-deflate | crop | 2.220 | 1.048 | 2.12× |
+| large-strip-none | firstrow | 0.004255 | 6.256 | 0.00068× |
+| large-strip-none | crop | 0.09409 | 39.491 | 0.0024× |
+| large-strip-lzw | firstrow | 70.010 | 1.124 | 62.28× |
+| large-strip-lzw | crop | 108.080 | 24.093 | 4.49× |
+| large-strip-deflate | firstrow | 26.204 | 0.03176 | 825.01× |
+| large-strip-deflate | crop | 26.419 | 9.406 | 2.81× |
+| many-strips | open | 0.004087 | 3.266 | 0.0013× |
+| many-strips | lookup | 0.003965 | 3.792 | 0.001× |
+| many-strips | open-lazy | 0.003425 | 0.008338 | 0.41× |
+| many-strips | lookup-lazy | 0.004075 | 2.114 | 0.0019× |
+| original-lzw-single-strip.tiff | native | 8.938 | 1.722 | 5.19× |
+| original-lzw-single-strip.tiff | rgba | 117.764 | 16.784 | 7.02× |
+| original-testfax4.tiff | native | 27.184 | 3.062 | 8.88× |
+| original-testfax4.tiff | rgba | 40.468 | 8.610 | 4.70× |
+| original-quad-lzw-compat.tiff | native | 2.288 | 1.939 | 1.18× |
+| original-quad-lzw-compat.tiff | rgba | 2.571 | 2.209 | 1.16× |
+| webp-lossy-opaque | native | 46.659 | 6.222 | 7.50× |
+| webp-lossy-opaque | rgba | 59.103 | 7.776 | 7.60× |
+| webp-lossy-opaque | crop | 7.057 | 0.7165 | 9.85× |
+| webp-lossy-texture | native | 169.193 | 68.136 | 2.48× |
+| webp-lossy-texture | rgba | 177.401 | 65.556 | 2.71× |
+| webp-lossy-texture | crop | 9.494 | 4.217 | 2.25× |
+| webp-lossy-odd | native | 4.048 | 1.210 | 3.35× |
+| webp-lossy-odd | rgba | 6.072 | 1.378 | 4.41× |
+| webp-lossy-odd | crop | 5.428 | 1.516 | 3.58× |
+| webp-lossless-opaque | native | 16.461 | 3.496 | 4.71× |
+| webp-lossless-opaque | rgba | 21.200 | 4.745 | 4.47× |
+| webp-lossless-opaque | crop | 2.017 | 0.6412 | 3.15× |
+| webp-lossless-texture | native | 44.469 | 21.831 | 2.04× |
+| webp-lossless-texture | rgba | 46.309 | 25.607 | 1.81× |
+| webp-lossless-texture | crop | 2.626 | 1.438 | 1.83× |
+| webp-lossless-odd | native | 1.229 | 0.2581 | 4.76× |
+| webp-lossless-odd | rgba | 1.252 | 0.6719 | 1.86× |
+| webp-lossless-odd | crop | 1.148 | 0.6983 | 1.64× |
 
 (End AI Text)
 
