@@ -56,7 +56,7 @@ pub struct Group {pub(super) g:wh::Huff,pub(super) r:wh::Huff,pub(super) b:wh::H
 impl Group {
     /// Fixed-size workspace. The decoder overwrites it before reading tables.
     pub fn empty() -> Self {
-        let h=wh::Huff {lens:Ghost(Seq::new(2328,|i:int| 0u8)),counts:[0usize;16],offsets:[0usize;16],symbols:[0u16;2328]};
+        let h=wh::Huff {lens:Ghost(Seq::new(2328,|i:int| 0u8)),counts:[0usize;16],offsets:[0usize;16],symbols:[0u16;2328],fast:[0u16;256]};
         Self {g:h,r:h,b:h,a:h,d:h}
     }
     pub(super) open spec fn valid(&self) -> bool {self.g.valid() && self.r.valid() && self.b.valid() && self.a.valid() && self.d.valid()}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead, one-pass JPEG and float unshuffle paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead, one-pass JPEG, WebP prefix table and float unshuffle paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -40,6 +40,8 @@ changes={
  'span-pixel':('adapter_geometry.rs','if fx {(n-1-i)*4} else {i*4}','if fx {(n-i)*4} else {i*4}','adapter_geometry','span_pixel'),
  'fp-unshuffle-plane':('native_fp.rs','let plane=if out_le{bytes-1-r}else{r};','let plane=if out_le{r}else{r};','native_fp','unshuffle'),
  'store-byte':('native_samples.rs','if bytes==1 {out[at]=(v%256) as u8;return;}','if bytes==1 {out[at]=(v%255) as u8;return;}','native_samples','store'),
+ 'webp-fast-entry':('webp_huffman.rs','return (n*4096+sym) as u16;','return ((n+1)*4096+sym) as u16;','webp_huffman','Huff::entry'),
+ 'webp-fast-symbol':('webp_huffman.rs','let len=(e/4096) as usize;let sym=(e%4096) as usize;','let len=(e/4096) as usize;let sym=(e/4096) as usize;','webp_huffman','Huff::read_window'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

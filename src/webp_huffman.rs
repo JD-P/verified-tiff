@@ -71,15 +71,53 @@ proof fn number_tail(l:Seq<u8>,v:int,n:nat,m:nat)
     ensures number(l,v,m)==number(l,v,n)+if v==0 {m-n} else {0},
     decreases m,
 { if m>n {number_tail(l,v,n,(m-1) as nat);} }
-// Lengths are ghost: decoding needs only the counts and ordered symbols.
+// Canonical walk over the low eight bits of v, LSB first: the same steps as
+// `symbol`, returning the symbol and its length, or None past eight bits.
+#[verifier::opaque]
+pub(super) open spec fn walk(h:HModel,v:u32,n:nat,code:int,first:int) -> Option<(int,int)>
+    decreases 9-n,
+{
+    if n==0 || n>8 {None} else {
+        let c=2*code+((v>>((n-1) as u32))&1u32) as int;let count=h.counts[n as int] as int;
+        if first<=c<first+count {
+            let k=ranked(h.lens,n as int,c-first,0);
+            if k<0 {None} else {Some((k,n as int))}
+        } else {walk(h,v,n+1,c,2*(first+count))}
+    }
+}
+// A nonzero entry holds length*4096+symbol for the code its index starts with.
+pub(super) open spec fn fast_entry(h:HModel,v:u32,e:u16) -> bool {
+    e!=0 ==> 1<=e/4096<=8 && e%4096<2328 && walk(h,v,1,0,0)==Some(((e%4096) as int,(e/4096) as int))
+}
+// A walk that ends within eight bits matches the stream walk on those bits.
+proof fn walk_symbol(s:Seq<u8>,b:int,end:int,h:HModel,v:u32,n:nat,code:int,first:int)
+    requires 1<=n<=8,b+8<=end*8,
+        forall|k:int| 0<=k<8 ==> #[trigger] field(s,b+k,1)==((v>>(k as u32))&1u32) as int,
+        walk(h,v,n,code,first).is_some(),
+    ensures symbol(s,b+n-1,end,h,n,code,first)==Some((walk(h,v,n,code,first).unwrap().0,b+walk(h,v,n,code,first).unwrap().1)),
+    decreases 9-n,
+{
+    reveal_with_fuel(symbol,1);reveal_with_fuel(walk,1);
+    assert(field(s,b+(n-1),1)==((v>>((n-1) as u32))&1u32) as int);
+    let c=2*code+field(s,b+n-1,1);let count=h.counts[n as int] as int;
+    if !(first<=c<first+count) {
+        walk_symbol(s,b,end,h,v,n+1,c,2*(first+count));
+    }
+}
+// Lengths are ghost: decoding needs only the counts, ordered symbols and the
+// eight-bit table.
 #[derive(Clone,Copy)]
 pub(super) struct Huff {
     pub lens:Ghost<Seq<u8>>,pub counts:[usize;16],
-    pub offsets:[usize;16],pub symbols:[u16;2328],
+    pub offsets:[usize;16],pub symbols:[u16;2328],pub fast:[u16;256],
 }
 impl Huff {
     pub(super) open spec fn model(self) -> HModel {HModel {lens:self.lens@,counts:self.counts@}}
     pub(super) open spec fn valid(self) -> bool {
+        &&& self.core()
+        &&& forall|v:int| 0<=v<256 ==> #[trigger] fast_entry(self.model(),v as u32,self.fast@[v])
+    }
+    pub(super) open spec fn core(self) -> bool {
         &&& self.lens@.len()==2328
         &&& forall|i:int| 0<=i<16 ==> self.counts@[i]==number(self.lens@,i,2328)
         &&& forall|i:int| 1<=i<16 ==> self.offsets@[i] as int+self.counts@[i]<=2328
@@ -133,12 +171,52 @@ impl Huff {
         // VP8L permits a single leaf, but no empty or incomplete multi-leaf tree.
         if left!=0 && (strict || !(counts[0]==2327 && counts[1]==1)) {return Err(Error::Invalid);}
         let (offsets,symbols)=ordered(lens,counts,alphabet);
-        let out=Self {lens:Ghost(lens@),counts,offsets,symbols};
+        let core=Self {lens:Ghost(lens@),counts,offsets,symbols,fast:[0u16;256]};
+        let fast=core.table();
+        let out=Self {fast,..core};
+        assert(out.model()==core.model() && out.core());
+        assert forall|v:int| 0<=v<256 implies #[trigger] fast_entry(out.model(),v as u32,out.fast@[v]) by {
+            assert(fast_entry(core.model(),v as u32,fast@[v]));
+        }
         assert(out.model()==huff(lens@)) by {assert(counts@==huff(lens@).counts);}
         Ok(out)
     }
+    fn table(&self) -> (t:[u16;256])
+        requires self.core(),
+        ensures forall|v:int| 0<=v<256 ==> #[trigger] fast_entry(self.model(),v as u32,t@[v]),
+    {
+        let mut t=[0u16;256];let mut v=0usize;
+        while v<256
+            invariant v<=256,self.core(),forall|j:int| 0<=j<v ==> #[trigger] fast_entry(self.model(),j as u32,t@[j]),
+            decreases 256-v,
+        {t[v]=self.entry(v as u32);v=v+1;}
+        t
+    }
+    fn entry(&self,v:u32) -> (e:u16)
+        requires self.core(),v<256,
+        ensures fast_entry(self.model(),v,e),
+    {
+        let mut n=1usize;let mut code=0usize;let mut first=0usize;
+        while n<=8
+            invariant 1<=n<=9,self.core(),v<256,code<pow(n as int-1),first<=4656*(pow(n as int-1)-1),
+                walk(self.model(),v,1,0,0)==walk(self.model(),v,n as nat,code as int,first as int),
+            decreases 9-n,
+        {
+            reveal_with_fuel(walk,1);
+            let bit=((v>>((n-1) as u32))&1u32) as usize;
+            assert(((v>>((n-1) as u32))&1u32)<=1u32) by(bit_vector);
+            proof {pow_bound(n as int);number_bound(self.lens@,n as int,2328);}
+            let count=self.counts[n];code=code*2+bit;
+            if code>=first && code-first<count {
+                let sym=self.symbols[self.offsets[n]+(code-first)] as usize;
+                return (n*4096+sym) as u16;
+            }
+            first=(first+count)*2;n=n+1;
+        }
+        0
+    }
     pub(super) fn find(&self,len:usize,rank:usize) -> (r:Result<usize,Error>)
-        requires self.valid(),1<=len<=15,
+        requires self.core(),1<=len<=15,
         ensures r.is_ok()==(ranked(self.lens@,len as int,rank as int,0)>=0),
             r.is_ok() ==> r.unwrap()==ranked(self.lens@,len as int,rank as int,0),
             r.is_ok() ==> r.unwrap()<2328,
@@ -295,6 +373,27 @@ impl Huff {
         let at=bits.at;let skip=bits.bit;
         let look=crate::bit_window::read(s,at,skip,16,false);
         proof {crate::bit_window::model(s@,at as int,skip as u32,16,false);}
+        // Codes of at most eight bits come from one table entry.
+        let w=look as u32;
+        assert((w&255u32)<256u32) by(bit_vector);
+        let e=self.fast[(w&255u32) as usize];
+        if e!=0 {
+            let len=(e/4096) as usize;let sym=(e%4096) as usize;
+            proof {
+                let v=w&255u32;
+                assert(fast_entry(self.model(),v,self.fast@[v as int]));
+                assert forall|k:int| 0<=k<8 implies #[trigger] field(s@,bits.pos()+k,1)==((v>>(k as u32))&1u32) as int by {
+                    crate::bit_window::digit(s@,at as int,skip as u32,16,k as u32);
+                    let kk=k as u32;
+                    assert(((v>>kk)&1u32)==((w>>kk)&1u32)) by(bit_vector) requires v==w&255u32,kk<8u32;
+                }
+                walk_symbol(s@,bits.pos(),bits.end as int,self.model(),v,1,0,0);
+            }
+            let next=skip+len;
+            proof {quotient_remainder(next as int,8);}
+            bits.at=at+next/8;bits.bit=next%8;
+            return Ok(sym);
+        }
         let mut n=1usize;let mut code=0usize;let mut first=0usize;
         while n<=15
             invariant 1<=n<=16,self.valid(),bits.valid(s@),*bits==*old(bits),at==bits.at,skip==bits.bit,bits.end-at>=3,
