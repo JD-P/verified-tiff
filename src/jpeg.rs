@@ -122,30 +122,34 @@ impl<'a> JpegSegment<'a> {
                     assert(y as int*row+x as int*ch+count<=self.output) by(nonlinear_arith)
                         requires y<h,x+n<=w,row as int==w as int*ch,count as int==n as int*ch,self.output as int==h as int*row,ch>0;
                 }
-                let dst=y*row+x*ch;let mut i=0usize;
-                while i<count
+                // One pixel per step: all channels of a pixel share its geometry.
+                let dst=y*row+x*ch;let mut col=0usize;
+                while col<n
                     invariant self.well_formed(),w==self.v@[12],h==self.v@[13],ch==self.v@[14],hs==self.v@[15],
                         row as int==w as int*ch,y<h,x<w,x%8==0,0<n<=8,x+n<=w,
-                        dst as int==y as int*row+x as int*ch,count as int==n as int*ch,dst as int+count<=self.output,i<=count,
+                        dst as int==y as int*row+x as int*ch,count as int==n as int*ch,dst as int+count<=self.output,col<=n,
                         a==crate::jpeg_layout::index(self.v@,x as int,y as int,0),a as int+n<=self.scratch,
                         ch==3 ==> b==crate::jpeg_layout::index(self.v@,x as int,y as int,1) && d==crate::jpeg_layout::index(self.v@,x as int,y as int,2)
                             && b as int+(phase as int+n-1)/(hs as int)<self.scratch && d as int+(phase as int+n-1)/(hs as int)<self.scratch,
                         phase as int==(x as int%(hs as int*8))%(hs as int),phase<hs,
                         scratch.len()>=self.scratch,output.len()==old(output).len(),output.len()>=self.output,
                         forall|j:int| 0<=j<self.scratch ==> scratch@[j]==crate::jpeg_transform::sample(self.coefficient_blocks()[j/64],j%64),
-                        forall|j:int| 0<=j<dst as int+i ==> output@[j]==self.decoded_byte(j),
+                        forall|j:int| 0<=j<dst as int+col as int*ch ==> output@[j]==self.decoded_byte(j),
                         forall|j:int| self.output<=j<output.len() ==> output@[j]==old(output)@[j],
-                    decreases count-i,
+                    decreases n-col,
                 {
-                    // Constant divisors for the two legal channel counts.
-                    let c=if ch==3 {i%3} else {i%ch};let col=if ch==3 {i/3} else {i/ch};
+                    assert(col as int*ch+ch<=count) by(nonlinear_arith) requires col<n,count as int==n as int*ch;
+                    let at=dst+col*ch;
                     proof {
-                        quotient_remainder(i as int,ch as int);
-                        assert(col<n) by(nonlinear_arith) requires i<count,count as int==n as int*ch,i as int==ch as int*col+c,c>=0,ch>0;
-                        let k=dst as int+i;let p=y as int*w+x+col;
-                        assert(k==p*ch+c) by(nonlinear_arith) requires k==dst as int+i,dst as int==y as int*row+x as int*ch,row as int==w as int*ch,i as int==ch as int*col+c,p==y as int*w+x+col;
-                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,ch as int,p,c as int);
-                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p,w as int,y as int,x as int+col);
+                        let pp=y as int*w+x+col;
+                        assert(at as int==pp*ch) by(nonlinear_arith)
+                            requires at as int==dst as int+col as int*ch,dst as int==y as int*row+x as int*ch,row as int==w as int*ch,pp==y as int*w+x+col;
+                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(at as int,ch as int,pp,0);
+                        if ch==3 {
+                            vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(at as int+1,3,pp,1);
+                            vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(at as int+2,3,pp,2);
+                        }
+                        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(pp,w as int,y as int,x as int+col);
                         crate::jpeg_layout::run_index(self.v@,x as int,y as int,0,col as int);
                         if ch==3 {
                             crate::jpeg_layout::run_index(self.v@,x as int,y as int,1,col as int);
@@ -153,12 +157,20 @@ impl<'a> JpegSegment<'a> {
                             vstd::arithmetic::div_mod::lemma_div_is_ordered(phase as int+col,phase as int+n-1,hs as int);
                         }
                     }
-                    let off=if hs==1 {phase+col} else if hs==2 {(phase+col)/2} else if hs==4 {(phase+col)/4} else {(phase+col)/hs};
-                    let value=if self.ycbcr && ch==3 {
-                        crate::jpeg_color::convert(scratch[a+col],scratch[b+off],scratch[d+off],c,self.limited)
-                    } else {scratch[if c==0 {a+col} else if c==1 {b+off} else {d+off}]};
-                    assert(value==self.decoded_byte(dst as int+i));
-                    output[dst+i]=value;i=i+1;
+                    if ch==3 {
+                        let off=if hs==1 {phase+col} else if hs==2 {(phase+col)/2} else if hs==4 {(phase+col)/4} else {(phase+col)/hs};
+                        let (y0,c1,c2)=(scratch[a+col],scratch[b+off],scratch[d+off]);
+                        let (v0,v1,v2)=if self.ycbcr {
+                            (crate::jpeg_color::convert(y0,c1,c2,0,self.limited),crate::jpeg_color::convert(y0,c1,c2,1,self.limited),crate::jpeg_color::convert(y0,c1,c2,2,self.limited))
+                        } else {(y0,c1,c2)};
+                        assert(v0==self.decoded_byte(at as int) && v1==self.decoded_byte(at as int+1) && v2==self.decoded_byte(at as int+2));
+                        output[at]=v0;output[at+1]=v1;output[at+2]=v2;
+                    } else {
+                        let v0=scratch[a+col];
+                        assert(v0==self.decoded_byte(at as int));
+                        output[at]=v0;
+                    }
+                    col=col+1;
                 }
                 x=x+n;
                 assert(x<w ==> x%8==0);
