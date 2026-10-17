@@ -24,6 +24,22 @@ pub(super) open spec fn batch(s:Seq<u8>,end:int,cap:int,v:Model,space:nat,fuel:n
     }
 }
 
+// Whole-match copies take the same transitions; no batch stop falls inside.
+proof fn copy_batch(s:Seq<u8>,end:int,cap:int,v:Model,b:Seq<u8>,space:nat,fuel:nat,last:bool)
+    requires crate::deflate::copied(v,b),v.bytes.len()+b.len()<=cap,b.len()<=fuel,b.len()<=space,
+        last || v.pos/8+1024<=s.len(),
+    ensures batch(s,end,cap,v,space,fuel,last)
+        ==batch(s,end,cap,crate::deflate::copy_model(v,b),(space-b.len()) as nat,(fuel-b.len()) as nat,last),
+    decreases b.len(),
+{
+    if b.len()==0 {assert(v.bytes+b =~= v.bytes);assert(crate::deflate::copy_model(v,b)==v);}
+    else {
+        crate::deflate::copy_step(s,end,cap,v,b);reveal_with_fuel(batch,1);
+        copy_batch(s,end,cap,crate::deflate::append(Model {left:(v.left-1) as usize,..v},b[0]),b.subrange(1,b.len() as int),
+            (space-1) as nat,(fuel-1) as nat,last);
+    }
+}
+
 // A match run is a sequence of copy transitions at one input position. The
 // loop has no early exit, so cursor fields stay in registers until it ends.
 #[inline(always)]
@@ -41,6 +57,12 @@ fn copy_run(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],space:Ghost<nat>,fuel:
 {
     let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
     let ghost wanted=batch(s@,c.end(),cap as int,c.model(),space@,fuel@,last@);
+    if n>=32 && n<=c.distance && (c.produced-c.distance)%32768+n<=32768 && c.produced%32768+n<=32768 {
+        let ghost v=c.model();
+        c.match_block(s,cap,dst);
+        proof {copy_batch(s@,c.end(),cap as int,v,dst@,space@,fuel@,last@);}
+        return;
+    }
     while i<n
         invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==3,c.left+i==old(c).left,c.bits==old(c).bits,
             c.distance==old(c).distance,c.window==old(c).window,c.produced==start+i,start==old(c).produced,

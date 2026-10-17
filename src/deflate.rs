@@ -182,6 +182,87 @@ impl Cursor {
         }
     }
     pub(super) fn done(&self) -> (r:bool) ensures r==(self.model().mode==5) {self.mode==5}
+    // A whole match whose source precedes it and neither range wraps the ring:
+    // two slice copies, then the checksum folds the copied bytes in order.
+    #[inline(always)]
+    pub(super) fn match_block(&mut self,s:&[u8],cap:usize,dst:&mut [u8])
+        requires old(self).valid(s@,cap as int),old(self).mode==3,0<old(dst).len()<=old(self).left,
+            old(dst).len()<=old(self).distance,0<old(self).distance<=old(self).produced,old(self).distance<=old(self).window,
+            old(self).left<=cap-old(self).produced,
+            (old(self).produced-old(self).distance)%32768+old(dst).len()<=32768,old(self).produced%32768+old(dst).len()<=32768,
+        ensures final(self).valid(s@,cap as int),final(self).end()==old(self).end(),final(dst).len()==old(dst).len(),
+            copied(old(self).model(),final(dst)@),final(self).model()==copy_model(old(self).model(),final(dst)@),
+            final(self).produced==old(self).produced+old(dst).len(),final(self).bits==old(self).bits,
+    {
+        let n=dst.len();let ghost h=self.history@;let ghost p=self.produced as int;let ghost d=self.distance as int;
+        let src0=(self.produced-self.distance)%32768;let d0=self.produced%32768;
+        {
+            let ring:&[u8]=&self.ring;
+            let (_,tail)=ring.split_at(src0);let (source,_)=tail.split_at(n);
+            dst.copy_from_slice(source);
+        }
+        assert forall|k:int| 0<=k<n implies #[trigger] dst@[k]==h[p-d+k] by {
+            vstd::arithmetic::div_mod::lemma_fundamental_div_mod(p-d,32768);
+            vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(p-d+k,32768,(p-d)/32768,src0+k);
+            assert(self.ring@[(p-d+k)%32768]==h[p-d+k]);
+        }
+        let ghost b=dst@;let ghost old_ring=self.ring@;
+        {
+            let ring:&mut [u8]=&mut self.ring;
+            let (_,tail)=ring.split_at_mut(d0);let (target,_)=tail.split_at_mut(n);
+            target.copy_from_slice(dst);
+        }
+        assert(forall|k:int| 0<=k<n ==> #[trigger] self.ring@[d0+k]==b[k]);
+        assert(forall|k:int| 0<=k<32768 && !(d0<=k<d0+n) ==> #[trigger] self.ring@[k]==old_ring[k]);
+        let mut a=self.a;let mut sum=self.b;let mut pending=self.pending;let mut i=0usize;
+        while i<n
+            invariant i<=n,n==dst.len(),dst@==b,b.len()==n,
+                a%65521==adler1(h+b.subrange(0,i as int)),sum%65521==adler2(h+b.subrange(0,i as int)),
+                pending<=256,a<=65520+pending*255,sum<=65520+pending*130800,
+            decreases n-i,
+        {
+            if pending==256 {a=a%65521;sum=sum%65521;pending=0;}
+            // Each chunk ends before the next reduction is due.
+            let m=if n-i<256-pending {n-i} else {256-pending};
+            let start=i;let stop=i+m;
+            while i<stop
+                invariant start<=i<=stop<=n,n==dst.len(),dst@==b,b.len()==n,pending+(stop-start)<=256,
+                    a%65521==adler1(h+b.subrange(0,i as int)),sum%65521==adler2(h+b.subrange(0,i as int)),
+                    a<=65520+(pending+(i-start))*255,sum<=65520+(pending+(i-start))*130800,
+                decreases stop-i,
+            {
+                let byte=dst[i];
+                let ghost prior_a=a;let ghost prior_b=sum;
+                a=a+byte as usize;sum=sum+a;
+                proof {
+                    assert(a%65521==(prior_a%65521+byte as int)%65521);
+                    assert(sum%65521==(prior_b%65521+a%65521)%65521);
+                    let q=h+b.subrange(0,i as int);let r=h+b.subrange(0,i as int+1);
+                    assert(r.drop_last() =~= q);assert(r.last()==byte);
+                    reveal_with_fuel(adler1,2);reveal_with_fuel(adler2,2);
+                }
+                i=i+1;
+            }
+            pending=pending+m;
+        }
+        assert(b.subrange(0,n as int) =~= b);
+        self.a=a;self.b=sum;self.pending=pending;self.produced=self.produced+n;self.left=self.left-n;
+        proof {self.history=Ghost(h+b);}
+        assert forall|k:int| 0<=k<self.produced && self.produced as int-32768<=k implies self.ring@[k%32768]==self.history@[k] by {
+            vstd::arithmetic::div_mod::lemma_fundamental_div_mod(p,32768);
+            vstd::arithmetic::div_mod::lemma_fundamental_div_mod(k,32768);
+            if k>=p {
+                vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(k,32768,p/32768,d0+(k-p));
+                assert(self.ring@[d0+(k-p)]==b[k-p]);
+            } else {
+                assert(!(d0<=k%32768<d0+n)) by(nonlinear_arith)
+                    requires p==p/32768*32768+d0,k==k/32768*32768+k%32768,0<=d0<32768,0<=k%32768<32768,
+                        p-32768+n<=k<p,d0+n<=32768,n>0;
+                assert(old_ring[k%32768]==h[k]);
+            }
+        }
+        assert(self.model()==copy_model(old(self).model(),b));
+    }
     #[inline(always)]
     pub(super) fn match_byte(&mut self,s:&[u8],cap:usize) -> (byte:u8)
         requires old(self).valid(s@,cap as int),old(self).mode==3,old(self).left>0,
@@ -361,6 +442,39 @@ pub(super) proof fn finish_prefix(s:Seq<u8>,end:int,cap:int,v:Model,fuel:nat)
     }
 }
 
+// A match whose bytes all precede it in history, taken as consecutive copy
+// transitions at one input position.
+pub(super) open spec fn copied(v:Model,b:Seq<u8>) -> bool {
+    &&& v.mode==3 && b.len()<=v.left && b.len()<=v.distance && 0<v.distance<=v.bytes.len() && v.distance<=v.window
+    &&& forall|k:int| 0<=k<b.len() ==> #[trigger] b[k]==v.bytes[v.bytes.len()-v.distance+k]
+}
+pub(super) open spec fn copy_model(v:Model,b:Seq<u8>) -> Model {Model {left:(v.left-b.len()) as usize,bytes:v.bytes+b,..v}}
+pub(super) proof fn copy_step(s:Seq<u8>,end:int,cap:int,v:Model,b:Seq<u8>)
+    requires copied(v,b),b.len()>0,v.bytes.len()+b.len()<=cap,
+    ensures transition(s,end,cap,v)==Some(append(Model {left:(v.left-1) as usize,..v},b[0])),
+        copied(append(Model {left:(v.left-1) as usize,..v},b[0]),b.subrange(1,b.len() as int)),
+        copy_model(append(Model {left:(v.left-1) as usize,..v},b[0]),b.subrange(1,b.len() as int))==copy_model(v,b),
+{
+    reveal(transition);
+    let w=append(Model {left:(v.left-1) as usize,..v},b[0]);let t=b.subrange(1,b.len() as int);
+    assert(b[0]==v.bytes[v.bytes.len()-v.distance]);
+    assert forall|k:int| 0<=k<t.len() implies #[trigger] t[k]==w.bytes[w.bytes.len()-w.distance+k] by {
+        assert(t[k]==b[k+1]);assert(w.bytes[w.bytes.len()-w.distance+k]==v.bytes[v.bytes.len()-v.distance+k+1]);
+    }
+    assert(w.bytes+t =~= v.bytes+b);
+}
+pub(super) proof fn copy_finish(s:Seq<u8>,end:int,cap:int,v:Model,b:Seq<u8>,fuel:nat)
+    requires copied(v,b),v.bytes.len()+b.len()<=cap,b.len()<=fuel,
+    ensures finish(s,end,cap,v,fuel)==finish(s,end,cap,copy_model(v,b),(fuel-b.len()) as nat),
+    decreases b.len(),
+{
+    if b.len()==0 {assert(v.bytes+b =~= v.bytes);assert(copy_model(v,b)==v);}
+    else {
+        copy_step(s,end,cap,v,b);reveal_with_fuel(finish,1);
+        copy_finish(s,end,cap,append(Model {left:(v.left-1) as usize,..v},b[0]),b.subrange(1,b.len() as int),(fuel-1) as nat);
+    }
+}
+
 // Copy transitions of one match, refined against the unbounded model. The
 // loop has no early exit, so cursor fields stay in registers until it ends.
 #[inline(always)]
@@ -377,6 +491,12 @@ fn copy_into(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],fuel:Ghost<nat>)
 {
     let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
     let ghost wanted=finish(s@,c.end(),cap as int,c.model(),fuel@);
+    if n>=32 && n<=c.distance && (c.produced-c.distance)%32768+n<=32768 && c.produced%32768+n<=32768 {
+        let ghost v=c.model();
+        c.match_block(s,cap,dst);
+        proof {copy_finish(s@,c.end(),cap as int,v,dst@,fuel@);}
+        return;
+    }
     while i<n
         invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==3,c.left+i==old(c).left,
             c.distance==old(c).distance,c.window==old(c).window,c.produced==start+i,start==old(c).produced,
