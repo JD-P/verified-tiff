@@ -40,6 +40,23 @@ proof fn copy_batch(s:Seq<u8>,end:int,cap:int,v:Model,b:Seq<u8>,space:nat,fuel:n
     }
 }
 
+// Stored blocks likewise; every intermediate position keeps the lookahead.
+proof fn stored_batch(s:Seq<u8>,end:int,cap:int,v:Model,b:Seq<u8>,space:nat,fuel:nat,last:bool)
+    requires crate::deflate::taken(s,end,v,b),v.bytes.len()+b.len()<=cap,b.len()<=fuel,b.len()<=space,
+        b.len()>0 ==> (last || v.pos/8+b.len()+1023<=s.len()),
+    ensures batch(s,end,cap,v,space,fuel,last)
+        ==batch(s,end,cap,crate::deflate::stored_model(v,b),(space-b.len()) as nat,(fuel-b.len()) as nat,last),
+    decreases b.len(),
+{
+    if b.len()==0 {assert(v.bytes+b =~= v.bytes);assert(crate::deflate::stored_model(v,b)==v);}
+    else {
+        crate::deflate::stored_step(s,end,cap,v,b);reveal_with_fuel(batch,1);
+        let w=crate::deflate::append(Model {pos:v.pos+8,left:(v.left-1) as usize,..v},b[0]);
+        assert(w.pos/8==v.pos/8+1) by {vstd::arithmetic::div_mod::lemma_fundamental_div_mod(v.pos,8);vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(v.pos+8,8,v.pos/8+1,0);}
+        stored_batch(s,end,cap,w,b.subrange(1,b.len() as int),(space-1) as nat,(fuel-1) as nat,last);
+    }
+}
+
 // A match run is a sequence of copy transitions at one input position. The
 // loop has no early exit, so cursor fields stay in registers until it ends.
 #[inline(always)]
@@ -102,6 +119,12 @@ fn stored_run(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],space:Ghost<nat>,fue
 {
     let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
     let ghost wanted=batch(s@,c.end(),cap as int,c.model(),space@,fuel@,last@);
+    if n>=32 && c.produced%32768+n<=32768 {
+        let ghost v=c.model();
+        c.stored_block(s,cap,dst);
+        proof {stored_batch(s@,c.end(),cap as int,v,dst@,space@,fuel@,last@);}
+        return;
+    }
     let (_,tail)=s.split_at(c.bits.at);let (src,_)=tail.split_at(n);
     while i<n
         invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==1,c.left+i==old(c).left,
@@ -253,7 +276,9 @@ impl Inflater {
             if c.mode==1 && c.left>0 && c.bits.bit==0 && c.bits.at<c.bits.end && c.produced<self.cap
                 && (last || s.len()-c.bits.at>1023) {
                 let room=if last {c.left} else {s.len()-c.bits.at-1023};
-                let n=c.left.min(write-written).min(left).min(c.bits.end-c.bits.at).min(self.cap-c.produced).min(room);
+                // Runs stop at the ring's end, so each one is a single slice copy.
+                let n=c.left.min(write-written).min(left).min(c.bits.end-c.bits.at).min(self.cap-c.produced).min(room)
+                    .min(32768-c.produced%32768);
                 // Stored bytes keep the same two work units each.
                 spend(budget,2*n)?;
                 let ghost prior_left=left;let ghost prior_written=written;let ghost prior=c.history@;let ghost before=output@;
