@@ -126,6 +126,25 @@ impl Cursor {
             r.is_ok() ==> final(self).history@.len()==final(self).produced,
     {
         if self.produced==cap {return Err(Error::Invalid);}
+        self.push(byte,cap);Ok(())
+    }
+    // Append one byte when the caller has already established output space.
+    #[inline(always)]
+    pub(super) fn push(&mut self,byte:u8,cap:usize)
+        requires old(self).produced==old(self).history@.len(),old(self).produced<cap,
+            old(self).a%65521==adler1(old(self).history@),old(self).b%65521==adler2(old(self).history@),
+            old(self).pending<=256,old(self).a<=65520+old(self).pending*255,old(self).b<=65520+old(self).pending*130800,
+            forall|k:int| 0<=k<old(self).produced && old(self).produced as int-32768<=k ==> old(self).ring@[k%32768]==old(self).history@[k],
+        ensures final(self).produced==old(self).produced+1 && final(self).produced<=cap,
+            final(self).model()==append(old(self).model(),byte),
+            final(self).a%65521==adler1(final(self).history@) && final(self).b%65521==adler2(final(self).history@)
+                && final(self).pending<=256 && final(self).a<=65520+final(self).pending*255 && final(self).b<=65520+final(self).pending*130800,
+            forall|k:int| 0<=k<final(self).produced && final(self).produced as int-32768<=k ==> final(self).ring@[k%32768]==final(self).history@[k],
+            final(self).bits==old(self).bits,final(self).lit==old(self).lit,final(self).dist==old(self).dist,
+            final(self).history@.len()==final(self).produced,
+            final(self).mode==old(self).mode,final(self).left==old(self).left,final(self).distance==old(self).distance,
+            final(self).last==old(self).last,final(self).window==old(self).window,
+    {
         let at=self.produced%32768;
         self.ring[at]=byte;
         // Accumulate bounded chunks; reduction is needed only every 256 bytes.
@@ -161,7 +180,6 @@ impl Cursor {
                 }
             }
         }
-        Ok(())
     }
     pub(super) fn done(&self) -> (r:bool) ensures r==(self.model().mode==5) {self.mode==5}
     #[inline(always)]
@@ -178,7 +196,22 @@ impl Cursor {
         let byte=self.ring[(self.produced-self.distance)%32768];
         assert(byte==self.history@[self.produced as int-self.distance]);
         self.left=self.left-1;
-        let r=self.emit(byte,cap);assert(r.is_ok());byte
+        self.push(byte,cap);byte
+    }
+    #[inline(always)]
+    pub(super) fn stored_byte(&mut self,s:&[u8],cap:usize) -> (byte:u8)
+        requires old(self).valid(s@,cap as int),old(self).mode==1,old(self).left>0,old(self).bits.bit==0,
+            old(self).bits.at<old(self).bits.end,old(self).produced<cap,
+        ensures final(self).valid(s@,cap as int),final(self).end()==old(self).end(),
+            Some(final(self).model())==transition(s@,old(self).end(),cap as int,old(self).model()),
+            final(self).produced==old(self).produced+1,final(self).history@==old(self).history@.push(byte),
+            final(self).mode==1,final(self).left+1==old(self).left,
+            final(self).bits.at==old(self).bits.at+1,final(self).bits.bit==0,final(self).bits.end==old(self).bits.end,
+    {
+        reveal(transition);
+        proof {aligned_byte(s@,self.bits.at as int);}
+        let byte=s[self.bits.at];self.bits.at=self.bits.at+1;self.left=self.left-1;
+        self.push(byte,cap);byte
     }
     #[inline(always)]
     pub(super) fn step(&mut self,s:&[u8],cap:usize) -> (r:Result<Option<u8>,Error>)
@@ -325,6 +358,78 @@ pub(super) proof fn finish_prefix(s:Seq<u8>,end:int,cap:int,v:Model,fuel:nat)
     }
 }
 
+// Copy transitions of one match, refined against the unbounded model. The
+// loop has no early exit, so cursor fields stay in registers until it ends.
+#[inline(always)]
+fn copy_into(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],fuel:Ghost<nat>)
+    requires old(c).valid(s@,cap as int),old(c).mode==3,0<old(dst).len()<=old(c).left,
+        0<old(c).distance<=old(c).produced,old(c).distance<=old(c).window,old(c).left<=cap-old(c).produced,
+        old(dst).len()<=fuel@,
+    ensures final(c).valid(s@,cap as int),final(c).end()==old(c).end(),
+        final(dst).len()==old(dst).len(),final(c).produced==old(c).produced+old(dst).len(),
+        forall|k:int| 0<=k<old(c).produced ==> final(c).history@[k]==old(c).history@[k],
+        forall|k:int| 0<=k<old(dst).len() ==> final(dst)@[k]==final(c).history@[old(c).produced+k],
+        finish(s@,old(c).end(),cap as int,old(c).model(),fuel@)
+            ==finish(s@,old(c).end(),cap as int,final(c).model(),(fuel@-old(dst).len()) as nat),
+{
+    let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
+    let ghost wanted=finish(s@,c.end(),cap as int,c.model(),fuel@);
+    while i<n
+        invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==3,c.left+i==old(c).left,
+            c.distance==old(c).distance,c.window==old(c).window,c.produced==start+i,start==old(c).produced,
+            0<c.distance<=c.produced,c.distance<=c.window,old(c).left<=cap-start,
+            c.valid(s@,cap as int),c.end()==old(c).end(),n<=fuel@,
+            forall|k:int| 0<=k<start ==> c.history@[k]==history[k],
+            forall|k:int| 0<=k<i ==> dst@[k]==c.history@[start+k],
+            wanted==finish(s@,c.end(),cap as int,c.model(),(fuel@-i) as nat),
+        decreases n-i,
+    {
+        reveal_with_fuel(finish,1);
+        let ghost previous=c.history@;
+        let byte=c.match_byte(s,cap);
+        dst[i]=byte;i=i+1;
+        assert forall|k:int| 0<=k<i implies dst@[k]==c.history@[start+k] by {
+            if k==i-1 {assert(c.history@[start+k]==byte);} else {assert(c.history@[start+k]==previous[start+k]);}
+        }
+        assert forall|k:int| 0<=k<start implies c.history@[k]==history[k] by {assert(c.history@[k]==previous[k]);}
+    }
+}
+
+// Stored-block bytes, likewise refined transition by transition.
+#[inline(always)]
+fn stored_into(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],fuel:Ghost<nat>)
+    requires old(c).valid(s@,cap as int),old(c).mode==1,0<old(dst).len()<=old(c).left,old(c).bits.bit==0,
+        old(c).bits.at+old(dst).len()<=old(c).bits.end,old(c).produced+old(dst).len()<=cap,old(dst).len()<=fuel@,
+    ensures final(c).valid(s@,cap as int),final(c).end()==old(c).end(),
+        final(dst).len()==old(dst).len(),final(c).produced==old(c).produced+old(dst).len(),
+        forall|k:int| 0<=k<old(c).produced ==> final(c).history@[k]==old(c).history@[k],
+        forall|k:int| 0<=k<old(dst).len() ==> final(dst)@[k]==final(c).history@[old(c).produced+k],
+        finish(s@,old(c).end(),cap as int,old(c).model(),fuel@)
+            ==finish(s@,old(c).end(),cap as int,final(c).model(),(fuel@-old(dst).len()) as nat),
+{
+    let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
+    let ghost wanted=finish(s@,c.end(),cap as int,c.model(),fuel@);
+    while i<n
+        invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==1,c.left+i==old(c).left,
+            c.bits.bit==0,c.bits.at==old(c).bits.at+i,c.bits.end==old(c).bits.end,old(c).bits.at+n<=old(c).bits.end,
+            c.produced==start+i,start==old(c).produced,start+n<=cap,
+            c.valid(s@,cap as int),c.end()==old(c).end(),n<=fuel@,
+            forall|k:int| 0<=k<start ==> c.history@[k]==history[k],
+            forall|k:int| 0<=k<i ==> dst@[k]==c.history@[start+k],
+            wanted==finish(s@,c.end(),cap as int,c.model(),(fuel@-i) as nat),
+        decreases n-i,
+    {
+        reveal_with_fuel(finish,1);
+        let ghost previous=c.history@;
+        let byte=c.stored_byte(s,cap);
+        dst[i]=byte;i=i+1;
+        assert forall|k:int| 0<=k<i implies dst@[k]==c.history@[start+k] by {
+            if k==i-1 {assert(c.history@[start+k]==byte);} else {assert(c.history@[start+k]==previous[start+k]);}
+        }
+        assert forall|k:int| 0<=k<start implies c.history@[k]==history[k] by {assert(c.history@[k]==previous[k]);}
+    }
+}
+
 pub(super) fn validate(s:&[u8],start:usize,count:usize,cap:usize,fuel:usize) -> (r:Result<usize,Error>)
     ensures r.is_ok()==result(s@,start as int,count as int,cap as int,fuel as nat).is_some(),
         r.is_ok() ==> r.unwrap()==result(s@,start as int,count as int,cap as int,fuel as nat).unwrap().len(),
@@ -356,6 +461,37 @@ pub(super) fn process(s:&[u8],start:usize,count:usize,cap:usize,fuel:usize,outpu
             forall|k:int| write<=k<output.len() ==> output@[k]==old(output)@[k],
         decreases left,
     {
+        if c.mode==3 && c.left>0 && c.distance>0 && c.distance<=c.produced && c.distance<=c.window && c.left<=cap-c.produced
+            && c.produced<=write && c.left.min(left)<=write-c.produced {
+            // A match lying inside the visible output is copied as one run.
+            let n=c.left.min(left);let at=c.produced;
+            let ghost prior=c.history@;let ghost before=output@;let ghost prior_left=left;
+            {
+                let (_,tail)=output.split_at_mut(at);
+                let (dst,_)=tail.split_at_mut(n);
+                copy_into(&mut c,s,cap,dst,Ghost(prior_left as nat));
+            }
+            left=left-n;
+            assert forall|k:int| 0<=k<write && k<c.produced implies output@[k]==c.history@[k] by {
+                if k<at {assert(output@[k]==before[k]);assert(c.history@[k]==prior[k]);}
+            }
+            continue;
+        }
+        if c.mode==1 && c.left>0 && c.bits.bit==0 && c.bits.at<c.bits.end && c.produced<cap && c.produced<write {
+            // Stored bytes inside the visible output are copied as one run.
+            let n=c.left.min(left).min(c.bits.end-c.bits.at).min(cap-c.produced).min(write-c.produced);let at=c.produced;
+            let ghost prior=c.history@;let ghost before=output@;let ghost prior_left=left;
+            {
+                let (_,tail)=output.split_at_mut(at);
+                let (dst,_)=tail.split_at_mut(n);
+                stored_into(&mut c,s,cap,dst,Ghost(prior_left as nat));
+            }
+            left=left-n;
+            assert forall|k:int| 0<=k<write && k<c.produced implies output@[k]==c.history@[k] by {
+                if k<at {assert(output@[k]==before[k]);assert(c.history@[k]==prior[k]);}
+            }
+            continue;
+        }
         reveal_with_fuel(finish,1);
         let pos=c.produced;let ghost previous=c.history@;
         let next=c.step(s,cap)?;left=left-1;

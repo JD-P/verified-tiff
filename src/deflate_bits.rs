@@ -19,7 +19,7 @@ pub(super) open spec fn field(s:Seq<u8>,p:int,n:nat) -> int decreases n {
     if n==0 {0} else {field(s,p,(n-1) as nat)+pow(n as int-1)*((s[(p+n-1)/8] as int / power2((p+n-1)%8))%2)}
 }
 // An aligned eight-bit field is exactly the stored byte.
-proof fn aligned_byte(s:Seq<u8>,at:int)
+pub(super) proof fn aligned_byte(s:Seq<u8>,at:int)
     requires 0<=at<s.len(),
     ensures field(s,at*8,8)==s[at] as int,
 {

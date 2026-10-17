@@ -24,6 +24,84 @@ pub(super) open spec fn batch(s:Seq<u8>,end:int,cap:int,v:Model,space:nat,fuel:n
     }
 }
 
+// A match run is a sequence of copy transitions at one input position. The
+// loop has no early exit, so cursor fields stay in registers until it ends.
+#[inline(always)]
+fn copy_run(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],space:Ghost<nat>,fuel:Ghost<nat>,last:Ghost<bool>)
+    requires old(c).valid(s@,cap as int),old(c).mode==3,0<old(dst).len()<=old(c).left,
+        0<old(c).distance<=old(c).produced,old(c).distance<=old(c).window,old(c).left<=cap-old(c).produced,
+        old(dst).len()<=space@,old(dst).len()<=fuel@,
+        last@ || (old(c).bits.at as int+1024<=s.len()),
+    ensures final(c).valid(s@,cap as int),final(c).end()==old(c).end(),final(c).bits==old(c).bits,
+        final(dst).len()==old(dst).len(),final(c).produced==old(c).produced+old(dst).len(),
+        forall|k:int| 0<=k<old(c).produced ==> final(c).history@[k]==old(c).history@[k],
+        forall|k:int| 0<=k<old(dst).len() ==> final(dst)@[k]==final(c).history@[old(c).produced+k],
+        batch(s@,old(c).end(),cap as int,old(c).model(),space@,fuel@,last@)
+            ==batch(s@,old(c).end(),cap as int,final(c).model(),(space@-old(dst).len()) as nat,(fuel@-old(dst).len()) as nat,last@),
+{
+    let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
+    let ghost wanted=batch(s@,c.end(),cap as int,c.model(),space@,fuel@,last@);
+    while i<n
+        invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==3,c.left+i==old(c).left,c.bits==old(c).bits,
+            c.distance==old(c).distance,c.window==old(c).window,c.produced==start+i,start==old(c).produced,
+            0<c.distance<=c.produced,c.distance<=c.window,old(c).left<=cap-start,
+            c.valid(s@,cap as int),c.end()==old(c).end(),n<=space@,n<=fuel@,
+            last@ || (c.bits.at as int+1024<=s.len()),
+            forall|k:int| 0<=k<start ==> c.history@[k]==history[k],
+            forall|k:int| 0<=k<i ==> dst@[k]==c.history@[start+k],
+            wanted==batch(s@,c.end(),cap as int,c.model(),(space@-i) as nat,(fuel@-i) as nat,last@),
+        decreases n-i,
+    {
+        reveal_with_fuel(batch,1);
+        let ghost previous=c.history@;
+        let byte=c.match_byte(s,cap);
+        dst[i]=byte;i=i+1;
+        assert forall|k:int| 0<=k<i implies dst@[k]==c.history@[start+k] by {
+            if k==i-1 {assert(c.history@[start+k]==byte);} else {assert(c.history@[start+k]==previous[start+k]);}
+        }
+        assert forall|k:int| 0<=k<start implies c.history@[k]==history[k] by {assert(c.history@[k]==previous[k]);}
+    }
+}
+
+// Stored-block bytes. Every intermediate state keeps the nonfinal window's
+// 1 KiB lookahead, so no batch stop is skipped.
+#[inline(always)]
+fn stored_run(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],space:Ghost<nat>,fuel:Ghost<nat>,last:Ghost<bool>)
+    requires old(c).valid(s@,cap as int),old(c).mode==1,0<old(dst).len()<=old(c).left,old(c).bits.bit==0,
+        old(c).bits.at+old(dst).len()<=old(c).bits.end,old(c).produced+old(dst).len()<=cap,
+        old(dst).len()<=space@,old(dst).len()<=fuel@,
+        last@ || (old(c).bits.at as int+old(dst).len()+1023<=s.len()),
+    ensures final(c).valid(s@,cap as int),final(c).end()==old(c).end(),
+        final(dst).len()==old(dst).len(),final(c).produced==old(c).produced+old(dst).len(),
+        forall|k:int| 0<=k<old(c).produced ==> final(c).history@[k]==old(c).history@[k],
+        forall|k:int| 0<=k<old(dst).len() ==> final(dst)@[k]==final(c).history@[old(c).produced+k],
+        batch(s@,old(c).end(),cap as int,old(c).model(),space@,fuel@,last@)
+            ==batch(s@,old(c).end(),cap as int,final(c).model(),(space@-old(dst).len()) as nat,(fuel@-old(dst).len()) as nat,last@),
+{
+    let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
+    let ghost wanted=batch(s@,c.end(),cap as int,c.model(),space@,fuel@,last@);
+    while i<n
+        invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==1,c.left+i==old(c).left,
+            c.bits.bit==0,c.bits.at==old(c).bits.at+i,c.bits.end==old(c).bits.end,old(c).bits.at+n<=old(c).bits.end,
+            c.produced==start+i,start==old(c).produced,start+n<=cap,
+            c.valid(s@,cap as int),c.end()==old(c).end(),n<=space@,n<=fuel@,
+            last@ || (old(c).bits.at as int+n+1023<=s.len()),
+            forall|k:int| 0<=k<start ==> c.history@[k]==history[k],
+            forall|k:int| 0<=k<i ==> dst@[k]==c.history@[start+k],
+            wanted==batch(s@,c.end(),cap as int,c.model(),(space@-i) as nat,(fuel@-i) as nat,last@),
+        decreases n-i,
+    {
+        reveal_with_fuel(batch,1);
+        let ghost previous=c.history@;
+        let byte=c.stored_byte(s,cap);
+        dst[i]=byte;i=i+1;
+        assert forall|k:int| 0<=k<i implies dst@[k]==c.history@[start+k] by {
+            if k==i-1 {assert(c.history@[start+k]==byte);} else {assert(c.history@[start+k]==previous[start+k]);}
+        }
+        assert forall|k:int| 0<=k<start implies c.history@[k]==history[k] by {assert(c.history@[k]==previous[k]);}
+    }
+}
+
 pub struct Inflater {cursor:Cursor,live:bool,cap:usize}
 impl Inflater {
     pub closed spec fn valid(&self)->bool {
@@ -132,31 +210,39 @@ impl Inflater {
             decreases left,
         {
             if c.mode==3 && c.left>0 && c.distance>0 && c.distance<=c.produced && c.distance<=c.window && c.left<=self.cap-c.produced {
-                let n=c.left.min(write-written).min(left);let mut i=0usize;
-                let at_before=c.bits.at;let count_before=c.left;let prior_left=left;
-                while i<n
-                    invariant i<=n,n>0,n<=count_before,n<=left+i,n<=write-written+i,left+i==prior_left,
-                        c.mode==3,c.left+i==count_before,c.bits.at==at_before,
-                        0<c.distance<=c.produced,c.distance<=c.window,c.left<=self.cap-c.produced,
-                        last || (c.mode!=4 && s.len()-c.bits.at>=1024),
-                        c.valid(s@,self.cap as int),c.end()==end,
-                        c.produced==base+written,written<=write,write<=output.len(),output.len()==old(output).len(),
-                        budget.remaining==2*left+old(budget).remaining%2,budget.remaining<=old(budget).remaining,
-                        wanted==batch(s@,end as int,self.cap as int,c.model(),(write-written) as nat,left as nat,last),
-                        forall|k:int|0<=k<written ==> output@[k]==c.history@[base+k],
-                        forall|k:int|write<=k<output.len() ==> output@[k]==old(output)@[k],
-                    decreases n-i,
+                let n=c.left.min(write-written).min(left);
+                // The run's two work units per copied byte are charged together.
+                spend(budget,2*n)?;
+                let ghost prior_left=left;let ghost prior_written=written;let ghost prior=c.history@;let ghost before=output@;
+                left=left-n;
                 {
-                    reveal_with_fuel(batch,1);spend(budget,2)?;
-                    let ghost previous=c.history@;
-                    let byte=c.match_byte(s,self.cap);
-                    output[written]=byte;written=written+1;left=left-1;i=i+1;
-                    assert forall|k:int|0<=k<written implies output@[k]==c.history@[base+k] by {
-                        if k==written-1 {assert(c.history@[base+k]==byte);}
-                        else {assert(c.history@[base+k]==previous[base+k]);}
-                    }
+                    let (_,tail)=output.split_at_mut(written);
+                    let (dst,_)=tail.split_at_mut(n);
+                    copy_run(c,s,self.cap,dst,Ghost((write-written) as nat),Ghost(prior_left as nat),Ghost(last));
                 }
-                assert(left<prior_left);
+                written=written+n;
+                assert forall|k:int|0<=k<written implies output@[k]==c.history@[base+k] by {
+                    if k<prior_written {assert(output@[k]==before[k]);assert(c.history@[base+k]==prior[base+k]);}
+                }
+                continue;
+            }
+            if c.mode==1 && c.left>0 && c.bits.bit==0 && c.bits.at<c.bits.end && c.produced<self.cap
+                && (last || s.len()-c.bits.at>1023) {
+                let room=if last {c.left} else {s.len()-c.bits.at-1023};
+                let n=c.left.min(write-written).min(left).min(c.bits.end-c.bits.at).min(self.cap-c.produced).min(room);
+                // Stored bytes keep the same two work units each.
+                spend(budget,2*n)?;
+                let ghost prior_left=left;let ghost prior_written=written;let ghost prior=c.history@;let ghost before=output@;
+                left=left-n;
+                {
+                    let (_,tail)=output.split_at_mut(written);
+                    let (dst,_)=tail.split_at_mut(n);
+                    stored_run(c,s,self.cap,dst,Ghost((write-written) as nat),Ghost(prior_left as nat),Ghost(last));
+                }
+                written=written+n;
+                assert forall|k:int|0<=k<written implies output@[k]==c.history@[base+k] by {
+                    if k<prior_written {assert(output@[k]==before[k]);assert(c.history@[base+k]==prior[base+k]);}
+                }
                 continue;
             }
             reveal_with_fuel(batch,1);
