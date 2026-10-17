@@ -1,0 +1,66 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+   --> /home/user/verified-tiff/target/reject-run-span-pixel/native_stream.rs:157:5
+    |
+157 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-span-pixel/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+   --> /home/user/verified-tiff/target/reject-run-span-pixel/native_stream.rs:158:5
+    |
+158 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-span-pixel/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+   --> /home/user/verified-tiff/target/reject-run-span-pixel/native_stream.rs:210:5
+    |
+210 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-span-pixel/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module adapter_geometry (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> /home/user/verified-tiff/target/reject-run-span-pixel/adapter_geometry.rs:69:1
+   |
+69 | pub fn span_pixel(w:usize,h:usize,vw:usize,vh:usize,x:usize,y:usize,n:usize,fx:bool,fy:bool,i:usize)->(r:usize)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+  --> /home/user/verified-tiff/target/reject-run-span-pixel/adapter_geometry.rs:71:13
+   |
+71 |     ensures span_at(w,h,vw,vh,x,y,n,fx,fy)+r==span_at(w,h,vw,vh,(x+i) as usize,y,1,fx,fy),r as int+4<=n as int*4,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+74 |     if fx {(n-i)*4} else {i*4}
+   |     -------------------------- at the end of the function body
+
+error: postcondition not satisfied
+  --> /home/user/verified-tiff/target/reject-run-span-pixel/adapter_geometry.rs:71:91
+   |
+71 |     ensures span_at(w,h,vw,vh,x,y,n,fx,fy)+r==span_at(w,h,vw,vh,(x+i) as usize,y,1,fx,fy),r as int+4<=n as int*4,
+   |                                                                                           ^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+74 |     if fx {(n-i)*4} else {i*4}
+   |     -------------------------- at the end of the function body
+
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

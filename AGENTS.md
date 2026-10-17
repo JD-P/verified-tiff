@@ -298,3 +298,11 @@ despite its counted setter. Exact-payload NUL validation and counting are verifi
 image-directory publication must derive NumberOfInks atomically and reject a
 conflicting count setter. Keep the three ink negative gates and independent
 metadata ABI/normalization regressions in compat/tests/metadata_contracts.py.
+
+The run/table pass keeps each fast path a refinement of its model: the WebP
+symbol table equals `ranked`, Deflate runs refine `finish`/`batch` at two work
+units per byte, LZW keeps recorded phrase positions and `copy_ahead` writes
+only below `needed`, and `span_pixel` matches one-pixel `crop_span` placement.
+Keep all 45 reject-run gates and the retargeted kernel, float and RGBA gates.
+Adapter bilevel packing, packed RGBA runs, CMYK/Lab conversion and streamed LZW
+stay unverified; compare every before/after byte, including JPEG.

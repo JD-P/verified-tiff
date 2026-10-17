@@ -1,0 +1,73 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+   --> /home/user/verified-tiff/target/reject-run-webp-window/native_stream.rs:157:5
+    |
+157 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-webp-window/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+   --> /home/user/verified-tiff/target/reject-run-webp-window/native_stream.rs:158:5
+    |
+158 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-webp-window/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+   --> /home/user/verified-tiff/target/reject-run-webp-window/native_stream.rs:210:5
+    |
+210 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-webp-window/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module webp_huffman (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+   --> /home/user/verified-tiff/target/reject-run-webp-window/webp_huffman.rs:398:9
+    |
+398 |         while n<=15
+    |         ^^^^^^^^^^^
+
+error: postcondition not satisfied
+   --> /home/user/verified-tiff/target/reject-run-webp-window/webp_huffman.rs:369:13
+    |
+369 |             r.is_ok()==symbol(s@,old(bits).pos(),old(bits).end as int,self.model(),1,0,0).is_some(),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+418 |                 let found=self.find(n,code-first)?;
+    |                                                  - at this exit
+
+note: recommendation not met
+   --> /home/user/verified-tiff/target/reject-run-webp-window/webp_huffman.rs:370:66
+    |
+370 | ...s int,final(bits).pos())==symbol(s@,old(bits).pos(),old(bits).end as int,self.model(),1,0,0).unwrap(),
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   --> std_specs/option.rs:154:8
+    |
+    = note: recommendation not met
+
+error: possible arithmetic underflow/overflow
+   --> /home/user/verified-tiff/target/reject-run-webp-window/webp_huffman.rs:416:18
+    |
+416 |             code=code*2+(bit^1);let count=self.counts[n];
+    |                  ^^^^^^^^^^^^^^
+
+verification results:: 7 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

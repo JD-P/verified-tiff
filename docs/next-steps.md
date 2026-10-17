@@ -37,17 +37,17 @@ acceptance proofs. Preserve the missing-EOL and duplicate-endpoint policies in
    controlled results. Word-based LZW/Deflate reads, exact JPEG transform
    factorization, JPEG row mapping, tile-row copies, shared bilevel span geometry, alpha/native-layout
    shortcuts and contiguous Deflate strip writes are implemented. The opt-in
-   combined Deflate API avoids replaying validated strips; its tiled fallback,
-   JPEG/LZW pipelines and partial compressed C reads still do separate validation
-   and decode. The C reader now batches streaming Deflate, stages complete native
+   combined Deflate API avoids replaying validated strips, and LZW and JPEG now
+   validate while decoding; the tiled Deflate fallback and partial compressed C
+   reads still do separate validation and decode. The C reader now batches streaming Deflate, stages complete native
    Deflate requests in one pass, and uses a proved top-bit refinement for LERC.
    Specialized, verified 8/16-bit RGB/gray rows, fused RGB alpha presentation,
    cached-segment borrowing and memory-admitted complete RGBA Deflate staging
    are now implemented. The earlier Deflate/LERC pass recorded two small-strip
    regressions; its original measurements remain in `reader-optimization.md`.
    Large RGB Deflate and LERC are substantially faster but still trail libtiff.
-   Remaining work includes reusable Huffman prefix tables, packed bilevel
-   expansion and adapter allocation/replay.
+   Remaining work includes reusable Huffman prefix tables, a wider JPEG bit
+   reader, LZW per-code dictionary overhead and adapter replay.
    Retain all semantic/acceptance contracts and benchmark each change. Do not
    trade exact JPEG output for faster approximate math.
 4. **Add codecs one at a time.** PackBits and LZW are implemented for bilevel, Gray8, and

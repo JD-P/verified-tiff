@@ -1,0 +1,60 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+   --> /home/user/verified-tiff/target/reject-run-block-ring/native_stream.rs:157:5
+    |
+157 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-block-ring/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+   --> /home/user/verified-tiff/target/reject-run-block-ring/native_stream.rs:158:5
+    |
+158 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-block-ring/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+   --> /home/user/verified-tiff/target/reject-run-block-ring/native_stream.rs:210:5
+    |
+210 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-block-ring/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module deflate (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+   --> /home/user/verified-tiff/target/reject-run-block-ring/deflate.rs:188:5
+    |
+188 |     pub(super) fn append_block(&mut self,b:&[u8],cap:usize)
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: assertion failed
+   --> /home/user/verified-tiff/target/reject-run-block-ring/deflate.rs:209:16
+    |
+209 |         assert(forall|k:int| 0<=k<n ==> #[trigger] self.ring@[d0+k]==b@[k]);
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: assertion failed
+   --> /home/user/verified-tiff/target/reject-run-block-ring/deflate.rs:210:16
+    |
+210 |         assert(forall|k:int| 0<=k<32768 && !(d0<=k<d0+n) ==> #[trigger] self.ring@[k]==old_ring[k]);
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

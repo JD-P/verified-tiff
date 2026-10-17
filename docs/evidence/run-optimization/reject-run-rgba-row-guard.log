@@ -1,0 +1,86 @@
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::model`
+   --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_stream.rs:157:5
+    |
+157 |     pub closed spec fn model(&self)->Option<Model>{if self.live{Some(self.cursor.model())}else{None}}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::model` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::initial`
+   --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_stream.rs:158:5
+    |
+158 |     pub closed spec fn initial(s:Seq<u8>)->Option<Model>{crate::deflate::initial(s,0,s.len() as int)}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function `native_stream::Inflater::initial` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `deflate::Model` is more private than the item `native_stream::Inflater::batch_result`
+   --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_stream.rs:210:5
+    |
+210 |     pub closed spec fn batch_result(&self,s:Seq<u8>,at:usize,bit:usize,end:usize,space:usize,work:usize,last:bool)->Option<(Model,nat)> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `native_stream::Inflater::batch_result` is reachable at visibility `pub`
+    |
+note: but type `deflate::Model` is only usable at visibility `pub(crate)`
+   --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/deflate.rs:36:1
+    |
+ 36 | pub(super) struct Model {
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module native_rgba (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_rgba.rs:81:5
+   |
+81 |     while i<n
+   |     ^^^^^^^^^
+
+error: postcondition not satisfied
+  --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_rgba.rs:57:13
+   |
+57 |     ensures r.is_ok()==valid(raw.len() as int,n,ch,wide,rgb,invert,alpha,premul,old(out).len() as int),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+97 |         if at+ch>=src.len()||4*i+4>dst.len(){return Err(Error::OutputTooSmall);}
+   |                                              --------------------------------- at this exit
+
+error: postcondition not satisfied
+  --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_rgba.rs:58:9
+   |
+58 |         final(out).len()==old(out).len(),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+97 |         if at+ch>=src.len()||4*i+4>dst.len(){return Err(Error::OutputTooSmall);}
+   |                                              --------------------------------- at this exit
+
+note: recommendation not met
+  --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_rgba.rs:61:55
+   |
+61 |         forall|k:int|n as int*4<=k<old(out).len() ==> final(out)@[k]==old(out)@[k],
+   |                                                       ^^^^^^^^^^^^^^
+   |
+  --> seq.rs:980:12
+   |
+   = note: recommendation not met
+
+note: recommendation not met
+  --> /home/user/verified-tiff/target/reject-run-rgba-row-guard/native_rgba.rs:86:63
+   |
+86 |             forall|k:int|i as int*4<=k<dst.len() ==> dst@[k]==prior[k],
+   |                                                               ^^^^^^^^
+   |
+  --> seq.rs:980:12
+   |
+   = note: recommendation not met
+
+verification results:: 6 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors; 3 warnings emitted
+

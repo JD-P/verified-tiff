@@ -1,0 +1,20 @@
+JPEG test oracle: libjpeg-turbo 3.1.1; static, scalar C, integer IDCT, nearest chroma upsampling
+WebP test oracle: libwebp 1.6.0; independent RGBA decode
+# TOTAL: 108
+# PASS:  108
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+libtool: link: cc -O2 -I /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff /home/user/verified-tiff/tests/oracle.c -o /home/user/verified-tiff/target/libtiff-oracle  /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff/.libs/libtiff.a -L/home/user/verified-tiff/.tools/webp/lib -L/home/user/verified-tiff/.tools/jpeg/lib /home/user/verified-tiff/.tools/webp/lib/libwebp.a /home/user/verified-tiff/.tools/webp/lib/libsharpyuv.a -llzma -ljpeg -lz -lm
+libtool: link: cc -O2 -I /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff /home/user/verified-tiff/tests/alpha_oracle.c -o /home/user/verified-tiff/target/alpha-oracle  /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff/.libs/libtiff.a -L/home/user/verified-tiff/.tools/webp/lib -L/home/user/verified-tiff/.tools/jpeg/lib /home/user/verified-tiff/.tools/webp/lib/libwebp.a /home/user/verified-tiff/.tools/webp/lib/libsharpyuv.a -llzma -ljpeg -lz -lm
+libtool: link: cc -O2 -I /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff /home/user/verified-tiff/tests/native_oracle.c -o /home/user/verified-tiff/target/native-oracle  /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff/.libs/libtiff.a -L/home/user/verified-tiff/.tools/webp/lib -L/home/user/verified-tiff/.tools/jpeg/lib /home/user/verified-tiff/.tools/webp/lib/libwebp.a /home/user/verified-tiff/.tools/webp/lib/libsharpyuv.a -llzma -ljpeg -lz -lm
+libtool: link: cc -O2 -I /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff /home/user/verified-tiff/tests/jpeg_tiff_oracle.c -o /home/user/verified-tiff/target/jpeg-tiff-oracle  /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff/.libs/libtiff.a -L/home/user/verified-tiff/.tools/webp/lib -L/home/user/verified-tiff/.tools/jpeg/lib /home/user/verified-tiff/.tools/webp/lib/libwebp.a /home/user/verified-tiff/.tools/webp/lib/libsharpyuv.a -llzma -ljpeg -lz -lm
+libtool: link: cc -O2 -I /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff /home/user/verified-tiff/tests/logluv_encoder.c -o /home/user/verified-tiff/target/logluv-encoder  /home/user/verified-tiff/.tools/tiff-4.7.1/libtiff/.libs/libtiff.a -L/home/user/verified-tiff/.tools/webp/lib -L/home/user/verified-tiff/.tools/jpeg/lib /home/user/verified-tiff/.tools/webp/lib/libwebp.a /home/user/verified-tiff/.tools/webp/lib/libsharpyuv.a -llzma -ljpeg -lz -lm
+Oracle built; run bash scripts/test.sh to compare the Rust reader.
+
+real	0m37.516s
+user	1m8.226s
+sys	0m15.454s
+exit=0
