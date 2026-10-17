@@ -27,7 +27,11 @@ pub fn read_word(s:&[u8],at:usize,bytes:usize,le:bool) -> (r:Result<u64,Error>)
     if !width_ok_exec(bytes) {return Err(Error::Unsupported);}
     if !checked_range(s.len(),at,bytes) {return Err(Error::Truncated);}
     if bytes==1 {Ok(s[at] as u64)}
-    else if bytes==2 {Ok(read16(s,at,le)? as u64)}
+    else if bytes==2 {
+        // The range is checked; read the two bytes in place.
+        let a=s[at] as u64;let b=s[at+1] as u64;
+        Ok(if le {a+256*b} else {256*a+b})
+    }
     else if bytes==4 {Ok(read32(s,at,le)? as u64)}
     else {
         let a=read32(s,at,le)? as u64;let b=read32(s,at+4,le)? as u64;
@@ -46,6 +50,17 @@ fn store(out:&mut [u8],at:usize,bytes:usize,le:bool,v:u64)
         forall|j:int| 0<=j<bytes ==> #[trigger] final(out)@[at as int+j]==f64model::digit(v as int,if le {j} else {bytes as int-1-j}),
         forall|k:int| 0<=k<old(out).len() && !(at<=k<at as int+bytes) ==> final(out)@[k]==old(out)@[k],
 {
+    // Two- and four-byte words use constant divisors; eight bytes take the digit loop.
+    if bytes==2 {
+        let d0=(v%256) as u8;let d1=((v/256)%256) as u8;
+        if le {out[at]=d0;out[at+1]=d1;} else {out[at]=d1;out[at+1]=d0;}
+        return;
+    }
+    if bytes==4 {
+        let d0=(v%256) as u8;let d1=((v/256)%256) as u8;let d2=((v/65536)%256) as u8;let d3=((v/16777216)%256) as u8;
+        if le {out[at]=d0;out[at+1]=d1;out[at+2]=d2;out[at+3]=d3;} else {out[at]=d3;out[at+1]=d2;out[at+2]=d1;out[at+3]=d0;}
+        return;
+    }
     let mut j=0usize;
     while j<bytes
         invariant width_ok(bytes),j<=bytes,at as int+bytes<=out.len(),out.len()==old(out).len(),
@@ -97,16 +112,20 @@ pub fn convert(raw:&[u8],row_bytes:usize,ch:usize,bytes:usize,le:bool,predict:bo
     }
     let modulo=if bytes==1 {256u128} else if bytes==2 {65536u128} else if bytes==4 {4294967296u128} else {18446744073709551616u128};
     let mut previous=[0u64;64];let mut n=0usize;
+    // Channel and column counters replace per-sample divisions.
+    let mut c=0usize;let mut col=0usize;
     while n<raw.len()/bytes
         invariant valid(raw@,row_bytes,ch,bytes),row==row_bytes/bytes,row>=ch,raw.len()%bytes==0,
             modulo==modulus(bytes),0<modulo<=18446744073709551616,
+            c==n%ch,col==n%row,
             out.len()==old(out).len(),out.len()>=raw.len(),n<=raw.len()/bytes,
             forall|k:int| 0<=k<n as int*bytes ==> out@[k]==converted(raw@,row,ch,bytes,le,predict,out_le,k),
             forall|k:int| raw.len()<=k<out.len() ==> out@[k]==old(out)@[k],
             forall|j:int| 0<=j<n && n as int-ch<=j ==> previous@[j%(ch as int)]==sample(raw@,row,ch,bytes,le,predict,j),
         decreases raw.len()/bytes-n,
     {
-        let c=n%ch;let first=!predict || n%row<ch || n<ch;
+        proof {if n<ch {vstd::arithmetic::div_mod::lemma_small_mod(n as nat,row as nat);}}
+        let first=!predict || col<ch;
         assert(n as int*bytes+bytes<=raw.len()) by(nonlinear_arith) requires n<raw.len()/bytes,bytes>0;
         let a=read_word(raw,n*bytes,bytes,le)?;
         let b=if first {0u64} else {previous[c]};
@@ -117,7 +136,12 @@ pub fn convert(raw:&[u8],row_bytes:usize,ch:usize,bytes:usize,le:bool,predict:bo
             }
             reveal_with_fuel(sample,1);
         }
-        let value=((a as u128+b as u128)%modulo) as u64;
+        let sum=a as u128+b as u128;
+        proof {
+            if !first {mod_below(raw@,row,ch,bytes,le,predict,n as int-ch);}
+            wrap(sum as int,modulo as int);
+        }
+        let value=(if sum>=modulo {sum-modulo} else {sum}) as u64;
         assert(value as int==sample(raw@,row,ch,bytes,le,predict,n as int));
         store(out,n*bytes,bytes,out_le,value);
         assert forall|k:int| 0<=k<(n as int+1)*bytes implies out@[k]==converted(raw@,row,ch,bytes,le,predict,out_le,k) by {
@@ -128,14 +152,46 @@ pub fn convert(raw:&[u8],row_bytes:usize,ch:usize,bytes:usize,le:bool,predict:bo
         previous[c]=value;
         assert forall|j:int| 0<=j<n as int+1 && n as int+1-ch<=j implies previous@[j%(ch as int)]==sample(raw@,row,ch,bytes,le,predict,j) by {
             if j<n {
-                quotient_remainder(j,ch as int);quotient_remainder(n as int,ch as int);
-                assert(j%(ch as int)!=c) by(nonlinear_arith)
-                    requires j<n,n as int-ch<j,ch>0,j==ch*(j/(ch as int))+j%(ch as int),n==ch*((n as int)/(ch as int))+c;
+                // Equal channels would make 0<n-j<ch a multiple of ch.
+                vstd::arithmetic::div_mod::lemma_mod_equivalence(n as int,j,ch as int);
+                vstd::arithmetic::div_mod::lemma_small_mod((n as int-j) as nat,ch as nat);
             }
         }
+        proof {mod_step(n as int,ch as int);mod_step(n as int,row as int);}
+        c=if c+1==ch {0} else {c+1};col=if col+1==row {0} else {col+1};
         n=n+1;
     }
     Ok(())
+}
+proof fn mod_step(x:int,m:int)
+    requires x>=0,m>0,
+    ensures (x+1)%m==(if x%m+1==m {0} else {x%m+1}),
+{
+    vstd::arithmetic::div_mod::lemma_fundamental_div_mod(x,m);
+    vstd::arithmetic::div_mod::lemma_mod_pos_bound(x,m);
+    let (q,r)=(x/m,x%m);
+    if r+1==m {
+        assert(x+1==(q+1)*m+0) by(nonlinear_arith) requires x==m*q+r,r+1==m;
+        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x+1,m,q+1,0);
+    } else {
+        assert(x+1==q*m+(r+1)) by(nonlinear_arith) requires x==m*q+r;
+        vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x+1,m,q,r+1);
+    }
+}
+proof fn wrap(x:int,m:int)
+    requires 0<=x<2*m,m>0,
+    ensures x%m==(if x>=m {x-m} else {x}),
+{
+    if x>=m {vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x,m,1,x-m);}
+    else {vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x,m,0,x);}
+}
+proof fn mod_below(s:Seq<u8>,row:usize,ch:usize,bytes:usize,le:bool,predict:bool,n:int)
+    requires width_ok(bytes),
+    ensures 0<=sample(s,row,ch,bytes,le,predict,n)<modulus(bytes),
+{
+    reveal_with_fuel(sample,1);
+    let m=modulus(bytes);
+    vstd::arithmetic::div_mod::lemma_mod_pos_bound(word(s,n*bytes,bytes,le)+(if !predict || row==0 || ch==0 || n<ch || n%(row as int)<ch {0int} else {sample(s,row,ch,bytes,le,predict,n-ch)}),m);
 }
 pub open spec fn reversed(v:u8) -> u8 {
     (((v as int)/128)%2+2*((v as int)/64%2)+4*((v as int)/32%2)+8*((v as int)/16%2)+16*((v as int)/8%2)+32*((v as int)/4%2)+64*((v as int)/2%2)+128*(v as int%2)) as u8

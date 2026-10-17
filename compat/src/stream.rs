@@ -171,7 +171,16 @@ impl Handle{
         }else if m.predictor==2{
             if !matches!(m.bits,8|16|32|64)||matches!(m.format,5|6)||!matches!(m.compression,5|8|32946|50000){return Err((NOTIMPL,"horizontal predictor layout"));}
             let mut out=Buf::zeros(n,self.limits.max_output,mem)?;
-            ns::convert(&raw,row,if m.planar==2{1}else{m.ch},m.bits/8,m.le,true,cfg!(target_endian="little"),&mut out).map_err(err)?;Ok(out)
+            let (ch,le,ne)=(if m.planar==2{1}else{m.ch},m.le,cfg!(target_endian="little"));
+            // Constant widths and channel counts specialize the proved kernel.
+            let r=match (m.bits/8,ch){
+                (1,1)=>ns::convert(&raw,row,1,1,le,true,ne,&mut out),
+                (2,1)=>ns::convert(&raw,row,1,2,le,true,ne,&mut out),
+                (1,3)=>ns::convert(&raw,row,3,1,le,true,ne,&mut out),
+                (2,3)=>ns::convert(&raw,row,3,2,le,true,ne,&mut out),
+                (4,1)=>ns::convert(&raw,row,1,4,le,true,ne,&mut out),
+                (bytes,ch)=>ns::convert(&raw,row,ch,bytes,le,true,ne,&mut out),
+            };r.map_err(err)?;Ok(out)
         }else if m.predictor==1{
             let bytes=if matches!(m.format,5|6){m.bits/16}else{m.bits/8};
             if m.le!=cfg!(target_endian="little")&&matches!(m.bits,16|24|32|64|128)&&bytes>1{
