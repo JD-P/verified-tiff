@@ -8,7 +8,7 @@ changes={
  'stream-phrase':('native_stream.rs','Ok(self.table.expand(c,out))','Ok(0usize)','native_stream','Lzw::code','postcondition not satisfied'),
  'stream-packet':('native_stream.rs','Ok((p.next,p.data,p.len,p.repeat))','Ok((p.next,p.data,0usize,p.repeat))','native_stream','packet','postcondition not satisfied'),
 
- 'float-shuffle':('native_fp.rs','reveal(decoded);out[k]=scratch[at];','reveal(decoded);out[k]=0;','native_fp','decode','invariant not satisfied'),
+ 'float-shuffle':('native_fp.rs','reveal(decoded);out[k+r]=scratch[base+plane*samples+j];','reveal(decoded);out[k+r]=0;','native_fp','unshuffle','invariant not satisfied'),
  'rle-alignment':('fax_frame.rs','let n=if c.aligned{(8-b.pos%8)%8}else{0};','let n=0usize;','fax_frame','begin_line','postcondition not satisfied'),
  'predictor':('native_samples.rs','let b=if first {0u64} else {previous[c]};','let b=0u64;','native_samples','convert','assertion failed'),
  'bigoffset':('container.rs','Ok(Header {little_endian:le,big,first_ifd})','Ok(Header {little_endian:le,big,first_ifd:0})','container','header','postcondition not satisfied'),

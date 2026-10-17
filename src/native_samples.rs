@@ -50,7 +50,8 @@ fn store(out:&mut [u8],at:usize,bytes:usize,le:bool,v:u64)
         forall|j:int| 0<=j<bytes ==> #[trigger] final(out)@[at as int+j]==f64model::digit(v as int,if le {j} else {bytes as int-1-j}),
         forall|k:int| 0<=k<old(out).len() && !(at<=k<at as int+bytes) ==> final(out)@[k]==old(out)@[k],
 {
-    // Two- and four-byte words use constant divisors; eight bytes take the digit loop.
+    // One-, two- and four-byte words use constant divisors; eight bytes take the digit loop.
+    if bytes==1 {out[at]=(v%256) as u8;return;}
     if bytes==2 {
         let d0=(v%256) as u8;let d1=((v/256)%256) as u8;
         if le {out[at]=d0;out[at+1]=d1;} else {out[at]=d1;out[at+1]=d0;}

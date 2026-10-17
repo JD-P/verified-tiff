@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead and one-pass JPEG paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead, one-pass JPEG and float unshuffle paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -38,6 +38,8 @@ changes={
  'jpeg-capture-ending':('jpeg_scan.rs','    if c.end(s,legacy) {\n        assert(result==Some(c.model()));\n        Ok(())','    if true {\n        Ok(())','jpeg_scan','decode_checked'),
  'jpeg-one-pass-accept':('jpeg_tiff.rs','    if taken {\n        spend(budget,image.work)?;','    if taken {\n        return Err(Error::Limit);','jpeg_tiff','decode_jpeg_into'),
  'span-pixel':('adapter_geometry.rs','if fx {(n-1-i)*4} else {i*4}','if fx {(n-i)*4} else {i*4}','adapter_geometry','span_pixel'),
+ 'fp-unshuffle-plane':('native_fp.rs','let plane=if out_le{bytes-1-r}else{r};','let plane=if out_le{r}else{r};','native_fp','unshuffle'),
+ 'store-byte':('native_samples.rs','if bytes==1 {out[at]=(v%256) as u8;return;}','if bytes==1 {out[at]=(v%255) as u8;return;}','native_samples','store'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

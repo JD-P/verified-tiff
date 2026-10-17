@@ -8,7 +8,7 @@ changes={
  'vp8-dc':('vp8_transform.rs','let out=[v;16];','let out=[0i32;16];','vp8_transform','transform'),
  'vp8-filter':('vp8_filter_kernel.rs','            out[3]=pr::clip(p0+a2);out[4]=pr::clip(q0-a1);','            out[3]=0;out[4]=pr::clip(q0-a1);','vp8_filter_kernel','filter'),
  'webp-coordinates':('webp_inverse.rs','else{x=x+1;}','else{x=x;}','webp_inverse','apply'),
- 'fp-coordinates':('native_fp.rs','else{local=local+1;}','else{local=local;}','native_fp','decode'),
+ 'fp-coordinates':('native_fp.rs','}else{\n            j=j+1;','}else{\n            j=j;','native_fp','unshuffle'),
  'match-output':('native_stream.rs','let byte=c.match_byte(s,cap);\n        dst[i]=byte;','let byte=c.match_byte(s,cap);\n        dst[i]=0;','native_stream','copy_run'),
  'match-work':('native_stream.rs','charged together.\n                spend(budget,2*n)?;','charged together.\n                spend(budget,n)?;','native_stream','Inflater::pull'),
 }
