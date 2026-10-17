@@ -337,13 +337,13 @@ fn rgba_row(raw:&[u8],n:usize,ch:usize,bits:usize,rgb:bool,invert:bool,alpha:Opt
     let le=cfg!(target_endian="little");let a=alpha.map_or(ch,|(a,_)|a);let premul=rgb&&alpha.is_some_and(|(_,kind)|kind==2);
     // Constant layout arguments specialize the hot loops; unusual extra-channel
     // layouts use the same proved kernel with a dynamic stride.
-    let r=match (bits,ch,rgb,invert,a){
-        (8,3,true,false,3)=>row(raw,n,3,false,true,false,3,false,le,reverse,out),
-        (8,4,true,false,3)=>row(raw,n,4,false,true,false,3,premul,le,reverse,out),
-        (8,1,false,false,1)=>row(raw,n,1,false,false,false,1,false,le,reverse,out),
-        (8,1,false,true,1)=>row(raw,n,1,false,false,true,1,false,le,reverse,out),
-        (16,3,true,false,3)=>row(raw,n,3,true,true,false,3,false,le,reverse,out),
-        (16,1,false,false,1)=>row(raw,n,1,true,false,false,1,false,le,reverse,out),
+    let r=match (bits,ch,rgb,invert,a,reverse){
+        (8,3,true,false,3,false)=>row(raw,n,3,false,true,false,3,false,le,false,out),
+        (8,4,true,false,3,false)=>row(raw,n,4,false,true,false,3,premul,le,false,out),
+        (8,1,false,false,1,false)=>row(raw,n,1,false,false,false,1,false,le,false,out),
+        (8,1,false,true,1,false)=>row(raw,n,1,false,false,true,1,false,le,false,out),
+        (16,3,true,false,3,false)=>row(raw,n,3,true,true,false,3,false,le,false,out),
+        (16,1,false,false,1,false)=>row(raw,n,1,true,false,false,1,false,le,false,out),
         _=>row(raw,n,ch,bits==16,rgb,invert,a,premul,le,reverse,out),
     };r.map_err(err)
 }

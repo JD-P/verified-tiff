@@ -3,7 +3,7 @@
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
- 'pixels':('out[d]=if le {r} else {a};','out[d]=if le {0} else {a};','row','invariant not satisfied'),
+ 'pixels':('dst[d]=if le {r} else {a};','dst[d]=if le {0} else {a};','row','invariant not satisfied'),
  'alpha':('if premul {((v as u32*a as u32+127)/255) as u8}','if premul {((v as u32*a as u32+128)/255) as u8}','associate','postcondition not satisfied'),
  'frame':('    Ok(())','    if out.len()>4*n {out[4*n]=0;}\n    Ok(())','row','postcondition not satisfied'),
 }

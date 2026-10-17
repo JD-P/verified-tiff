@@ -15,7 +15,7 @@ changes={
  'webp-unused-lengths':('webp_huffman.rs','counts[0]=counts[0]+(2328-alphabet);','counts[0]=counts[0];','webp_huffman','Huff::build'),
  'webp-window':('webp_huffman.rs','code=code*2+bit;let count=self.counts[n];','code=code*2+(bit^1);let count=self.counts[n];','webp_huffman','Huff::read_window'),
  'webp-cache-shift':('webp.rs','let r=mixed>>shift;','let r=mixed>>(shift-1);','webp','hash'),
- 'rgba-last-byte':('native_rgba.rs','out[d+3]=if le {a} else {r};','out[d+3]=if le {r} else {r};','native_rgba','row'),
+ 'rgba-last-byte':('native_rgba.rs','dst[d+3]=if le {a} else {r};','dst[d+3]=if le {r} else {r};','native_rgba','row'),
  'packbits-repeat':('lib.rs','fill_byte_run(output, at, n, s[self.data]);','fill_byte_run(output, at, n, 0);','root','PbCursor::take'),
  'packbits-literal':('lib.rs','copy_byte_run(s, self.data, output, at, n, false);','copy_byte_run(s, self.data, output, at, n, true);','root','PbCursor::take'),
  'packbits-literal-advance':('lib.rs','self.data = self.data + n;\n        }\n        self.run = self.run - n;','self.data = self.data + n - 1;\n        }\n        self.run = self.run - n;','root','PbCursor::take'),
@@ -27,6 +27,7 @@ changes={
  'lzw-repeat-tail':('lib.rs','output[i+len-1]=output[last];','output[i+len-1]=0;','root','lz_decode'),
  'copy-within':('lib.rs','let b=output[src+j];output[dst+j]=b;','let b=output[src+j];output[dst+j]=0;','root','copy_within'),
  'lzw-skip-length':('native_stream.rs','else{self.table.data(c,self.legacy)}\n','else{self.table.data(c,self.legacy)?;Ok(1)}\n','native_stream','Lzw::skip'),
+ 'rgba-row-guard':('native_rgba.rs','if at+ch>src.len()||','if at+ch>=src.len()||','native_rgba','row'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

@@ -45,6 +45,10 @@ fn associate(v:u8,a:u8,premul:bool) -> (b:u8)
     assert(0<=v as int*a as int<=65025) by(nonlinear_arith);
     if premul {((v as u32*a as u32+127)/255) as u8} else {v}
 }
+proof fn prefix_value(s:Seq<u8>,m:int,i:int,wide:bool,le:bool)
+    requires 0<=m<=s.len(),0<=i,(i+1)*(if wide {2int} else {1int})<=m,
+    ensures value(s.subrange(0,m),i,wide,le)==value(s,i,wide,le),
+{}
 /// A bounded row, optionally mirrored. Invalid arguments leave all output intact;
 /// success changes exactly 4*n bytes. Source and output lengths bound the work.
 /// Inline parameters allow the adapter to specialize common layouts once per row.
@@ -66,39 +70,55 @@ pub fn row(raw:&[u8],n:usize,ch:usize,wide:bool,rgb:bool,invert:bool,alpha:usize
                 0<=raw.len() as int%(stride as int)<stride;
     }
     if n>raw.len()/stride||n>out.len()/4{return Err(Error::OutputTooSmall);}
+    // Exact-length row slices let the compiler drop the per-pixel checks.
+    assert(n as int*stride==n as int*ch*(if wide {2int} else {1int})) by(nonlinear_arith)
+        requires stride==ch*(if wide {2int} else {1int});
+    let ghost olen=out.len() as int;
+    let (src,_)=raw.split_at(n*stride);
+    let (dst,_)=out.split_at_mut(4*n);
+    let ghost prior=dst@;
     let mut i=0usize;
     while i<n
-        invariant valid(raw.len() as int,n,ch,wide,rgb,invert,alpha,premul,out.len() as int),
-            i<=n,out.len()==old(out).len(),
-            forall|p:int,c:int|0<=p<i && 0<=c<4 ==> #[trigger] out@[4*p+c]==component(raw@,if reverse {n as int-1-p} else {p},ch,wide,rgb,invert,alpha,premul,le,if le {c} else {3-c}),
-            forall|k:int|i as int*4<=k<out.len() ==> out@[k]==old(out)@[k],
+        invariant valid(raw.len() as int,n,ch,wide,rgb,invert,alpha,premul,olen),
+            i<=n,dst.len()==4*n,src@==raw@.subrange(0,n as int*stride),stride==ch*(if wide {2usize} else {1usize}),
+            n as int*stride==n as int*ch*(if wide {2int} else {1int}),
+            forall|p:int,c:int|0<=p<i && 0<=c<4 ==> #[trigger] dst@[4*p+c]==component(raw@,if reverse {n as int-1-p} else {p},ch,wide,rgb,invert,alpha,premul,le,if le {c} else {3-c}),
+            forall|k:int|i as int*4<=k<dst.len() ==> dst@[k]==prior[k],
         decreases n-i,
     {
         let p=if reverse {n-1-i} else {i};
-        assert((p as int+1)*ch*(if wide {2int} else {1int})<=raw.len()) by(nonlinear_arith)
-            requires p<n,n as int*ch*(if wide {2int} else {1int})<=raw.len(),0<ch<=64;
-        assert(p as int*ch+ch<=raw.len()) by(nonlinear_arith)
-            requires (p as int+1)*ch*(if wide {2int} else {1int})<=raw.len(),0<ch;
+        let ghost m=n as int*ch*(if wide {2int} else {1int});
+        assert((p as int+1)*ch*(if wide {2int} else {1int})<=m) by(nonlinear_arith)
+            requires p<n,m==n as int*ch*(if wide {2int} else {1int}),0<ch<=64;
+        assert(p as int*ch+ch<=m) by(nonlinear_arith)
+            requires (p as int+1)*ch*(if wide {2int} else {1int})<=m,0<ch;
         let at=p*ch;
-        assert((at as int+ch)*(if wide {2int} else {1int})<=raw.len()) by(nonlinear_arith)
-            requires at==p as int*ch,(p as int+1)*ch*(if wide {2int} else {1int})<=raw.len();
+        // Never taken; it states the row bound where the compiler can use it.
+        if at+ch>src.len()||4*i+4>dst.len(){return Err(Error::OutputTooSmall);}
+        assert((at as int+ch)*(if wide {2int} else {1int})<=m) by(nonlinear_arith)
+            requires at==p as int*ch,(p as int+1)*ch*(if wide {2int} else {1int})<=m;
         proof {
             if wide {
-                assert(2*(at as int+ch)<=raw.len());
-                assert(2*(at as int+1)<=raw.len());
-                if alpha<ch {assert(2*(at as int+alpha+1)<=raw.len());}
-                if rgb {assert(2*(at as int+3)<=raw.len());}
+                assert(2*(at as int+ch)<=m);
+                assert(2*(at as int+1)<=m);
+                if alpha<ch {assert(2*(at as int+alpha+1)<=m);}
+                if rgb {assert(2*(at as int+3)<=m);}
             }
         }
-        let a=if alpha<ch {scale(load(raw,at+alpha,wide,le),wide,rgb,false)} else {255u8};
-        let r=scale(load(raw,at,wide,le),wide,rgb,invert);
-        let g=if rgb {scale(load(raw,at+1,wide,le),wide,true,false)} else {r};
-        let b=if rgb {scale(load(raw,at+2,wide,le),wide,true,false)} else {r};
+        proof {
+            prefix_value(raw@,n as int*stride,at as int,wide,le);
+            if alpha<ch {prefix_value(raw@,n as int*stride,at+alpha,wide,le);}
+            if rgb {prefix_value(raw@,n as int*stride,at+1,wide,le);prefix_value(raw@,n as int*stride,at+2,wide,le);}
+        }
+        let a=if alpha<ch {scale(load(src,at+alpha,wide,le),wide,rgb,false)} else {255u8};
+        let r=scale(load(src,at,wide,le),wide,rgb,invert);
+        let g=if rgb {scale(load(src,at+1,wide,le),wide,true,false)} else {r};
+        let b=if rgb {scale(load(src,at+2,wide,le),wide,true,false)} else {r};
         let r=associate(r,a,premul);let g=associate(g,a,premul);let b=associate(b,a,premul);
         let d=4*i;
         // Writing the last byte first lets the compiler drop the other bounds checks.
-        out[d+3]=if le {a} else {r};
-        out[d]=if le {r} else {a};out[d+1]=if le {g} else {b};out[d+2]=if le {b} else {g};
+        dst[d+3]=if le {a} else {r};
+        dst[d]=if le {r} else {a};dst[d+1]=if le {g} else {b};dst[d+2]=if le {b} else {g};
         i=i+1;
     }
     Ok(())
