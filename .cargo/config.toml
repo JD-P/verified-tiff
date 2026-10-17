@@ -1,0 +1,6 @@
+# Intel cores from Skylake through Cascade Lake with the JCC erratum microcode
+# do not cache jumps that cross or end on a 32-byte boundary. Hot decoder loops
+# then ran 10-30% slower depending on unrelated code placement. Padding keeps
+# jumps off those boundaries; it adds alignment bytes and changes no code.
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "llvm-args=-x86-branches-within-32B-boundaries"]
