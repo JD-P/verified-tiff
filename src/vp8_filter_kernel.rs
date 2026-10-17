@@ -69,6 +69,7 @@ let p3=e[0] as i32;let p2=e[1] as i32;let p1=e[2] as i32;let p0=e[3] as i32;
         }
     }
 }
+#[inline(always)]
 pub(super) fn filter(e:&[u8;8],simple:bool,edge:bool,limit:u8,inner:u8,threshold:u8) -> (out:[u8;8])
     ensures forall|k:int|0<=k<8 ==> #[trigger] out@[k]==sample(e@,simple,edge,limit,inner,threshold,k as usize),
 {
