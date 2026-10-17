@@ -63,6 +63,16 @@ pub fn crop_span(w:usize,h:usize,vw:usize,vh:usize,x:usize,y:usize,n:usize,fx:bo
         requires ty<h,tx as int+n<=w,w>0;}
     let at=(ty*w+tx)*4;let count=n*4;Ok((at,count))
 }
+/// Offset of pixel i inside a span from crop_span: the same destination a
+/// one-pixel crop_span at x+i would return, so a span keeps per-pixel placement.
+#[inline(always)]
+pub fn span_pixel(w:usize,h:usize,vw:usize,vh:usize,x:usize,y:usize,n:usize,fx:bool,fy:bool,i:usize)->(r:usize)
+    requires span_valid(w,h,vw,vh,x,y,n),i<n,
+    ensures span_at(w,h,vw,vh,x,y,n,fx,fy)+r==span_at(w,h,vw,vh,(x+i) as usize,y,1,fx,fy),r as int+4<=n as int*4,
+{
+    proof {assert(n as int*4<=w as int*h*4) by(nonlinear_arith) requires n<=w,h>0;}
+    if fx {(n-1-i)*4} else {i*4}
+}
 pub fn orientation(source:usize,target:usize)->(r:Result<(bool,bool),Error>)
     ensures r.is_ok()==(1<=source<=8 && 1<=target<=8),
         r.is_ok() ==> r.unwrap().0==(((source-1)%4==1||(source-1)%4==2)!=((target-1)%4==1||(target-1)%4==2)),

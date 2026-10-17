@@ -64,10 +64,26 @@ impl Handle {
                         }}
                     }
                 }
-                for xx in left..rr{
-                let lx=xx-bx*bw;let off=(xx-left)*ch;
+                // One destination span per row run; a mirrored run is written last-first.
+                let n=rr-left;
+                let (dest,_)=geometry::crop_span(w,h,right-x,bottom-y,left-x,yy-y,n,fx,fy).map_err(err)?;
+                let data=if let Some(data)=&full{Some(&data[ly*row..ly*row+row])}else{direct.as_deref()};
+                let span=&mut out[dest..dest+n*4];
+                if let (Some(data),true)=(data,photo!=6&&bits==8){
+                    // Contiguous 8-bit CMYK/Lab pixels: the same conversions, read in place.
+                    let src=&data[(left-bx*bw)*ch..(rr-bx*bw)*ch];
+                    for (i,p) in src.chunks_exact(ch).enumerate(){
+                        let mut q=if photo==5{color::cmyk(p[0] as u16,p[1] as u16,p[2] as u16,p[3] as u16,false)}
+                            else{lab(p[0] as u16,p[1] as u16,p[2] as u16,bits,reference,&gamma)};
+                        if let Some((a,kind))=alpha{q[3]=p[a];if kind==2{for c in 0..3{q[c]=((q[c] as u32*q[3] as u32+127)/255) as u8;}}}
+                        let to=geometry::span_pixel(w,h,right-x,bottom-y,left-x,yy-y,n,fx,fy,i);
+                        decoder::pack(&mut span[to..to+4],q);
+                    }
+                    continue;
+                }
+                for i in 0..n{
+                let xx=left+i;let lx=xx-bx*bw;let off=i*ch;
                 let component=|c:usize|->u16{
-                    let data=if let Some(data)=&full{Some(&data[ly*row..ly*row+row])}else{direct.as_ref().map(|data|&**data)};
                     if let Some(data)=data{let p=(lx*ch+c)*(bits/8);if bits==8{data[p] as u16}else{u16::from_ne_bytes([data[p],data[p+1]])}}else{words[off+c]}
                 };
                 let mut q=if photo==6{
@@ -77,8 +93,8 @@ impl Handle {
                     color::cmyk(component(0),component(1),component(2),component(3),bits==16)
                 }else{lab(component(0),component(1),component(2),bits,reference,&gamma)};
                 if let Some((a,kind))=alpha{q[3]=if bits==8{component(a) as u8}else{((component(a) as u32+128)/257) as u8};if kind==2{for c in 0..3{q[c]=((q[c] as u32*q[3] as u32+127)/255) as u8;}}}
-                let (dest,_)=geometry::crop_span(w,h,right-x,bottom-y,xx-x,yy-y,1,fx,fy).map_err(err)?;
-                decoder::pack(&mut out[dest..dest+4],q);
+                let to=geometry::span_pixel(w,h,right-x,bottom-y,left-x,yy-y,n,fx,fy,i);
+                decoder::pack(&mut span[to..to+4],q);
             }}
         }}
         self.rendered=Some(out);Ok(())

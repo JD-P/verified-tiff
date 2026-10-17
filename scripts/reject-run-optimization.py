@@ -37,6 +37,7 @@ changes={
  'jpeg-capture-sample':('jpeg_scan.rs','{output[i*64+j]=values[j];j=j+1;}\n        assert forall|k:int| 0<=k<(i as int+1)*64 implies output@[k]==crate::jpeg_transform::sample(c.history','{output[i*64+j]=values[0];j=j+1;}\n        assert forall|k:int| 0<=k<(i as int+1)*64 implies output@[k]==crate::jpeg_transform::sample(c.history','jpeg_scan','decode_checked'),
  'jpeg-capture-ending':('jpeg_scan.rs','    if c.end(s,legacy) {\n        assert(result==Some(c.model()));\n        Ok(())','    if true {\n        Ok(())','jpeg_scan','decode_checked'),
  'jpeg-one-pass-accept':('jpeg_tiff.rs','    if taken {\n        spend(budget,image.work)?;','    if taken {\n        return Err(Error::Limit);','jpeg_tiff','decode_jpeg_into'),
+ 'span-pixel':('adapter_geometry.rs','if fx {(n-1-i)*4} else {i*4}','if fx {(n-i)*4} else {i*4}','adapter_geometry','span_pixel'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)
