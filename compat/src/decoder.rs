@@ -335,9 +335,7 @@ fn pack_bilevel(pixels:&[u8],bw:usize,rows:usize,row:usize,flip:u8,out:&mut[u8])
     let bit=|p:u8,i:usize|((p==255) as u8)<<(7-i);
     for (line,dest) in pixels.chunks_exact(bw).take(rows).zip(out.chunks_exact_mut(row)){
         let mut groups=line.chunks_exact(8);let mut bytes=dest.iter_mut();
-        for (g,d) in (&mut groups).zip(&mut bytes){
-            let mut b=0u8;for i in 0..8{b|=bit(g[i],i);}*d=b^flip;
-        }
+        for (g,d) in (&mut groups).zip(&mut bytes){*d=pack8(g)^flip;}
         let rest=groups.remainder();
         if !rest.is_empty(){if let Some(d)=bytes.next(){
             let mut b=0u8;for (i,&p) in rest.iter().enumerate(){b|=bit(p,i);}
@@ -345,6 +343,17 @@ fn pack_bilevel(pixels:&[u8],bw:usize,rows:usize,row:usize,flip:u8,out:&mut[u8])
         }}
     }
     Ok(())
+}
+
+// Eight samples per word: a byte's high bit survives exactly when it is 255
+// (0x7f-masked add, then OR, then NOT), and one multiply gathers the eight
+// flags MSB-first without carries.
+#[inline(always)]
+fn pack8(g:&[u8])->u8{
+    let x=u64::from_le_bytes([g[0],g[1],g[2],g[3],g[4],g[5],g[6],g[7]]);
+    const L:u64=0x7f7f7f7f7f7f7f7f;
+    let m=!x;let t=!(((m&L)+L)|m|L);
+    ((t>>7).wrapping_mul(0x8040201008040201)>>56) as u8
 }
 
 // Presentation-only byte expansion, in the same unverified adapter boundary
