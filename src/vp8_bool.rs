@@ -42,6 +42,7 @@ pub(super) open spec fn symbol(s:Seq<u8>,r:Reader,p:u8) -> Option<(bool,Reader)>
         let n=normalize(s,l.unwrap(),7);if n.is_none(){None}else{Some(decision(n.unwrap(),p))}
     }
 }
+#[inline(always)]
 pub(super) fn bit(s:&[u8],r:Reader,p:u8) -> (res:Result<(bool,Reader),Error>)
     requires r.valid(s@),
     ensures res.is_ok()==symbol(s@,r,p).is_some(),
