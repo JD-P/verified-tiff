@@ -26,6 +26,7 @@ changes={
  'lzw-entry-position':('lib.rs','if created { pos[slot]=last as u32; }','if created { pos[slot]=i as u32; }','root','lz_decode'),
  'lzw-repeat-tail':('lib.rs','output[i+len-1]=output[last];','output[i+len-1]=0;','root','lz_decode'),
  'copy-within':('lib.rs','let b=output[src+j];output[dst+j]=b;','let b=output[src+j];output[dst+j]=0;','root','copy_within'),
+ 'lzw-skip-length':('native_stream.rs','else{self.table.data(c,self.legacy)}\n','else{self.table.data(c,self.legacy)?;Ok(1)}\n','native_stream','Lzw::skip'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

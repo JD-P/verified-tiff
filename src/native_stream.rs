@@ -310,6 +310,31 @@ impl Lzw {
         else if c==257{Ok(0)}
         else{self.table.data(c,self.legacy)?;Ok(self.table.expand(c,out))}
     }
+    /// The `code` transition without writing the phrase. Validation needs only
+    /// its length and dictionary update.
+    #[inline(always)]
+    pub fn skip(&mut self,c:usize)->(r:Result<usize,Error>)
+        requires old(self).valid(),
+        ensures final(self).valid(),final(self).legacy()==old(self).legacy(),
+            r.is_ok()==(c<4096 && (!old(self).first()||c==256) &&
+                (c==256||c==257||code_valid(old(self).dict(),old(self).previous(),c as int,old(self).legacy()))),
+            r.is_ok() ==> !final(self).first(),
+            r.is_ok() ==> (c==256 ==> r.unwrap()==0 && final(self).dict()==initial_dict() && final(self).previous()==256),
+            r.is_ok() ==> (c==257 ==> r.unwrap()==0 && final(self).dict()==old(self).dict() && final(self).previous()==old(self).previous()),
+            r.is_ok() && c!=256 && c!=257 ==> {
+                &&& r.unwrap()==phrase(old(self).dict(),old(self).previous(),c as int).len()
+                &&& 1<=r.unwrap()<=4096
+                &&& final(self).dict()==after(old(self).dict(),old(self).previous(),c as int)
+                &&& final(self).previous()==c
+            },
+    {
+        reveal(code_valid);reveal(phrase);reveal(after);reveal(initial_dict);
+        if c>=4096||(self.first&&c!=256){return Err(Error::Invalid);}
+        self.first=false;
+        if c==256{self.table.clear();Ok(0)}
+        else if c==257{Ok(0)}
+        else{self.table.data(c,self.legacy)}
+    }
 }
 #[inline(always)]
 pub fn lzw_code(s:&[u8],at:usize,bit:usize,width:usize,legacy:bool)->(r:Result<(usize,usize,usize),Error>)
