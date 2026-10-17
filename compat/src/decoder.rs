@@ -353,9 +353,17 @@ fn packed_rgba_row(data:&[u8],start:usize,n:usize,bits:usize,table:&[[u8;32];256
     let per=8/bits;let mut x=0;
     if !reverse{
         while x<n&&(start+x)%per!=0{let p=start+x;let j=p%per*4;out[x*4..x*4+4].copy_from_slice(&table[data[p/per] as usize][j..j+4]);x+=1;}
-        while n-x>=per{let p=start+x;out[x*4..(x+per)*4].copy_from_slice(&table[data[p/per] as usize][..per*4]);x+=per;}
+        // Whole source bytes expand to fixed-size table rows; no per-byte division.
+        let whole=(n-x)/per*per;let (first,dst)=((start+x)/per,&mut out[x*4..(x+whole)*4]);
+        match per{8=>packed_run::<32>(data,first,table,dst),4=>packed_run::<16>(data,first,table,dst),
+            2=>packed_run::<8>(data,first,table,dst),_=>packed_run::<4>(data,first,table,dst)}
+        x+=whole;
     }
     while x<n{let p=start+x;let j=p%per*4;let to=if reverse{n-1-x}else{x}*4;out[to..to+4].copy_from_slice(&table[data[p/per] as usize][j..j+4]);x+=1;}
+}
+fn packed_run<const N:usize>(data:&[u8],first:usize,table:&[[u8;32];256],out:&mut[u8]){
+    let bytes=&data[first..first+out.len()/N];
+    for (chunk,b) in out.chunks_exact_mut(N).zip(bytes){chunk.copy_from_slice(&table[*b as usize][..N]);}
 }
 fn rgba_row(raw:&[u8],n:usize,ch:usize,bits:usize,rgb:bool,invert:bool,alpha:Option<(usize,u16)>,reverse:bool,out:&mut[u8])->R<()>{
     use verified_tiff::native_rgba::row;
