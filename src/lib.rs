@@ -1301,14 +1301,14 @@ impl PbCursor {
             emitted: 0, data: start, run: 0, repeat: false }
     }
 
-    fn next(&mut self, s: &[u8]) -> (v: u8)
+    // Loads packets until the current run is nonempty.
+    fn load(&mut self, s: &[u8])
         requires old(self).valid(s@), old(self).emitted < old(self)._needed,
         ensures final(self).valid(s@), final(self)._start == old(self)._start,
             final(self).end == old(self).end, final(self)._stride == old(self)._stride,
             final(self)._needed == old(self)._needed,
-            final(self).emitted == old(self).emitted + 1,
-            final(self).at >= old(self).at,
-            v == pb_byte(s@, old(self)._start as int, old(self).end as int, old(self).emitted as int),
+            final(self).emitted == old(self).emitted, final(self).at >= old(self).at,
+            final(self).run > 0,
     {
         while self.run == 0
             invariant self.valid(s@), self.emitted < self._needed,
@@ -1321,7 +1321,7 @@ impl PbCursor {
             let ghost before = *self;
             let packet = pb_packet(s, self.at, self.end);
             assert(packet.is_ok());
-            let p = match packet { Ok(p) => p, Err(_) => { return 0; } };
+            let p = match packet { Ok(p) => p, Err(_) => { return; } };
             proof {
                 assert forall|k: int| 0 <= k < p.len implies
                     #[trigger] pb_byte(s@, self._start as int, self.end as int, self.emitted as int + k)
@@ -1336,6 +1336,18 @@ impl PbCursor {
             }
             self.data = p.data; self.run = p.len; self.repeat = p.repeat; self.at = p.next;
         }
+    }
+
+    fn next(&mut self, s: &[u8]) -> (v: u8)
+        requires old(self).valid(s@), old(self).emitted < old(self)._needed,
+        ensures final(self).valid(s@), final(self)._start == old(self)._start,
+            final(self).end == old(self).end, final(self)._stride == old(self)._stride,
+            final(self)._needed == old(self)._needed,
+            final(self).emitted == old(self).emitted + 1,
+            final(self).at >= old(self).at,
+            v == pb_byte(s@, old(self)._start as int, old(self).end as int, old(self).emitted as int),
+    {
+        self.load(s);
         let v = s[self.data];
         let ghost before = *self;
         proof { before.run_byte(s@, 0); }
@@ -1357,6 +1369,51 @@ impl PbCursor {
             }
         }
         v
+    }
+
+    // Emits the current packet's run, at most `max` bytes, as one slice copy
+    // or fill instead of one cursor step per byte.
+    fn take(&mut self, s: &[u8], output: &mut [u8], at: usize, max: usize) -> (n: usize)
+        requires old(self).valid(s@), 0 < max <= old(self)._needed - old(self).emitted,
+            at as int + max <= old(output).len(),
+        ensures final(self).valid(s@), final(self)._start == old(self)._start,
+            final(self).end == old(self).end, final(self)._stride == old(self)._stride,
+            final(self)._needed == old(self)._needed,
+            0 < n <= max, final(self).emitted == old(self).emitted + n,
+            final(output).len() == old(output).len(),
+            forall|k: int| 0 <= k < n ==> #[trigger] final(output)@[at as int + k]
+                == pb_byte(s@, old(self)._start as int, old(self).end as int, old(self).emitted as int + k),
+            forall|k: int| 0 <= k < old(output).len() && !(at <= k < at as int + n)
+                ==> final(output)@[k] == old(output)@[k],
+    {
+        if self.run == 0 { self.load(s); }
+        let n = if self.run < max { self.run } else { max };
+        let ghost before = *self;
+        if self.repeat {
+            fill_byte_run(output, at, n, s[self.data]);
+        } else {
+            copy_byte_run(s, self.data, output, at, n, false);
+            self.data = self.data + n;
+        }
+        self.run = self.run - n;
+        self.emitted = self.emitted + n;
+        proof {
+            assert forall|k: int| 0 <= k < n implies #[trigger] output@[at as int + k]
+                == pb_byte(s@, self._start as int, self.end as int, before.emitted as int + k) by {
+                before.run_byte(s@, k);
+            }
+            assert forall|k: int| 0 <= k < self.run implies
+                #[trigger] pb_byte(s@, self._start as int, self.end as int, self.emitted as int + k)
+                    == s@[self.data as int + if self.repeat { 0int } else { k }] by {
+                before.run_byte(s@, k + n);
+            }
+            assert forall|k: int| self.run <= k < self._needed - self.emitted implies
+                #[trigger] pb_byte(s@, self._start as int, self.end as int, self.emitted as int + k)
+                    == pb_byte(s@, self.at as int, self.end as int, k - self.run) by {
+                before.tail_byte(s@, k + n);
+            }
+        }
+        n
     }
 }
 
@@ -2909,6 +2966,23 @@ fn copy_byte_run(input:&[u8],src:usize,output:&mut [u8],dst:usize,n:usize,invert
         {
             target[i]=255-source[i];i=i+1;
         }
+    }
+}
+
+fn fill_byte_run(output:&mut [u8],dst:usize,n:usize,v:u8)
+    requires dst as int+n<=old(output).len(),
+    ensures final(output).len()==old(output).len(),
+        forall|i:int| 0<=i<n ==> #[trigger] final(output)@[dst as int+i]==v,
+        forall|i:int| 0<=i<old(output).len() && !(dst<=i<dst as int+n) ==> final(output)@[i]==old(output)@[i],
+{
+    let (_,target_tail)=output.split_at_mut(dst);
+    let (target,_)=target_tail.split_at_mut(n);
+    let mut i=0usize;
+    while i<n
+        invariant i<=n,target.len()==n,forall|j:int| 0<=j<i ==> target@[j]==v,
+        decreases n-i,
+    {
+        target[i]=v;i=i+1;
     }
 }
 

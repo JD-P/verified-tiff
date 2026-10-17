@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table and RGBA paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA and PackBits paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -16,6 +16,10 @@ changes={
  'webp-window':('webp_huffman.rs','code=code*2+bit;let count=self.counts[n];','code=code*2+(bit^1);let count=self.counts[n];','webp_huffman','Huff::read_window'),
  'webp-cache-shift':('webp.rs','let r=mixed>>shift;','let r=mixed>>(shift-1);','webp','hash'),
  'rgba-last-byte':('native_rgba.rs','out[d+3]=if le {a} else {r};','out[d+3]=if le {r} else {r};','native_rgba','row'),
+ 'packbits-repeat':('lib.rs','fill_byte_run(output, at, n, s[self.data]);','fill_byte_run(output, at, n, 0);','root','PbCursor::take'),
+ 'packbits-literal':('lib.rs','copy_byte_run(s, self.data, output, at, n, false);','copy_byte_run(s, self.data, output, at, n, true);','root','PbCursor::take'),
+ 'packbits-literal-advance':('lib.rs','self.data = self.data + n;\n        }\n        self.run = self.run - n;','self.data = self.data + n - 1;\n        }\n        self.run = self.run - n;','root','PbCursor::take'),
+ 'fill-byte-run':('lib.rs','target[i]=v;i=i+1;','target[i]=0;i=i+1;','root','fill_byte_run'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

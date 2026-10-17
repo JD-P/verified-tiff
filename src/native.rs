@@ -61,7 +61,13 @@ pub fn decode(s:&[u8],codec:u16,stride:usize,needed:usize,cap:usize,
                 forall|k:int| 0<=k<i ==> output@[k]==pb_byte(s@,0,s.len() as int,k),
                 forall|k:int| needed<=k<output.len() ==> output@[k]==old(output)@[k],
             decreases needed-i,
-        {let byte=cursor.next(s);output[i]=byte;i=i+1;}
+        {
+            let n=cursor.take(s,output,i,needed-i);
+            assert forall|k:int| i<=k<i+n implies output@[k]==pb_byte(s@,0,s.len() as int,k) by {
+                assert(output@[i as int+(k-i)]==pb_byte(s@,0,s.len() as int,i as int+(k-i)));
+            }
+            i=i+n;
+        }
         assert forall|k:int| 0<=k<needed implies output@[k]==decoded_byte(s@,codec,cap,k) by {}
     } else if codec==5 {
         let mut probe=Budget {remaining:s.len()};
