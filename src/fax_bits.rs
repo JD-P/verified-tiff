@@ -3,14 +3,14 @@ use super::*;
 use crate::deflate_bits as db;
 verus! {
 #[derive(Clone,Copy)]
-pub(super) struct Bits {pub pos:usize,pub end:usize,pub lsb:bool}
+pub(super) struct Bits {pub pos:usize,pub end:usize,pub lsb:usize}
 impl Bits {
     pub(super) open spec fn valid(self,s:Seq<u8>) -> bool {self.pos<=self.end && self.end<=8*s.len()}
 }
 #[verifier::opaque]
 pub(super) open spec fn one(s:Seq<u8>,b:Bits) -> Option<(usize,Bits)> {
     if b.pos>=b.end {None} else {
-        let n=if b.lsb {b.pos as int%8} else {7-b.pos as int%8};
+        let n=if b.lsb!=0 {b.pos as int%8} else {7-b.pos as int%8};
         Some(((s[b.pos as int/8] as int/db::pow(n)%2) as usize,Bits {pos:(b.pos+1) as usize,..b}))
     }
 }
@@ -23,7 +23,7 @@ pub(super) fn bit(s:&[u8],b:Bits) -> (r:Result<(usize,Bits),Error>)
     reveal(one);
     if b.pos==b.end {return Err(Error::Truncated);}
     assert(b.pos/8<s.len()) by(nonlinear_arith) requires b.pos<b.end,b.end<=8*s.len();
-    let n=if b.lsb {b.pos%8} else {7-b.pos%8};let d=crate::jpeg_bits::power(n);
+    let n=if b.lsb!=0 {b.pos%8} else {7-b.pos%8};let d=crate::jpeg_bits::power(n);
     Ok((((s[b.pos/8] as usize)/d)%2,Bits {pos:b.pos+1,..b}))
 }
 #[verifier::opaque]

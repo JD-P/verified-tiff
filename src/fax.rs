@@ -35,6 +35,8 @@ pub(super) fn render(ends:&[u32;65538],n:usize,w:usize,base:usize,output:&mut [u
         forall|k:int| 0<=k<old(output).len() && !(base<=k<base as int+w) ==> final(output)@[k]==old(output)@[k],
 {
     let mut j=0usize;let mut x=0usize;let ghost rows=ends@.subrange(0,n as int);
+    // Restating the proved bounds lets the compiler drop per-pixel checks.
+    if output.len()<w || base>output.len()-w {return Ok(());}
     while j<n
         invariant j<=n,n<=65538,x<=w,base as int+w<=output.len(),output.len()==old(output).len(),
             rows==ends@.subrange(0,n as int),row_ok(rows,w),x==if j==0 {0int} else {ends@[j as int-1] as int},
@@ -44,6 +46,7 @@ pub(super) fn render(ends:&[u32;65538],n:usize,w:usize,base:usize,output:&mut [u
     {
         let end=ends[j] as usize;let v=if j%2==0 {0u8} else {255u8};
         assert(rows[j as int]<=w);if j>0 {assert(rows[j as int-1]<=rows[j as int]);}assert(x<=end<=w);
+        let end=if end>w {w} else {end};
         while x<end
             invariant j<n,n<=65538,x<=end<=w,base as int+w<=output.len(),output.len()==old(output).len(),
                 rows==ends@.subrange(0,n as int),row_ok(rows,w),end==ends@[j as int],v==if j%2==0 {0u8} else {255u8},

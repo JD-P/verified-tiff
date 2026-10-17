@@ -31,7 +31,7 @@ pub(super) open spec fn plan(s:Seq<u8>,f:Format,k:int,l:Limits) -> Option<Plan> 
     let off=tag_value(s,f.offsets,k,f.le);let count=tag_value(s,f.counts,k,f.le);let h=rows(f,k);let pixels=f.bw as int*h;
     if !value_valid(s,f.offsets,k) || !value_valid(s,f.counts,k) || !range_ok(s.len() as int,off,count) || count==0 ||
         8*(off+count)>=usize::MAX || pixels>l.max_output || fee(count,pixels,h)>usize::MAX {None}
-    else {let bits=Bits {pos:(8*off) as usize,end:(8*(off+count)) as usize,lsb:f.lsb};
+    else {let bits=Bits {pos:(8*off) as usize,end:(8*(off+count)) as usize,lsb:if f.lsb {1usize} else {0usize}};
         let missing=f.compression==3 && !f.mixed && !f.aligned && !ff::zero_bits(s,bits,11);
         Some(Plan {bits,config:Config {group4:f.compression==4,mixed:f.mixed,aligned:f.aligned,missing},rows:h as usize,pixels:pixels as usize,work:fee(count,pixels,h) as usize})
     }
@@ -52,7 +52,7 @@ pub(super) fn read(s:&[u8],f:Format,k:usize,l:&Limits) -> (r:Result<Plan,Error>)
     let work=add(add(add(mul(count,64)?,mul(pixels,4)?)?,mul(rows,64)?)?,1)?;
     assert(rows<=pixels) by(nonlinear_arith) requires pixels as int==f.bw as int*rows,f.bw>=1;
     assert(work as int<=64*s.len()+68*(l.max_output as int)+1);
-    let bits=Bits {pos:start,end,lsb:f.lsb};
+    let bits=Bits {pos:start,end,lsb:if f.lsb {1usize} else {0usize}};
     let missing=f.compression==3 && !f.mixed && !f.aligned && !ff::zeros(s,bits,11);
     Ok(Plan {bits,config:Config {group4:f.compression==4,mixed:f.mixed,aligned:f.aligned,missing},rows,pixels,work})
 }

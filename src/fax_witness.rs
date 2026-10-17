@@ -35,10 +35,10 @@ proof fn stream(g4:bool)
 {
     directory(g4);let s=bytes(g4);let f=f::model(s,metadata());
     reveal(tag_value);reveal(value_valid);reveal(seg::plan);
-    let bits=b::Bits {pos:784,end:if g4 {792usize} else {808usize},lsb:false};
+    let bits=b::Bits {pos:784,end:if g4 {792usize} else {808usize},lsb:0usize};
     let config=e::Config {group4:g4,mixed:false,aligned:false,missing:false};
     reveal(e::zero_bits);reveal(e::eol);reveal(b::one);
-    if !g4 {assert(e::zero_bits(bytes(false),b::Bits {pos:784,end:808,lsb:false},11)) by(compute);}
+    if !g4 {assert(e::zero_bits(bytes(false),b::Bits {pos:784,end:808,lsb:0usize},11)) by(compute);}
     assert(seg::plan(s,f,0,limits()).is_some());
     assert(seg::plan(s,f,0,limits()).unwrap().bits==bits && seg::plan(s,f,0,limits()).unwrap().config==config);
     reveal(c::step);reveal(r::step);reveal(r::mode);reveal(b::run);reveal(b::symbol);
@@ -46,9 +46,9 @@ proof fn stream(g4:bool)
     let end=b::Bits {pos:if g4 {785usize} else {802usize},..bits};
     if g4 {assert(e::line(s,bits,config)==Some((start,true)));assert(r::mode(s,start,0,0,7)==Some((0i8,end)));}
     else {
-        assert(e::eol(bytes(false),b::Bits {pos:784,end:808,lsb:false},0,19)==Some(b::Bits {pos:796,end:808,lsb:false})) by(compute);
+        assert(e::eol(bytes(false),b::Bits {pos:784,end:808,lsb:0usize},0,19)==Some(b::Bits {pos:796,end:808,lsb:0usize})) by(compute);
         assert(e::line(s,bits,config)==Some((start,false)));
-        assert(b::symbol(bytes(false),b::Bits {pos:796,end:808,lsb:false},crate::fax_tables::white(),0,13)==Some((1usize,b::Bits {pos:802,end:808,lsb:false}))) by(compute);
+        assert(b::symbol(bytes(false),b::Bits {pos:796,end:808,lsb:0usize},crate::fax_tables::white(),0,13)==Some((1usize,b::Bits {pos:802,end:808,lsb:0usize}))) by(compute);
         assert(b::run(s,start,false,1,0,1026)==Some((1usize,end)));
     }
     let row=r::Model {bits:end,a:1,bi:if g4 {2usize} else {1usize},ends:seq![1u32]};
@@ -57,7 +57,7 @@ proof fn stream(g4:bool)
     assert(r::finish(s,seq![1u32],1,g4,r::begin(start),(start.end-start.pos+1) as nat)==Some(row));
     let out=c::Model {bits:end,reference:seq![1u32],history:seq![seq![1u32]]};
     assert(c::step(s,config,1,c::initial(bits,1))==Some(out));
-    if g4 {assert(e::zero_bits(bytes(true),b::Bits {pos:785,end:792,lsb:false},7)) by(compute);} else {assert(e::zero_bits(bytes(false),b::Bits {pos:802,end:808,lsb:false},6)) by(compute);}
+    if g4 {assert(e::zero_bits(bytes(true),b::Bits {pos:785,end:792,lsb:0usize},7)) by(compute);} else {assert(e::zero_bits(bytes(false),b::Bits {pos:802,end:808,lsb:0usize},6)) by(compute);}
     assert(e::terminated(s,end,config));reveal_with_fuel(c::finish,2);
     assert(c::finish(s,config,1,c::initial(bits,1),1)==Some(out));
 }
