@@ -2855,6 +2855,38 @@ proof fn tile_row_mapping(g:Geometry,y:int,x:int,n:int,i:int)
         requires g.local(k)==((y%(g.block_height as int))*bw+x%bw+ix)*ch+c,i==ch*ix+c;
 }
 
+// A full-width strip owns one contiguous span of interleaved output bytes,
+// and its local index is the offset inside that span.
+proof fn strip_span(g:Geometry,k:int,rows:int,q:int)
+    requires g.positive(),!g.bilevel,g.block_width==g.width,g.across==1,0<=k,1<=rows<=g.block_height,
+        k*g.block_height+rows<=g.height,rows==g.block_height || k*g.block_height+rows==g.height,
+        0<=q<g.width as int*g.height*g.channels,
+    ensures (g.segment(q)==k)==(k*g.block_height*g.width*g.channels<=q<(k*g.block_height+rows)*g.width*g.channels),
+        g.segment(q)==k ==> g.local(q)==q-k*g.block_height*g.width*g.channels,
+{
+    let ch=g.channels as int;let w=g.width as int;let bh=g.block_height as int;let h=g.height as int;
+    let p=q/ch;let c=q%ch;quotient_remainder(q,ch);
+    let y=p/w;let x=p%w;quotient_remainder(p,w);
+    let s=y/bh;let r=y%bh;quotient_remainder(y,bh);
+    vstd::arithmetic::div_mod::lemma_fundamental_div_mod_converse(x,w,0,x);
+    assert(g.segment(q)==s);
+    assert(g.local(q)==(r*w+x)*ch+c);
+    let base=k*bh*w*ch;
+    assert(0<=y<h) by(nonlinear_arith) requires 0<=p,0<=x<w,p==w*y+x,0<=q<w*h*ch,q==ch*p+(q%ch),0<=q%ch<ch;
+    if s==k {
+        assert(r<rows) by(nonlinear_arith) requires y==bh*s+r,s==k,y<h,r<bh,rows==bh || k*bh+rows==h;
+        assert(q-base==(r*w+x)*ch+c) by(nonlinear_arith) requires q==ch*p+c,p==w*y+x,y==bh*s+r,s==k,base==k*bh*w*ch;
+        assert(base<=q<(k*bh+rows)*w*ch) by(nonlinear_arith)
+            requires q-base==(r*w+x)*ch+c,0<=r<rows,0<=x<w,0<=c<ch,base==k*bh*w*ch,w>0,ch>0;
+    } else if s<k {
+        assert(y<k*bh) by(nonlinear_arith) requires y==bh*s+r,r<bh,s<k,bh>0;
+        assert(q<base) by(nonlinear_arith) requires q==ch*p+c,p==w*y+x,y<k*bh,0<=x<w,0<=c<ch,base==k*bh*w*ch,w>0,ch>0;
+    } else {
+        assert(y>=k*bh+rows) by(nonlinear_arith) requires y==bh*s+r,0<=r,s>k,rows<=bh,bh>0;
+        assert(q>=(k*bh+rows)*w*ch) by(nonlinear_arith) requires q==ch*p+c,p==w*y+x,y>=k*bh+rows,0<=x,0<=c,w>0,ch>0;
+    }
+}
+
 fn copy_byte_run(input:&[u8],src:usize,output:&mut [u8],dst:usize,n:usize,invert:bool)
     requires src as int+n<=input.len(),dst as int+n<=old(output).len(),
     ensures final(output).len()==old(output).len(),

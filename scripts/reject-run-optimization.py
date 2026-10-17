@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run and WebP table paths."""
+"""Reject semantic mutations of the run, strip-copy and WebP table paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -8,6 +8,8 @@ changes={
  'segment-match-output':('deflate.rs','let byte=c.match_byte(s,cap);\n        dst[i]=byte;','let byte=c.match_byte(s,cap);\n        dst[i]=0;','deflate','copy_into'),
  'segment-stored-output':('deflate.rs','let byte=c.stored_byte(s,cap);\n        dst[i]=byte;','let byte=c.stored_byte(s,cap);\n        dst[i]=0;','deflate','stored_into'),
  'stored-byte':('deflate.rs','let byte=s[self.bits.at];self.bits.at=self.bits.at+1;','let byte=0u8;self.bits.at=self.bits.at+1;','deflate','Cursor::stored_byte'),
+ 'fax-strip':('fax_tiff.rs','copy_byte_run(pixels,0,output,base,pixels.len(),f.photo==0);','copy_byte_run(pixels,0,output,base,pixels.len(),f.photo!=0);','fax_tiff','scatter_segment'),
+ 'jpeg-strip':('jpeg_tiff.rs','copy_byte_run(pixels,0,output,base,pixels.len(),false);','copy_byte_run(pixels,0,output,base,pixels.len(),true);','jpeg_tiff','scatter_segment'),
  'webp-symbol-order':('webp_huffman.rs','symbols[at]=i as u16;next[l]=at+1;','symbols[at]=i as u16;next[l]=at;','webp_huffman','ordered'),
  'webp-unused-lengths':('webp_huffman.rs','counts[0]=counts[0]+(2328-alphabet);','counts[0]=counts[0];','webp_huffman','Huff::build'),
  'webp-window':('webp_huffman.rs','code=code*2+bit;let count=self.counts[n];','code=code*2+(bit^1);let count=self.counts[n];','webp_huffman','Huff::read_window'),

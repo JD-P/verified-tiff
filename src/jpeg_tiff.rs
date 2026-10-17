@@ -346,6 +346,38 @@ fn scatter_segment(f:jf::Format,k:usize,pixels:&[u8],output:&mut [u8]) -> (r:Res
         forall|q:int| f.output<=q<old(output).len() ==> final(output)@[q]==old(output)@[q],
 {
     let g=make_geometry(f);
+    if !f.tiled {
+        // A strip is one contiguous span of interleaved output bytes.
+        let rows=seg::height(f,k);
+        assert(f.bw==f.w);
+        assert((f.w as int-1)/(f.w as int)==0) by(nonlinear_arith) requires f.w>0;
+        assert(f.across==1);
+        assert(f.segments==(f.h as int-1)/(f.bh as int)+1) by(nonlinear_arith)
+            requires f.across==1,f.segments==f.across as int*((f.h as int-1)/(f.bh as int)+1);
+        let ghost (w,h,bh,ch,kk)=(f.w as int,f.h as int,f.bh as int,f.ch as int,k as int);
+        assert(kk*bh+rows<=h) by(nonlinear_arith)
+            requires bh>0,kk<(h-1)/bh+1,rows==(if h-kk*bh<bh {h-kk*bh} else {bh});
+        assert(kk*bh>=0) by(nonlinear_arith) requires kk>=0,bh>0;
+        assert((kk*bh+rows)*w<=h*w) by(nonlinear_arith) requires kk*bh+rows<=h,w>0;
+        assert((kk*bh+rows)*w*ch<=h*w*ch) by(nonlinear_arith) requires (kk*bh+rows)*w<=h*w,ch>0;
+        assert(pixels.len()==w*rows*ch) by(nonlinear_arith) requires pixels.len()==f.bw as int*rows*f.ch,f.bw==w,f.ch==ch;
+        assert((kk*bh+rows)*w*ch==kk*bh*w*ch+pixels.len()) by(nonlinear_arith) requires pixels.len()==w*rows*ch;
+        assert(kk*bh*w<=h*w && kk*bh*w>=0) by(nonlinear_arith) requires 0<=kk*bh<=h,w>0;
+        assert(kk*bh*w*ch>=0 && h*w*ch==f.output) by(nonlinear_arith) requires kk*bh*w>=0,ch>0,f.output==w*h*ch;
+        assert(kk*bh*w<=f.output && kk*bh*w*ch<=f.output) by(nonlinear_arith)
+            requires kk*bh*w<=h*w,kk*bh*w>=0,ch>=1,h*w*ch==f.output,(kk*bh+rows)*w*ch==kk*bh*w*ch+pixels.len(),(kk*bh+rows)*w*ch<=h*w*ch;
+        let base=k*f.bh*f.w*f.ch;
+        assert(base as int==kk*bh*w*ch);
+        copy_byte_run(pixels,0,output,base,pixels.len(),false);
+        assert forall|q:int| 0<=q<f.output implies output@[q]==(if g.segment(q)==k {pixels@[g.local(q)]} else {old(output)@[q]}) by {
+            strip_span(g,kk,rows as int,q);
+            if g.segment(q)==k {
+                let i=q-base;assert(0<=i<pixels.len());
+                assert(output@[base as int+i]==pixels@[0+i]);
+            }
+        }
+        return Ok(());
+    }
     assert(f.bw as int*f.ch<=196605) by(nonlinear_arith) requires f.bw<=65535,f.ch<=3;
     let stride=f.bw*f.ch;let mut i=0usize;
     while i<pixels.len()

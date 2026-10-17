@@ -305,6 +305,32 @@ fn scatter_segment(f:jf::Format,k:usize,pixels:&[u8],output:&mut [u8]) -> (r:Res
         forall|q:int| f.output<=q<old(output).len() ==> final(output)@[q]==old(output)@[q],
 {
     let g=make_fax_geometry(f);
+    if !f.tiled {
+        // A strip is one contiguous output span.
+        let rows=seg::height(f,k);
+        assert(f.bw==f.w);
+        assert((f.w as int-1)/(f.w as int)==0) by(nonlinear_arith) requires f.w>0;
+        assert(f.across==1);
+        assert(f.segments==(f.h as int-1)/(f.bh as int)+1) by(nonlinear_arith)
+            requires f.across==1,f.segments==f.across as int*((f.h as int-1)/(f.bh as int)+1);
+        let ghost (w,h,bh,kk)=(f.w as int,f.h as int,f.bh as int,k as int);
+        assert(kk*bh+rows<=h) by(nonlinear_arith)
+            requires bh>0,kk<(h-1)/bh+1,rows==(if h-kk*bh<bh {h-kk*bh} else {bh});
+        assert(kk*bh*w+w*rows<=w*h && kk*bh*w>=0 && kk*bh>=0) by(nonlinear_arith) requires kk*bh+rows<=h,w>0,kk>=0,bh>0,rows>=1;
+        assert(pixels.len()==w*rows) by(nonlinear_arith) requires pixels.len()==f.bw as int*rows*1usize,f.bw==w;
+        assert((kk*bh+rows)*w*1==kk*bh*w+pixels.len() && kk*bh*w*1==kk*bh*w) by(nonlinear_arith) requires pixels.len()==w*rows;
+        let base=k*f.bh*f.w;
+        assert(base as int==kk*bh*w);
+        copy_byte_run(pixels,0,output,base,pixels.len(),f.photo==0);
+        assert forall|q:int| 0<=q<f.output implies output@[q]==(if g.segment(q)==k {shade(f,pixels@[g.local(q)])} else {old(output)@[q]}) by {
+            strip_span(g,kk,rows as int,q);
+            if g.segment(q)==k {
+                let i=q-base;assert(0<=i<pixels.len());
+                assert(output@[base as int+i]==(if f.photo==0 {(255-pixels@[0+i]) as u8} else {pixels@[0+i]}));
+            }
+        }
+        return Ok(());
+    }
     assert(f.bw as int*1usize<=65536) by(nonlinear_arith) requires f.bw<=65536,1usize<=3;
     let stride=f.bw*1usize;let mut i=0usize;
     while i<pixels.len()
