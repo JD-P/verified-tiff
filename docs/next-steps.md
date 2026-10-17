@@ -47,7 +47,18 @@ acceptance proofs. Preserve the missing-EOL and duplicate-endpoint policies in
    regressions; its original measurements remain in `reader-optimization.md`.
    Large RGB Deflate and LERC are substantially faster but still trail libtiff.
    Remaining work includes reusable Huffman prefix tables, a wider JPEG bit
-   reader, LZW per-code dictionary overhead and adapter replay.
+   reader, LZW per-code dictionary overhead and adapter replay. Stripped fax
+   images could decode straight into the output with no scratch buffer, but
+   that only pays off when the scratch pages are never touched; prefer a
+   verified scratch-free fax contract to `unsafe` zeroed allocation in the
+   adapter. In-place VP8 token probabilities help textured lossy WebP but
+   cost the other lossy fixtures. Row-wise byte prediction and
+   register-carried 16-bit prediction verify alone, but in the same module
+   they push the native `predictor` and `store-byte` gates into the solver's
+   resource limit; restructure those proofs first. A commit's effect can
+   depend on unrelated code through LLVM's codegen-unit split, so re-measure
+   later commits after dropping one, and use callgrind instruction counts to
+   separate real effects from layout noise.
    Retain all semantic/acceptance contracts and benchmark each change. Do not
    trade exact JPEG output for faster approximate math.
 4. **Add codecs one at a time.** PackBits and LZW are implemented for bilevel, Gray8, and
