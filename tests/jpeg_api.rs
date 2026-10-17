@@ -1,4 +1,4 @@
-use verified_tiff::{inspect_jpeg_tiff, inspect_raster, jpeg_inspection_work_limit, raster_inspection_work_limit, Budget, Error, Limits};
+use verified_tiff::{decode_jpeg_into, inspect_jpeg_tiff, inspect_raster, jpeg_decode_work_limit, jpeg_inspection_work_limit, raster_inspection_work_limit, Budget, Error, Limits};
 const CASES:&[(&[u8],&[u8])]=&[
 (include_bytes!("fixtures/jpeg-witness.tif"),include_bytes!("fixtures/jpeg-witness.pixels")),
 (include_bytes!("fixtures/jpeg-gray.tif"),include_bytes!("fixtures/jpeg-gray.pixels")),
@@ -39,6 +39,44 @@ fn jpeg_budget_formula_and_overflow() {
     assert_eq!(jpeg_inspection_work_limit(usize::MAX,&l),Err(Error::Limit));
     assert_eq!(jpeg_inspection_work_limit(0,&Limits{max_input:usize::MAX,..l}),Err(Error::Limit));
     assert_eq!(jpeg_inspection_work_limit(0,&Limits{max_output:usize::MAX,max_segments:0,..l}),Ok(1339));
+    assert_eq!(jpeg_decode_work_limit(0,&l),Ok(205910+601+3138*65));
+    assert_eq!(jpeg_decode_work_limit(usize::MAX,&l),Err(Error::Limit));
+    assert_eq!(jpeg_decode_work_limit(0,&Limits{max_output:usize::MAX,max_segments:0,..l}),Ok(1339));
+}
+#[test]
+fn one_pass_jpeg_matches_inspected_decode_budgets_and_frames() {
+    for &(source,expected) in CASES {
+        let lim=Limits::conservative();
+        let quota=jpeg_inspection_work_limit(0,&lim).unwrap();
+        let mut ib=Budget{remaining:quota};
+        let image=inspect_jpeg_tiff(source,0,&lim,&mut ib).unwrap();
+        let (olen,slen)=(image.output_len(),image.scratch_len());
+        let mut reference=vec![0;olen];let mut scratch=vec![0;slen];
+        image.decode_with_scratch(&mut reference,&mut scratch,&mut Budget{remaining:image.decode_work_limit()}).unwrap();
+        let exact=quota-ib.remaining+image.decode_work_limit();
+        let mut out=vec![0xa5;olen+11];let mut scratch=vec![0x5a;slen+13];
+        let mut budget=Budget{remaining:exact};
+        let one=decode_jpeg_into(source,0,&lim,&mut out,&mut scratch,&mut budget).unwrap();
+        assert_eq!(budget.remaining,0);assert_eq!(&out[..olen],&reference[..]);
+        assert!(out[..olen].iter().zip(expected).all(|(a,b)|a.abs_diff(*b)<=3));
+        assert_eq!((one.width(),one.height(),one.channels(),one.output_len(),one.scratch_len(),one.decode_work_limit()),
+            (image.width(),image.height(),image.channels(),olen,slen,image.decode_work_limit()));
+        assert!(out[olen..].iter().all(|v|*v==0xa5));assert!(scratch[slen..].iter().all(|v|*v==0x5a));
+        for b in [0,exact-1] {
+            out.fill(0xa5);scratch.fill(0x5a);
+            assert!(decode_jpeg_into(source,0,&lim,&mut out,&mut scratch,&mut Budget{remaining:b}).is_err());
+            assert!(out.iter().all(|v|*v==0xa5));assert!(scratch[slen..].iter().all(|v|*v==0x5a));
+        }
+        for (o,s) in [(olen-1,slen),(olen,slen-1)] {
+            out.fill(0xa5);
+            assert_eq!(decode_jpeg_into(source,0,&lim,&mut out[..o],&mut scratch[..s],&mut Budget{remaining:exact}).err(),Some(Error::OutputTooSmall));
+            assert!(out.iter().all(|v|*v==0xa5));
+        }
+        let fit=Limits{max_input:source.len(),max_output:slen.max(olen),..lim};
+        let mut out=vec![0xa5;fit.max_output];let mut scratch=vec![0x5a;fit.max_output];
+        decode_jpeg_into(source,0,&fit,&mut out,&mut scratch,&mut Budget{remaining:jpeg_decode_work_limit(0,&fit).unwrap()}).unwrap();
+        assert_eq!(&out[..olen],&reference[..]);
+    }
 }
 
 #[test]

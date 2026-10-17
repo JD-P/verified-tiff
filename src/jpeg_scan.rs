@@ -212,4 +212,48 @@ pub(super) fn decode_blocks(s:&[u8],v:[usize;32],bits:Bits,count:usize,legacy:bo
     }
     Ok(())
 }
+/// `validate` and `decode_blocks` in one pass. Failure may leave a decoded prefix.
+pub(super) fn decode_checked(s:&[u8],v:[usize;32],bits:Bits,count:usize,legacy:bool,output:&mut [u8]) -> (r:Result<(),Error>)
+    requires scan_ok(s@,v@),bits.valid(s@),count as int*64<=old(output).len(),
+    ensures r.is_ok()==finish(s@,v@,initial(bits),count as nat,legacy).is_some(),final(output).len()==old(output).len(),
+        r.is_ok() ==> forall|k:int| 0<=k<count as int*64 ==> final(output)@[k]==crate::jpeg_transform::sample(finish(s@,v@,initial(bits),count as nat,legacy).unwrap().blocks[k/64],k%64),
+        forall|k:int| count as int*64<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
+{
+    let t=Tables::new(s,v,count);
+    let mut c=Cursor::new(bits);let mut i=0usize;
+    let ghost result=finish(s@,v@,initial(bits),count as nat,legacy);
+    while i<count
+        invariant c.valid(s@),i==c.produced,i<=count,scan_ok(s@,v@),t.ready(s@,v@),count as int*64<=output.len(),output.len()==old(output).len(),
+            result==finish(s@,v@,initial(bits),count as nat,legacy),
+            result==finish(s@,v@,c.model(),(count-i) as nat,legacy),
+            forall|k:int| 0<=k<i as int*64 ==> output@[k]==crate::jpeg_transform::sample(c.history@[k/64],k%64),
+            forall|k:int| i as int*64<=k<output.len() ==> output@[k]==old(output)@[k],
+        decreases count-i,
+    {
+        reveal_with_fuel(finish,1);
+        let ghost before=c.history@;
+        let coef=c.next(s,v,&t)?;
+        assert(c.history@[i as int]==coef@);
+        let values=crate::jpeg_transform::idct(coef);let mut j=0usize;
+        while j<64
+            invariant j<=64,i<count,count as int*64<=output.len(),output.len()==old(output).len(),
+                c.history@==before.push(coef@),before.len()==i,
+                forall|k:int| 0<=k<i as int*64 ==> output@[k]==crate::jpeg_transform::sample(before[k/64],k%64),
+                forall|k:int| 0<=k<64 ==> values@[k]==crate::jpeg_transform::sample(coef@,k),
+                forall|k:int| 0<=k<j ==> output@[i as int*64+k]==values@[k],
+                forall|k:int| i as int*64+j<=k<output.len() ==> output@[k]==old(output)@[k],
+            decreases 64-j,
+        {output[i*64+j]=values[j];j=j+1;}
+        assert forall|k:int| 0<=k<(i as int+1)*64 implies output@[k]==crate::jpeg_transform::sample(c.history@[k/64],k%64) by {
+            if k>=i as int*64 {assert(k/64==i && k%64==k-i as int*64) by(nonlinear_arith) requires i as int*64<=k<(i as int+1)*64;}
+            else {assert(0<=k/64<i) by(nonlinear_arith) requires 0<=k<i as int*64;}
+        }
+        i=i+1;
+    }
+    reveal_with_fuel(finish,1);
+    if c.end(s,legacy) {
+        assert(result==Some(c.model()));
+        Ok(())
+    } else {Err(Error::Invalid)}
+}
 }

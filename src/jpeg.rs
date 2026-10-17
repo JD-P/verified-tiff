@@ -72,7 +72,7 @@ impl<'a> JpegSegment<'a> {
         self.render(scratch,output);
         Ok(())
     }
-    fn render(&self,scratch:&[u8],output:&mut [u8])
+    pub(super) fn render(&self,scratch:&[u8],output:&mut [u8])
         requires self.well_formed(),scratch.len()>=self.scratch,old(output).len()>=self.output,
             forall|j:int| 0<=j<self.scratch ==> scratch@[j]==crate::jpeg_transform::sample(self.coefficient_blocks()[j/64],j%64),
         ensures final(output).len()==old(output).len(),
@@ -224,10 +224,45 @@ pub(super) fn prepare<'a>(s:&'a [u8],v:[usize;32],bits:Bits,legacy:bool,ycbcr:bo
     js::validate(s,v,bits,count,legacy)?;
     Ok(JpegSegment {input:s,v,bits,count,legacy,ycbcr,limited,scratch,output,work})
 }
+pub(super) fn prepare_into<'a>(s:&'a [u8],v:[usize;32],bits:Bits,legacy:bool,ycbcr:bool,limited:bool,limits:&Limits,budget:&mut Budget,scratch_room:&mut [u8]) -> (r:Result<(JpegSegment<'a>,bool),Error>)
+    requires jh::scan_ok(s@,v@),bits.valid(s@),
+    ensures final(budget).remaining<=old(budget).remaining,
+        r.is_ok()==(eligible(s@,v@,bits,legacy,*limits) && old(budget).remaining as int>=work(v@)),
+        r.is_ok() ==> final(budget).remaining as int+work(v@)==old(budget).remaining,
+        old(budget).remaining as int-final(budget).remaining<=work(v@),
+        old(budget).remaining as int-final(budget).remaining<=3137*(limits.max_output as int),
+        r.is_ok() ==> r.unwrap().0.well_formed() && r.unwrap().0.input@==s@ && r.unwrap().0.v==v && r.unwrap().0.bits==bits && r.unwrap().0.legacy==legacy && r.unwrap().0.ycbcr==ycbcr && r.unwrap().0.limited==limited,
+        r.is_ok() ==> r.unwrap().0.output<=limits.max_output && r.unwrap().0.scratch<=limits.max_output,
+        r.is_ok() ==> r.unwrap().0.output==pixel_count(v@) && r.unwrap().0.scratch==64*js::total(v@) && r.unwrap().0.work==work(v@),
+        final(scratch_room).len()==old(scratch_room).len(),
+        r.is_ok() && r.unwrap().1 ==> forall|j:int| 0<=j<r.unwrap().0.scratch ==> final(scratch_room)@[j]==crate::jpeg_transform::sample(r.unwrap().0.coefficient_blocks()[j/64],j%64),
+        r.is_ok() && r.unwrap().1 ==> forall|j:int| r.unwrap().0.scratch<=j<old(scratch_room).len() ==> final(scratch_room)@[j]==old(scratch_room)@[j],
+        r.is_ok() && !r.unwrap().1 ==> final(scratch_room)@==old(scratch_room)@,
+        r.is_ok() && r.unwrap().1 ==> old(scratch_room).len()>=r.unwrap().0.scratch,
+        r.is_ok() ==> r.unwrap().0.count==js::total(v@),
+        forall|j:int| limits.max_output<=j<old(scratch_room).len() ==> final(scratch_room)@[j]==old(scratch_room)@[j],
+{
+    reveal(eligible);
+    assert(js::total(v@)>=0);
+    assert(js::total(v@)<=js::total(v@)*64) by(nonlinear_arith) requires js::total(v@)>=0;
+    assert(v@[12] as int*v@[13]<=pixel_count(v@)) by(nonlinear_arith) requires v@[14]>=1;
+    if v[12]>limits.max_dimension || v[13]>limits.max_dimension {return Err(Error::Limit);}
+    let count=js::block_count(v)?;let need=mul(count,64)?;
+    let output=mul(mul(v[12],v[13])?,v[14])?;
+    if need>limits.max_output || output>limits.max_output {return Err(Error::Limit);}
+    let work=add(mul(count,3136)?,output)?;
+    assert(count as int<=limits.max_output) by(nonlinear_arith) requires need as int==count as int*64,need<=limits.max_output;
+    assert(work as int<=3137*(limits.max_output as int));
+    spend(budget,work)?;
+    // With room, the one validating pass also writes the samples.
+    let captured=scratch_room.len()>=need;
+    if captured {js::decode_checked(s,v,bits,count,legacy,scratch_room)?;} else {js::validate(s,v,bits,count,legacy)?;}
+    Ok((JpegSegment {input:s,v,bits,count,legacy,ycbcr,limited,scratch:need,output,work},captured))
+}
 pub(super) fn materialize<'a>(s:&'a [u8],v:[usize;32],bits:Bits,legacy:bool,ycbcr:bool,limited:bool,limits:&Limits) -> (r:Result<JpegSegment<'a>,Error>)
     requires jh::scan_ok(s@,v@),bits.valid(s@),eligible(s@,v@,bits,legacy,*limits),
     ensures r.is_ok(),r.unwrap().well_formed(),r.unwrap().input@==s@,r.unwrap().v==v,r.unwrap().bits==bits,r.unwrap().legacy==legacy,r.unwrap().ycbcr==ycbcr,r.unwrap().limited==limited,
-        r.unwrap().output==pixel_count(v@),r.unwrap().scratch==64*js::total(v@),r.unwrap().work==work(v@),
+        r.unwrap().output==pixel_count(v@),r.unwrap().scratch==64*js::total(v@),r.unwrap().work==work(v@),r.unwrap().count==js::total(v@),
 {
     reveal(eligible);
     assert(js::total(v@)>=0);

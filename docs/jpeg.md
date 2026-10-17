@@ -8,6 +8,12 @@ choice of RGB versus YCbCr interpretation. The standalone entry point has
 verified successful decoding; the whole-inspection completeness theorem is
 provided for the TIFF/JPEG entry point.
 
+`decode_jpeg_into` inspects and decodes a TIFF/JPEG page in one call; for a
+single-segment page whose scratch has room, inspection keeps the samples from
+its entropy pass instead of replaying it. It succeeds for every member of
+`supported_jpeg_profile` given `max_output`-sized buffers and the budget
+`jpeg_decode_work_limit` returns, and leaves the output unchanged on failure.
+
 ## Supported profile
 
 - Classic TIFF, either byte order, Compression 7 (JPEG) or 6 (old JPEG).

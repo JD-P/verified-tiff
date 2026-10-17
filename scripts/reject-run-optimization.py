@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW and JPEG lookahead paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW, JPEG lookahead and one-pass JPEG paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -34,6 +34,9 @@ changes={
  'jpeg-window-stuffing':('jpeg_huffman.rs','Bits {at:b.at+adv,byte:nb,left:8-(len-left),end:b.end}','Bits {at:b.at+1,byte:nb,left:8-(len-left),end:b.end}','jpeg_huffman','decode_fast'),
  'jpeg-amplitude':('jpeg_bits.rs','let v=hi*power(m)+((nb as usize)>>(8-m));','let v=hi*power(m)+((nb as usize)>>(8-m))/2;','jpeg_bits','read_fast'),
  'jpeg-amplitude-stuffing':('jpeg_bits.rs','Ok((v,Bits {at:b.at+adv,byte:nb,left:8-m,end:b.end}))','Ok((v,Bits {at:b.at+1,byte:nb,left:8-m,end:b.end}))','jpeg_bits','read_fast'),
+ 'jpeg-capture-sample':('jpeg_scan.rs','{output[i*64+j]=values[j];j=j+1;}\n        assert forall|k:int| 0<=k<(i as int+1)*64 implies output@[k]==crate::jpeg_transform::sample(c.history','{output[i*64+j]=values[0];j=j+1;}\n        assert forall|k:int| 0<=k<(i as int+1)*64 implies output@[k]==crate::jpeg_transform::sample(c.history','jpeg_scan','decode_checked'),
+ 'jpeg-capture-ending':('jpeg_scan.rs','    if c.end(s,legacy) {\n        assert(result==Some(c.model()));\n        Ok(())','    if true {\n        Ok(())','jpeg_scan','decode_checked'),
+ 'jpeg-one-pass-accept':('jpeg_tiff.rs','    if taken {\n        spend(budget,image.work)?;','    if taken {\n        return Err(Error::Limit);','jpeg_tiff','decode_jpeg_into'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

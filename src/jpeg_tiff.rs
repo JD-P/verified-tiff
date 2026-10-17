@@ -82,6 +82,8 @@ proof fn profile_directory(s:Seq<u8>,page:usize,l:Limits,p:nat)
     ensures nth_ifd(s,word32(s,4,s[0]==73),s[0]==73,p)!=0,
         jm::directory_ok(s,nth_ifd(s,word32(s,4,s[0]==73),s[0]==73,p),s[0]==73,l.max_tags as int),
 {reveal(supported_jpeg_profile);}
+/// Work for one segment's inspection, and also for its decode.
+pub open spec fn jpeg_segment_work_bound(l:Limits) -> int {2*(l.max_input as int)+1+3138*(l.max_output as int)}
 pub open spec fn jpeg_inspection_work_bound(page:usize,l:Limits) -> int {
     (page as int+1)*(l.max_tags as int+1)+4*(l.max_input as int)+128+
     l.max_segments as int*(2*(l.max_input as int)+1+3138*(l.max_output as int))
@@ -146,9 +148,20 @@ pub(super) open spec fn segment_pixel(s:Seq<u8>,f:jf::Format,p:seg::Model,k:int)
 }
 #[verifier::opaque]
 spec fn per_segment_bound(l:Limits) -> int {2*(l.max_input as int)+1+3138*(l.max_output as int)}
-fn inspect_segment(s:&[u8],f:jf::Format,base:[usize;32],k:usize,l:&Limits,budget:&mut Budget) -> (r:Result<(usize,usize),Error>)
+/// Segment `k`'s decoded samples, as `decode_with_scratch` stages them.
+pub(super) open spec fn captured(s:Seq<u8>,f:jf::Format,base:Seq<usize>,k:int,scratch:Seq<u8>) -> bool {
+    let p=seg::plan(s,f,base,k).unwrap();
+    let blocks=js::finish(s,p.v,js::initial(p.bits),js::total(p.v) as nat,f.compression==6).unwrap().blocks;
+    64*js::total(p.v)<=scratch.len() && forall|j:int| 0<=j<64*js::total(p.v) ==> scratch[j]==crate::jpeg_transform::sample(blocks[j/64],j%64)
+}
+fn inspect_segment(s:&[u8],f:jf::Format,base:[usize;32],k:usize,l:&Limits,budget:&mut Budget,scratch:&mut [u8],capture:bool) -> (r:Result<(usize,usize,bool),Error>)
     requires f.valid(),k<f.segments,seg::base_ready(s@,f,base@),s.len()<=l.max_input,
     ensures final(budget).remaining<=old(budget).remaining,
+        final(scratch).len()==old(scratch).len(),
+        forall|j:int| l.max_output<=j<old(scratch).len() ==> final(scratch)@[j]==old(scratch)@[j],
+        r.is_ok() && r.unwrap().2 ==> capture && captured(s@,f,base@,k as int,final(scratch)@),
+        r.is_ok() && !r.unwrap().2 ==> final(scratch)@==old(scratch)@,
+        r.is_ok() ==> r.unwrap().0 as int<=per_segment_bound(*l),
         old(budget).remaining as int-final(budget).remaining<=per_segment_bound(*l),
         segment_supported(s@,f,base@,k as int,*l) && old(budget).remaining as int>=per_segment_bound(*l) ==> r.is_ok(),
         r.is_ok() ==> segment_supported(s@,f,base@,k as int,*l),
@@ -164,16 +177,36 @@ fn inspect_segment(s:&[u8],f:jf::Format,base:[usize;32],k:usize,l:&Limits,budget
     assert(eligible ==> j::work(p.v@)<=3137*(l.max_output as int)) by(nonlinear_arith)
         requires eligible ==> 0<=js::total(p.v@) && 64*js::total(p.v@)<=l.max_output && j::pixel_count(p.v@)<=l.max_output,
             j::work(p.v@)==3136*js::total(p.v@)+j::pixel_count(p.v@);
-    let image=j::prepare(s,p.v,p.bits,f.compression==6,f.photo==6,f.limited,l,budget)?;
+    let (image,taken)=if capture {j::prepare_into(s,p.v,p.bits,f.compression==6,f.photo==6,f.limited,l,budget,scratch)?}
+        else {(j::prepare(s,p.v,p.bits,f.compression==6,f.photo==6,f.limited,l,budget)?,false)};
     let need=add(image.scratch,image.output)?;if need>l.max_output {return Err(Error::Limit);}
     let cost=add(add(fee,image.work)?,image.output)?;
     assert(need as int==segment_scratch(s@,f,base@,k as int));assert(cost as int==segment_fee(s@,f,base@,k as int));
-    Ok((cost,need))
+    assert(cost as int<=per_segment_bound(*l));
+    assert(taken ==> captured(s@,f,base@,k as int,scratch@));
+    Ok((cost,need,taken))
 }
 pub fn inspect_jpeg_tiff<'a>(s:&'a [u8],page:usize,l:&Limits,budget:&mut Budget) -> (r:Result<JpegImage<'a>,Error>)
     ensures supported_jpeg_profile(s@,page,*l) && old(budget).remaining as int>=jpeg_inspection_work_bound(page,*l) ==> r.is_ok(),
         final(budget).remaining<=old(budget).remaining,r.is_ok() ==> r.unwrap().well_formed() && r.unwrap().metadata_matches_source(),
         r.is_ok() ==> r.unwrap().byte_len()<=l.max_output && r.unwrap().scratch_size()<=l.max_output,
+{
+    let mut scratch=[0u8;0];
+    let (image,_)=inspect_capture(s,page,l,budget,&mut scratch,false)?;
+    Ok(image)
+}
+/// Inspection that, for a single-segment image with room in `scratch`, also
+/// leaves the segment's decoded samples there from its one validating pass.
+fn inspect_capture<'a>(s:&'a [u8],page:usize,l:&Limits,budget:&mut Budget,room:&mut [u8],capture:bool) -> (r:Result<(JpegImage<'a>,bool),Error>)
+    ensures supported_jpeg_profile(s@,page,*l) && old(budget).remaining as int>=jpeg_inspection_work_bound(page,*l) ==> r.is_ok(),
+        final(budget).remaining<=old(budget).remaining,r.is_ok() ==> r.unwrap().0.well_formed() && r.unwrap().0.metadata_matches_source(),
+        r.is_ok() ==> r.unwrap().0.byte_len()<=l.max_output && r.unwrap().0.scratch_size()<=l.max_output,
+        r.is_ok() ==> old(budget).remaining as int-final(budget).remaining<=jpeg_inspection_work_bound(page,*l),
+        r.is_ok() ==> r.unwrap().0.work as int<=l.max_segments as int*jpeg_segment_work_bound(*l),
+        final(room).len()==old(room).len(),
+        forall|j:int| l.max_output<=j<old(room).len() ==> final(room)@[j]==old(room)@[j],
+        r.is_ok() && r.unwrap().1 ==> r.unwrap().0.format.segments==1 && captured(s@,r.unwrap().0.format,r.unwrap().0.base@,0,final(room)@),
+        r.is_ok() ==> r.unwrap().0.input@==s@,
 {
     let ghost initial_budget=budget.remaining;
     let ghost eligible=supported_jpeg_profile(s@,page,*l) && budget.remaining as int>=jpeg_inspection_work_bound(page,*l);
@@ -224,7 +257,8 @@ pub fn inspect_jpeg_tiff<'a>(s:&'a [u8],page:usize,l:&Limits,budget:&mut Budget)
             f.segments<=l.max_segments,unit>=0;
     assert(eligible ==> forall|q:int| 0<=q<f.segments ==> segment_supported(s@,f,base@,q,*l));
     assert(eligible ==> work_prefix(s@,f,base@,f.segments as nat)<=usize::MAX);
-    let mut k=0usize;let mut work=0usize;let mut scratch=0usize;
+    let mut k=0usize;let mut work=0usize;let mut scratch=0usize;let mut taken=false;
+    assert(initial_budget as int-budget.remaining<=dcost+fixed);
     reveal_with_fuel(work_prefix,1);reveal_with_fuel(scratch_prefix,1);
     while k<f.segments
         invariant s.len()<=l.max_input,k<=f.segments,
@@ -237,12 +271,18 @@ pub fn inspect_jpeg_tiff<'a>(s:&'a [u8],page:usize,l:&Limits,budget:&mut Budget)
             f==jf::model(s@,m),jf::fields(s@,m,*l),f.output<=l.max_output,jc::base_model(s@,f)==Some(base@),
             work as int==work_prefix(s@,f,base@,k as nat),scratch as int==scratch_prefix(s@,f,base@,k as nat),scratch<=l.max_output,
             forall|j:int| 0<=j<k ==> segment_supported(s@,f,base@,j,*l),
+            dcost==(page as int+1)*(l.max_tags as int+1),fixed==4*(l.max_input as int)+128,0<=dcost,
+            initial_budget as int-budget.remaining<=dcost+fixed+k as int*unit,work as int<=k as int*unit,
+            room.len()==old(room).len(),forall|j:int| l.max_output<=j<old(room).len() ==> room@[j]==old(room)@[j],
+            taken ==> f.segments==1 && k>=1 && captured(s@,f,base@,0,room@),
         decreases f.segments-k,
     {
         assert(eligible ==> segment_supported(s@,f,base@,k as int,*l));
         assert(eligible ==> budget.remaining as int>=unit) by(nonlinear_arith) requires k<f.segments,unit>=0,eligible ==> budget.remaining as int>=(f.segments as int-k)*unit;
         let ghost before=budget.remaining;
-        let (cost,need)=inspect_segment(s,f,base,k,l,budget)?;
+        let (cost,need,t)=inspect_segment(s,f,base,k,l,budget,room,capture && f.segments==1)?;
+        if t {taken=true;}
+        assert((k as int+1)*unit==k as int*unit+unit) by(nonlinear_arith);
         assert(eligible ==> budget.remaining as int>=(f.segments as int-k-1)*unit) by(nonlinear_arith)
             requires eligible ==> before as int>=(f.segments as int-k)*unit,before as int-budget.remaining<=unit;
         proof {
@@ -257,7 +297,8 @@ pub fn inspect_jpeg_tiff<'a>(s:&'a [u8],page:usize,l:&Limits,budget:&mut Budget)
         assert(segment_supported(s@,f,base@,k as int,*l));
         k=k+1;reveal_with_fuel(work_prefix,1);reveal_with_fuel(scratch_prefix,1);
     }
-    Ok(JpegImage {input:s,meta:m,format:f,base,page,limits:*l,scratch,work})
+    assert(k as int*unit<=l.max_segments as int*unit) by(nonlinear_arith) requires k<=f.segments,f.segments<=l.max_segments,unit>=0;
+    Ok((JpegImage {input:s,meta:m,format:f,base,page,limits:*l,scratch,work},taken))
 }
 proof fn covers(f:jf::Format,k:int)
     requires f.valid(),0<=k<f.output,
@@ -338,6 +379,86 @@ impl<'a> JpegImage<'a> {
         assert forall|q:int| 0<=q<f.output implies output@[q]==self.decoded_byte(q) by {covers(f,q);}
         Ok(())
     }
+}
+impl<'a> JpegImage<'a> {
+    /// Render a single-segment image whose samples inspection left in `scratch`.
+    fn render_captured(&self,scratch:&mut [u8],output:&mut [u8]) -> (r:Result<(),Error>)
+        requires self.well_formed(),self.format.segments==1,captured(self.input@,self.format,self.base@,0,old(scratch)@),
+            old(output).len()>=self.byte_len(),old(scratch).len()>=self.scratch_size(),
+        ensures r.is_ok(),final(output).len()==old(output).len(),final(scratch).len()==old(scratch).len(),
+            forall|q:int| 0<=q<self.byte_len() ==> final(output)@[q]==self.decoded_byte(q),
+            forall|q:int| self.byte_len()<=q<old(output).len() ==> final(output)@[q]==old(output)@[q],
+            forall|q:int| self.scratch_size()<=q<old(scratch).len() ==> final(scratch)@[q]==old(scratch)@[q],
+    {
+        let f=self.format;let g=make_geometry(f);
+        proof {prefixes(self.input@,f,self.base@,f.segments as nat,f.segments as nat,self.limits);}
+        assert(segment_supported(self.input@,f,self.base@,0,self.limits));reveal(segment_supported);
+        let plan=seg::read(self.input,f,self.base,0)?;
+        let image=j::materialize(self.input,plan.v,plan.bits,f.compression==6,f.photo==6,f.limited,&self.limits)?;
+        let raw=image.scratch;let pixels=image.output;let need=add(raw,pixels)?;
+        assert(need<=self.scratch);
+        let ghost before_scratch=scratch@;let ghost before_output=output@;
+        let (blockbuf,rest)=scratch.split_at_mut(raw);let (tile,tail)=rest.split_at_mut(pixels);
+        proof {image.expose();}
+        assert forall|j:int| 0<=j<image.scratch implies blockbuf@[j]==crate::jpeg_transform::sample(image.coefficient_blocks()[j/64],j%64) by {
+            assert(blockbuf@[j]==before_scratch[j]);
+        }
+        image.render(blockbuf,tile);
+        assert forall|q:int| 0<=q<pixels implies tile@[q]==segment_pixel(self.input@,f,plan.model(),q) by {
+            assert(tile@[q]==image.decoded_byte(q));
+            assert(image.decoded_byte(q)==j::pixel(self.input@,plan.v@,plan.bits,f.compression==6,f.photo==6,f.limited,q));
+        };
+        scatter_segment(f,0,tile,output)?;
+        assert forall|q:int| 0<=q<f.output implies output@[q]==self.decoded_byte(q) by {covers(f,q);}
+        Ok(())
+    }
+}
+pub open spec fn jpeg_decode_work_bound(page:usize,l:Limits) -> int {
+    jpeg_inspection_work_bound(page,l)+l.max_segments as int*jpeg_segment_work_bound(l)
+}
+pub fn jpeg_decode_work_limit(page:usize,l:&Limits) -> (r:Result<usize,Error>)
+    ensures r.is_ok()==(jpeg_decode_work_bound(page,*l)<=usize::MAX),r.is_ok() ==> r.unwrap()==jpeg_decode_work_bound(page,*l),
+{
+    let ghost ms=l.max_segments as int;let ghost mi=l.max_input as int;let ghost mo=l.max_output as int;
+    assert(ms*(2*mi+1+3138*mo)==2*(ms*mi)+ms+3138*(ms*mo)) by(nonlinear_arith);
+    assert(0<=ms*mi<=2*(ms*mi) && 0<=ms*mo<=3138*(ms*mo)) by(nonlinear_arith) requires ms>=0,mi>=0,mo>=0;
+    let base=jpeg_inspection_work_limit(page,l)?;
+    let a=mul(mul(l.max_segments,l.max_input)?,2)?;let b=mul(mul(l.max_segments,l.max_output)?,3138)?;
+    add(add(add(base,a)?,l.max_segments)?,b)
+}
+/// Decode a JPEG TIFF into caller-owned buffers. A single-segment image with
+/// room in `scratch` validates and decodes its scan in one pass; other images
+/// inspect and then decode. Output is unchanged on failure; scratch below
+/// `limits.max_output` may be partly written. The work charge is that of
+/// inspection followed by `decode_with_scratch`. Use `jpeg_decode_work_limit`
+/// for a sufficient budget and buffers of `limits.max_output` for capacity.
+pub fn decode_jpeg_into<'a>(s:&'a [u8],page:usize,limits:&Limits,output:&mut [u8],scratch:&mut [u8],budget:&mut Budget) -> (r:Result<JpegImage<'a>,Error>)
+    ensures final(budget).remaining<=old(budget).remaining,
+        supported_jpeg_profile(s@,page,*limits) && old(budget).remaining as int>=jpeg_decode_work_bound(page,*limits)
+            && old(scratch).len()>=limits.max_output && old(output).len()>=limits.max_output ==> r.is_ok(),
+        r.is_err() ==> final(output)@==old(output)@,
+        final(output).len()==old(output).len(),final(scratch).len()==old(scratch).len(),
+        r.is_ok() ==> r.unwrap().well_formed() && r.unwrap().metadata_matches_source(),
+        r.is_ok() ==> r.unwrap().byte_len()<=limits.max_output && r.unwrap().scratch_size()<=limits.max_output,
+        r.is_ok() ==> forall|k:int| 0<=k<r.unwrap().byte_len() ==> final(output)@[k]==r.unwrap().decoded_byte(k),
+        r.is_ok() ==> forall|k:int| r.unwrap().byte_len()<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
+        forall|k:int| limits.max_output<=k<old(scratch).len() ==> final(scratch)@[k]==old(scratch)@[k],
+{
+    let ghost initial=budget.remaining;let ghost before_scratch=scratch@;
+    let (image,taken)=inspect_capture(s,page,limits,budget,scratch,true)?;
+    let ghost inspected=scratch@;
+    if output.len()<image.format.output || scratch.len()<image.scratch {return Err(Error::OutputTooSmall);}
+    if budget.remaining<image.work {return Err(Error::Limit);}
+    if taken {
+        spend(budget,image.work)?;
+        image.render_captured(scratch,output)?;
+    } else {
+        image.decode_with_scratch(output,scratch,budget)?;
+    }
+    assert forall|k:int| limits.max_output<=k<scratch.len() implies scratch@[k]==before_scratch[k] by {
+        assert(scratch@[k]==inspected[k]);
+    }
+    Ok(image)
 }
 fn scatter_segment(f:jf::Format,k:usize,pixels:&[u8],output:&mut [u8]) -> (r:Result<(),Error>)
     requires f.valid(),k<f.segments,pixels.len()==f.bw as int*seg::rows(f,k as int)*f.ch,old(output).len()>=f.output,

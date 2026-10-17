@@ -8,7 +8,7 @@ use std::{
     ptr,
 };
 use verified_tiff::{
-    inspect_raster, read32, Budget, Error, Limits,
+    decode_jpeg_into, inspect_raster, read32, Budget, Error, Limits,
 };
 type R<T> = Result<T, (i32, &'static str)>;
 const INVALID: i32 = 22;

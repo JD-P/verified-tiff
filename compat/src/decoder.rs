@@ -202,10 +202,13 @@ impl Handle{
     fn special(&mut self,k:usize,encoded:&[u8],budget:&mut Budget)->R<Buf<u8>>{
         if !matches!(self.meta.compression,3|4|6|7|50001|34676){return Err((NOTIMPL,"compression not implemented"));}
         let source=self.synthetic(k,encoded,budget)?;
-        let image=inspect_raster(&source,0,&self.limits,budget).map_err(err)?;
-        let mut pixels=Buf::zeros(image.output_len(),self.limits.max_output,&self.source.mem)?;
-        let mut scratch=Buf::zeros(image.scratch_len(),self.limits.max_output,&self.source.mem)?;
-        image.decode_with_scratch(&mut pixels,&mut scratch,budget).map_err(err)?;
+        let once=if matches!(self.meta.compression,6|7){self.jpeg_once(k,&source,budget)?}else{None};
+        let pixels=match once{Some(p)=>p,None=>{
+            let image=inspect_raster(&source,0,&self.limits,budget).map_err(err)?;
+            let mut pixels=Buf::zeros(image.output_len(),self.limits.max_output,&self.source.mem)?;
+            let mut scratch=Buf::zeros(image.scratch_len(),self.limits.max_output,&self.source.mem)?;
+            image.decode_with_scratch(&mut pixels,&mut scratch,budget).map_err(err)?;pixels
+        }};
         let m=&self.meta;
         if m.bits==1{
             let rows=m.segment_rows(k)?;let row=m.row_bytes(m.bw)?;
@@ -229,6 +232,28 @@ impl Handle{
             let mut out=Buf::zeros(pixels.len(),self.limits.max_output,&self.source.mem)?;
             ns::convert(&pixels,m.row_bytes(m.bw)?,m.ch,2,true,false,false,&mut out).map_err(err)?;Ok(out)
         }else{Ok(pixels)}
+    }
+    /// One validating entropy pass for a JPEG segment whose estimated buffers
+    /// fit. The probe's work is charged whatever its outcome. An input error is
+    /// final; an undersized estimate leaves the rest of the budget to the
+    /// general path.
+    fn jpeg_once(&self,k:usize,source:&[u8],budget:&mut Budget)->R<Option<Buf<u8>>>{
+        let m=&self.meta;let Ok(rows)=m.segment_rows(k) else {return Ok(None)};
+        let Some(len)=m.bw.checked_mul(rows).and_then(|n|n.checked_mul(m.ch)) else {return Ok(None)};
+        // Each component has at most ceil(n/8)+3 blocks per axis (sampling <= 4).
+        let blocks=(m.bw.div_ceil(8)+3).checked_mul(rows.div_ceil(8)+3).and_then(|n|n.checked_mul(m.ch));
+        let Some(room)=blocks.and_then(|n|n.checked_mul(64)).and_then(|n|n.checked_add(len)) else {return Ok(None)};
+        let room=room.min(self.limits.max_output);
+        let Ok(mut pixels)=Buf::zeros(len,self.limits.max_output,&self.source.mem) else {return Ok(None)};
+        let Ok(mut scratch)=Buf::zeros(room,self.limits.max_output,&self.source.mem) else {return Ok(None)};
+        let mut probe=Budget{remaining:budget.remaining};
+        let r=decode_jpeg_into(source,0,&self.limits,&mut pixels,&mut scratch,&mut probe);
+        budget.remaining=probe.remaining;
+        match r{
+            Ok(image) if image.output_len()==len=>Ok(Some(pixels)),
+            Ok(_)|Err(Error::OutputTooSmall)=>Ok(None),
+            Err(e)=>Err(err(e)),
+        }
     }
     fn synthetic(&mut self,k:usize,encoded:&[u8],budget:&mut Budget)->R<Buf<u8>>{
         let first_offset=self.meta.offsets.get(&mut self.source,0)?;
