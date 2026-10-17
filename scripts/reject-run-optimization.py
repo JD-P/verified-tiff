@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits and LZW paths."""
+"""Reject semantic mutations of the run, strip-copy, fax cursor, WebP table, RGBA, PackBits, LZW and JPEG lookahead paths."""
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
@@ -28,6 +28,12 @@ changes={
  'copy-within':('lib.rs','let b=output[src+j];output[dst+j]=b;','let b=output[src+j];output[dst+j]=0;','root','copy_within'),
  'lzw-skip-length':('native_stream.rs','else{self.table.data(c,self.legacy)}\n','else{self.table.data(c,self.legacy)?;Ok(1)}\n','native_stream','Lzw::skip'),
  'rgba-row-guard':('native_rgba.rs','if at+ch>src.len()||','if at+ch>=src.len()||','native_rgba','row'),
+ 'jpeg-table-entry':('jpeg_huffman.rs','let entry=(n*256+sym as usize) as u16;','let entry=((n+1)*256+sym as usize) as u16;','jpeg_huffman','fast'),
+ 'jpeg-window-symbol':('jpeg_huffman.rs','let sym=(e&255) as u8;','let sym=(e&127) as u8;','jpeg_huffman','decode_fast'),
+ 'jpeg-window-state':('jpeg_huffman.rs','let q=if len<=left {','let q=if len<left {','jpeg_huffman','decode_fast'),
+ 'jpeg-window-stuffing':('jpeg_huffman.rs','Bits {at:b.at+adv,byte:nb,left:8-(len-left),end:b.end}','Bits {at:b.at+1,byte:nb,left:8-(len-left),end:b.end}','jpeg_huffman','decode_fast'),
+ 'jpeg-amplitude':('jpeg_bits.rs','let v=hi*power(m)+((nb as usize)>>(8-m));','let v=hi*power(m)+((nb as usize)>>(8-m))/2;','jpeg_bits','read_fast'),
+ 'jpeg-amplitude-stuffing':('jpeg_bits.rs','Ok((v,Bits {at:b.at+adv,byte:nb,left:8-m,end:b.end}))','Ok((v,Bits {at:b.at+1,byte:nb,left:8-m,end:b.end}))','jpeg_bits','read_fast'),
 }
 for name,(file,before,after,module,function) in changes.items():
  dest=root/'target'/('reject-run-'+name);shutil.copytree(root/'src',dest,dirs_exist_ok=True)

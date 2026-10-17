@@ -3,7 +3,7 @@
 use super::*;
 use crate::jpeg_bits::Bits;
 use crate::jpeg_header::*;
-use crate::jpeg_huffman::Huff;
+use crate::jpeg_huffman::{Huff,fast};
 use crate::jpeg_block as b;
 verus! {
 pub(super) open spec fn across(v:Seq<usize>) -> int {(v[12]+8*v[15]-1)/(8*v[15])}
@@ -64,6 +64,32 @@ pub(super) open spec fn finish(s:Seq<u8>,v:Seq<usize>,m:Model,n:nat,legacy:bool)
     if n==0 {if terminated(s,m.bits,legacy) {Some(m)} else {None}}
     else {let a=step(s,v,m);if a.is_none() {None} else {finish(s,v,a.unwrap(),(n-1) as nat,legacy)}}
 }
+/// Lookahead tables for each component's DC and AC codes. Short scans keep
+/// all-zero tables, which select the bit-serial decoder.
+pub(super) struct Tables {pub dc0:[u16;256],pub ac0:[u16;256],pub dc1:[u16;256],pub ac1:[u16;256],pub dc2:[u16;256],pub ac2:[u16;256]}
+impl Tables {
+    pub(super) open spec fn ready(&self,s:Seq<u8>,v:Seq<usize>) -> bool {
+        &&& crate::jpeg_huffman::fast_ok(s,Huff {base:v[4+v[23]]},self.dc0@) && crate::jpeg_huffman::fast_ok(s,Huff {base:v[8+v[26]]},self.ac0@)
+        &&& v[14]==3 ==> crate::jpeg_huffman::fast_ok(s,Huff {base:v[4+v[24]]},self.dc1@) && crate::jpeg_huffman::fast_ok(s,Huff {base:v[8+v[27]]},self.ac1@)
+            && crate::jpeg_huffman::fast_ok(s,Huff {base:v[4+v[25]]},self.dc2@) && crate::jpeg_huffman::fast_ok(s,Huff {base:v[8+v[28]]},self.ac2@)
+    }
+    pub(super) fn new(s:&[u8],v:[usize;32],count:usize) -> (r:Self)
+        requires scan_ok(s@,v@),
+        ensures r.ready(s@,v@),
+    {
+        let z=[0u16;256];
+        let mut t=Tables {dc0:z,ac0:z,dc1:z,ac1:z,dc2:z,ac2:z};
+        if count<64 {return t;}
+        t.dc0=fast(s,Huff {base:v[4+v[23]]});t.ac0=fast(s,Huff {base:v[8+v[26]]});
+        if v[14]==3 {
+            t.dc1=if v[4+v[24]]==v[4+v[23]] {t.dc0} else {fast(s,Huff {base:v[4+v[24]]})};
+            t.ac1=if v[8+v[27]]==v[8+v[26]] {t.ac0} else {fast(s,Huff {base:v[8+v[27]]})};
+            t.dc2=if v[4+v[25]]==v[4+v[24]] {t.dc1} else {fast(s,Huff {base:v[4+v[25]]})};
+            t.ac2=if v[8+v[28]]==v[8+v[27]] {t.ac1} else {fast(s,Huff {base:v[8+v[28]]})};
+        }
+        t
+    }
+}
 pub(super) struct Cursor {pub bits:Bits,pub pred:[i64;3],pub produced:usize,pub history:Ghost<Seq<Seq<i64>>>}
 impl Cursor {
     pub(super) open spec fn model(&self) -> Model {Model {bits:self.bits,pred:self.pred@,blocks:self.history@}}
@@ -78,8 +104,8 @@ impl Cursor {
         let out=Cursor {bits,pred:[0i64;3],produced:0,history:Ghost(Seq::empty())};
         assert(out.pred@ =~= seq![0i64,0,0]);out
     }
-    pub(super) fn next(&mut self,s:&[u8],v:[usize;32]) -> (r:Result<[i64;64],Error>)
-        requires old(self).valid(s@),scan_ok(s@,v@),old(self).produced<usize::MAX,
+    pub(super) fn next(&mut self,s:&[u8],v:[usize;32],t:&Tables) -> (r:Result<[i64;64],Error>)
+        requires old(self).valid(s@),scan_ok(s@,v@),old(self).produced<usize::MAX,t.ready(s@,v@),
         ensures r.is_ok()==step(s@,v@,old(self).model()).is_some(),
             r.is_ok() ==> final(self).valid(s@) && final(self).model()==step(s@,v@,old(self).model()).unwrap(),
             r.is_ok() ==> final(self).produced==old(self).produced+1 && final(self).history@==old(self).history@.push(r.unwrap()@),
@@ -95,7 +121,8 @@ impl Cursor {
         let mut pred=self.pred;
         if self.produced>0 && self.produced%per==0 && v[29]>0 && (self.produced/per)%v[29]==0 {pred=[0i64;3];}
         assert(pred@==if reset(v@,self.produced as int) {seq![0i64,0,0]} else {self.pred@});
-        let out=b::block(s,bits,qt,dc,ac,pred[c])?;
+        let (dt,at)=if c==0 {(&t.dc0,&t.ac0)} else if c==1 {(&t.dc1,&t.ac1)} else {(&t.dc2,&t.ac2)};
+        let out=b::block(s,bits,qt,dc,ac,pred[c],dt,at)?;
         self.pred=pred;
         self.bits=out.bits;self.pred[c]=out.pred;self.produced=self.produced+1;
         proof {self.history=Ghost(self.history@.push(out.coef@));}
@@ -113,15 +140,16 @@ pub(super) fn validate(s:&[u8],v:[usize;32],bits:Bits,count:usize,legacy:bool) -
     requires scan_ok(s@,v@),bits.valid(s@),
     ensures r.is_ok()==finish(s@,v@,initial(bits),count as nat,legacy).is_some(),
 {
+    let t=Tables::new(s,v,count);
     let mut c=Cursor::new(bits);let mut i=0usize;
     let ghost result=finish(s@,v@,initial(bits),count as nat,legacy);
     while i<count
-        invariant c.valid(s@),i==c.produced,i<=count,scan_ok(s@,v@),
+        invariant c.valid(s@),i==c.produced,i<=count,scan_ok(s@,v@),t.ready(s@,v@),
             result==finish(s@,v@,initial(bits),count as nat,legacy),
             result==finish(s@,v@,c.model(),(count-i) as nat,legacy),
         decreases count-i,
     {
-        reveal_with_fuel(finish,1);c.next(s,v)?;i=i+1;
+        reveal_with_fuel(finish,1);c.next(s,v,&t)?;i=i+1;
     }
     reveal_with_fuel(finish,1);
     if c.end(s,legacy) {Ok(())} else {Err(Error::Invalid)}
@@ -149,11 +177,12 @@ pub(super) fn decode_blocks(s:&[u8],v:[usize;32],bits:Bits,count:usize,legacy:bo
         forall|k:int| 0<=k<count as int*64 ==> final(output)@[k]==crate::jpeg_transform::sample(finish(s@,v@,initial(bits),count as nat,legacy).unwrap().blocks[k/64],k%64),
         forall|k:int| count as int*64<=k<old(output).len() ==> final(output)@[k]==old(output)@[k],
 {
+    let t=Tables::new(s,v,count);
     let mut c=Cursor::new(bits);let mut i=0usize;
     let ghost result=finish(s@,v@,initial(bits),count as nat,legacy);
     let outlen=output.len();
     while i<count
-        invariant c.valid(s@),i==c.produced,i<=count,scan_ok(s@,v@),count as int*64<=output.len(),output.len()==old(output).len(),
+        invariant c.valid(s@),i==c.produced,i<=count,scan_ok(s@,v@),t.ready(s@,v@),count as int*64<=output.len(),output.len()==old(output).len(),
             result==finish(s@,v@,initial(bits),count as nat,legacy),result.is_some(),
             result==finish(s@,v@,c.model(),(count-i) as nat,legacy),
             forall|k:int| 0<=k<i as int*64 ==> output@[k]==crate::jpeg_transform::sample(result.unwrap().blocks[k/64],k%64),
@@ -161,7 +190,7 @@ pub(super) fn decode_blocks(s:&[u8],v:[usize;32],bits:Bits,count:usize,legacy:bo
         decreases count-i,
     {
         reveal_with_fuel(finish,1);
-        let coef=c.next(s,v)?;
+        let coef=c.next(s,v,&t)?;
         assert(result==finish(s@,v@,c.model(),(count-i-1) as nat,legacy));
         proof {finish_prefix(s@,v@,c.model(),(count-i-1) as nat,legacy);}
         assert(c.history@[i as int]==coef@);

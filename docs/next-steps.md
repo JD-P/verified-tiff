@@ -48,9 +48,8 @@ acceptance proofs. Preserve the missing-EOL and duplicate-endpoint policies in
    Large RGB Deflate and LERC are substantially faster but still trail libtiff.
    Remaining work includes reusable Huffman prefix tables, packed bilevel
    expansion and adapter allocation/replay.
-   Retain all semantic/acceptance contracts and benchmark each change: a tested
-   JPEG speculative lookahead implementation was removed because it regressed
-   textured images. Do not trade exact JPEG output for faster approximate math.
+   Retain all semantic/acceptance contracts and benchmark each change. Do not
+   trade exact JPEG output for faster approximate math.
 4. **Add codecs one at a time.** PackBits and LZW are implemented for bilevel, Gray8, and
    RGB8 with optional 8-bit alpha. Deflate now supports all current representations. CCITT Group 3/4 now supports bilevel scans with explicit compatibility rules.
    Float64 and its Predictor 2 are implemented. The single-group WebP lossless subset now covers the original opaque-alpha fixture. The native C path now includes predictor/color/palette transforms, entropy meta-images, lossy VP8 and ALPH with separate checked models. The native C path now supports integer Predictor 2 and float32. Predictor 3 and byte-aligned CCITT RLE now have separate verified native APIs used by the C reader. Dictionary-free ZSTD now has a verified native segment API with full block/literal/FSE modes and checksum validation. Lerc2 v4 and static VP8/VP8L now have verified native APIs. A subsequent task can integrate these native formats into the complete whole-image acceptance model. Give each codec its own input/output relation,

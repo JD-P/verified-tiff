@@ -21,7 +21,7 @@ fn amplitude(s:&[u8],b:Bits,n:usize) -> (r:Result<(i64,Bits),Error>)
         r.is_ok() ==> r.unwrap().1==field(s@,b,n as nat).unwrap().1 && r.unwrap().1.valid(s@),
         r.is_ok() ==> -2047<=r.unwrap().0<=2047,
 {
-    let (v,q)=read(s,b,n)?;
+    let (v,q)=read_fast(s,b,n)?;
     if n==0 {return Ok((0,q));}
     let mid=crate::jpeg_bits::power(n-1);let full=crate::jpeg_bits::power(n);
     Ok((if v<mid {v as i64+1-full as i64} else {v as i64},q))
@@ -67,15 +67,15 @@ impl Block {
         (forall|i:int| 0<=i<64 ==> -524288<=#[trigger] self.coef@[i]<=524288)
     }
     #[inline(always)]
-    fn advance(&mut self,s:&[u8],qt:usize,dc:Huff,ac:Huff) -> (r:Result<(),Error>)
-        requires old(self).valid(s@),range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),
+    fn advance(&mut self,s:&[u8],qt:usize,dc:Huff,ac:Huff,dt:&[u16;256],at:&[u16;256]) -> (r:Result<(),Error>)
+        requires old(self).valid(s@),range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),fast_ok(s@,dc,dt@),fast_ok(s@,ac,at@),
         ensures r.is_ok()==step(s@,qt as int,dc,ac,old(self).model()).is_some(),
             r.is_ok() ==> final(self).model()==step(s@,qt as int,dc,ac,old(self).model()).unwrap(),
             r.is_ok() ==> final(self).valid(s@),
     {
         reveal(step);
         if self.done || self.k>=64 {return Err(Error::Invalid);}
-        let (code,b)=decode(s,self.bits,if self.k==0 {dc} else {ac})?;
+        let (h,t)=if self.k==0 {(dc,dt)} else {(ac,at)};let (code,b)=decode_fast(s,self.bits,h,t)?;
         if self.k==0 {
             if code>11 {return Err(Error::Invalid);}
             let (v,q)=amplitude(s,b,code as usize)?;
@@ -98,8 +98,8 @@ impl Block {
         Ok(())
     }
 }
-pub(super) fn block(s:&[u8],bits:Bits,qt:usize,dc:Huff,ac:Huff,pred:i64) -> (r:Result<Block,Error>)
-    requires bits.valid(s@),range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),-2048<=pred<=2047,
+pub(super) fn block(s:&[u8],bits:Bits,qt:usize,dc:Huff,ac:Huff,pred:i64,dt:&[u16;256],at:&[u16;256]) -> (r:Result<Block,Error>)
+    requires bits.valid(s@),range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),-2048<=pred<=2047,fast_ok(s@,dc,dt@),fast_ok(s@,ac,at@),
     ensures r.is_ok()==finish(s@,qt as int,dc,ac,initial(bits,pred),65).is_some(),
         r.is_ok() ==> r.unwrap().valid(s@) && r.unwrap().done && r.unwrap().model()==finish(s@,qt as int,dc,ac,initial(bits,pred),65).unwrap(),
 {
@@ -108,14 +108,14 @@ pub(super) fn block(s:&[u8],bits:Bits,qt:usize,dc:Huff,ac:Huff,pred:i64) -> (r:R
     assert(b.coef@ =~= Seq::new(64,|i:int| 0i64));
     assert(b.model()==initial(bits,pred));
     while !b.done
-        invariant b.valid(s@),left<=65,range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),
+        invariant b.valid(s@),left<=65,range_ok(s.len() as int,qt as int,64),dc.valid(s@),ac.valid(s@),fast_ok(s@,dc,dt@),fast_ok(s@,ac,at@),
             result==finish(s@,qt as int,dc,ac,initial(bits,pred),65),
             result==finish(s@,qt as int,dc,ac,b.model(),left as nat),
         decreases left,
     {
         reveal_with_fuel(finish,1);
         if left==0 {return Err(Error::Invalid);}
-        b.advance(s,qt,dc,ac)?;left=left-1;
+        b.advance(s,qt,dc,ac,dt,at)?;left=left-1;
     }
     reveal_with_fuel(finish,1);Ok(b)
 }
