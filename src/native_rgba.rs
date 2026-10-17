@@ -96,8 +96,9 @@ pub fn row(raw:&[u8],n:usize,ch:usize,wide:bool,rgb:bool,invert:bool,alpha:usize
         let b=if rgb {scale(load(raw,at+2,wide,le),wide,true,false)} else {r};
         let r=associate(r,a,premul);let g=associate(g,a,premul);let b=associate(b,a,premul);
         let d=4*i;
-        out[d]=if le {r} else {a};out[d+1]=if le {g} else {b};
-        out[d+2]=if le {b} else {g};out[d+3]=if le {a} else {r};
+        // Writing the last byte first lets the compiler drop the other bounds checks.
+        out[d+3]=if le {a} else {r};
+        out[d]=if le {r} else {a};out[d+1]=if le {g} else {b};out[d+2]=if le {b} else {g};
         i=i+1;
     }
     Ok(())
