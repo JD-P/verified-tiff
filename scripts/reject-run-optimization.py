@@ -3,11 +3,11 @@
 import os,pathlib,shutil,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 changes={
- 'stream-stored-output':('native_stream.rs','let byte=c.stored_byte(s,cap);\n        dst[i]=byte;','let byte=c.stored_byte(s,cap);\n        dst[i]=0;','native_stream','stored_run'),
+ 'stream-stored-output':('native_stream.rs','let byte=c.stored_byte(s,src,i,cap);\n        dst[i]=byte;','let byte=c.stored_byte(s,src,i,cap);\n        dst[i]=0;','native_stream','stored_run'),
  'stream-stored-work':('native_stream.rs','two work units each.\n                spend(budget,2*n)?;','two work units each.\n                spend(budget,n)?;','native_stream','Inflater::pull'),
  'segment-match-output':('deflate.rs','let byte=c.match_byte(s,cap);\n        dst[i]=byte;','let byte=c.match_byte(s,cap);\n        dst[i]=0;','deflate','copy_into'),
- 'segment-stored-output':('deflate.rs','let byte=c.stored_byte(s,cap);\n        dst[i]=byte;','let byte=c.stored_byte(s,cap);\n        dst[i]=0;','deflate','stored_into'),
- 'stored-byte':('deflate.rs','let byte=s[self.bits.at];self.bits.at=self.bits.at+1;','let byte=0u8;self.bits.at=self.bits.at+1;','deflate','Cursor::stored_byte'),
+ 'segment-stored-output':('deflate.rs','let byte=c.stored_byte(s,src,i,cap);\n        dst[i]=byte;','let byte=c.stored_byte(s,src,i,cap);\n        dst[i]=0;','deflate','stored_into'),
+ 'stored-byte':('deflate.rs','let byte=src[i];self.bits.at=self.bits.at+1;','let byte=0u8;self.bits.at=self.bits.at+1;','deflate','Cursor::stored_byte'),
  'fax-strip':('fax_tiff.rs','copy_byte_run(pixels,0,output,base,pixels.len(),f.photo==0);','copy_byte_run(pixels,0,output,base,pixels.len(),f.photo!=0);','fax_tiff','scatter_segment'),
  'jpeg-strip':('jpeg_tiff.rs','copy_byte_run(pixels,0,output,base,pixels.len(),false);','copy_byte_run(pixels,0,output,base,pixels.len(),true);','jpeg_tiff','scatter_segment'),
  'fax-bit-order':('fax_bits.rs','let n=if b.lsb!=0 {b.pos%8} else {7-b.pos%8};','let n=if b.lsb==0 {b.pos%8} else {7-b.pos%8};','fax_bits','bit'),

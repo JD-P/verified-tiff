@@ -199,9 +199,10 @@ impl Cursor {
         self.push(byte,cap);byte
     }
     #[inline(always)]
-    pub(super) fn stored_byte(&mut self,s:&[u8],cap:usize) -> (byte:u8)
+    pub(super) fn stored_byte(&mut self,s:&[u8],src:&[u8],i:usize,cap:usize) -> (byte:u8)
         requires old(self).valid(s@,cap as int),old(self).mode==1,old(self).left>0,old(self).bits.bit==0,
             old(self).bits.at<old(self).bits.end,old(self).produced<cap,
+            i<src.len(),src@[i as int]==s@[old(self).bits.at as int],
         ensures final(self).valid(s@,cap as int),final(self).end()==old(self).end(),
             Some(final(self).model())==transition(s@,old(self).end(),cap as int,old(self).model()),
             final(self).produced==old(self).produced+1,final(self).history@==old(self).history@.push(byte),
@@ -210,7 +211,9 @@ impl Cursor {
     {
         reveal(transition);
         proof {aligned_byte(s@,self.bits.at as int);}
-        let byte=s[self.bits.at];self.bits.at=self.bits.at+1;self.left=self.left-1;
+        // Runs pass the block's own subslice, so the read needs no bounds check
+        // and the cursor fields stay in registers across the loop.
+        let byte=src[i];self.bits.at=self.bits.at+1;self.left=self.left-1;
         self.push(byte,cap);byte
     }
     #[inline(always)]
@@ -409,8 +412,10 @@ fn stored_into(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],fuel:Ghost<nat>)
 {
     let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
     let ghost wanted=finish(s@,c.end(),cap as int,c.model(),fuel@);
+    let (_,tail)=s.split_at(c.bits.at);let (src,_)=tail.split_at(n);
     while i<n
         invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==1,c.left+i==old(c).left,
+            src.len()==n,forall|k:int| 0<=k<n ==> #[trigger] src@[k]==s@[old(c).bits.at+k],
             c.bits.bit==0,c.bits.at==old(c).bits.at+i,c.bits.end==old(c).bits.end,old(c).bits.at+n<=old(c).bits.end,
             c.produced==start+i,start==old(c).produced,start+n<=cap,
             c.valid(s@,cap as int),c.end()==old(c).end(),n<=fuel@,
@@ -421,7 +426,7 @@ fn stored_into(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],fuel:Ghost<nat>)
     {
         reveal_with_fuel(finish,1);
         let ghost previous=c.history@;
-        let byte=c.stored_byte(s,cap);
+        let byte=c.stored_byte(s,src,i,cap);
         dst[i]=byte;i=i+1;
         assert forall|k:int| 0<=k<i implies dst@[k]==c.history@[start+k] by {
             if k==i-1 {assert(c.history@[start+k]==byte);} else {assert(c.history@[start+k]==previous[start+k]);}

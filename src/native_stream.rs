@@ -80,8 +80,10 @@ fn stored_run(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],space:Ghost<nat>,fue
 {
     let n=dst.len();let mut i=0usize;let ghost start=c.produced;let ghost history=c.history@;
     let ghost wanted=batch(s@,c.end(),cap as int,c.model(),space@,fuel@,last@);
+    let (_,tail)=s.split_at(c.bits.at);let (src,_)=tail.split_at(n);
     while i<n
         invariant i<=n,n==dst.len(),n<=old(c).left,c.mode==1,c.left+i==old(c).left,
+            src.len()==n,forall|k:int| 0<=k<n ==> #[trigger] src@[k]==s@[old(c).bits.at+k],
             c.bits.bit==0,c.bits.at==old(c).bits.at+i,c.bits.end==old(c).bits.end,old(c).bits.at+n<=old(c).bits.end,
             c.produced==start+i,start==old(c).produced,start+n<=cap,
             c.valid(s@,cap as int),c.end()==old(c).end(),n<=space@,n<=fuel@,
@@ -93,7 +95,7 @@ fn stored_run(c:&mut Cursor,s:&[u8],cap:usize,dst:&mut [u8],space:Ghost<nat>,fue
     {
         reveal_with_fuel(batch,1);
         let ghost previous=c.history@;
-        let byte=c.stored_byte(s,cap);
+        let byte=c.stored_byte(s,src,i,cap);
         dst[i]=byte;i=i+1;
         assert forall|k:int| 0<=k<i implies dst@[k]==c.history@[start+k] by {
             if k==i-1 {assert(c.history@[start+k]==byte);} else {assert(c.history@[start+k]==previous[start+k]);}
