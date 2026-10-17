@@ -137,7 +137,8 @@ impl<'a> JpegSegment<'a> {
                         forall|j:int| self.output<=j<output.len() ==> output@[j]==old(output)@[j],
                     decreases count-i,
                 {
-                    let c=i%ch;let col=i/ch;
+                    // Constant divisors for the two legal channel counts.
+                    let c=if ch==3 {i%3} else {i%ch};let col=if ch==3 {i/3} else {i/ch};
                     proof {
                         quotient_remainder(i as int,ch as int);
                         assert(col<n) by(nonlinear_arith) requires i<count,count as int==n as int*ch,i as int==ch as int*col+c,c>=0,ch>0;
@@ -152,10 +153,10 @@ impl<'a> JpegSegment<'a> {
                             vstd::arithmetic::div_mod::lemma_div_is_ordered(phase as int+col,phase as int+n-1,hs as int);
                         }
                     }
+                    let off=if hs==1 {phase+col} else if hs==2 {(phase+col)/2} else if hs==4 {(phase+col)/4} else {(phase+col)/hs};
                     let value=if self.ycbcr && ch==3 {
-                        let off=(phase+col)/hs;
                         crate::jpeg_color::convert(scratch[a+col],scratch[b+off],scratch[d+off],c,self.limited)
-                    } else {scratch[if c==0 {a+col} else if c==1 {b+(phase+col)/hs} else {d+(phase+col)/hs}]};
+                    } else {scratch[if c==0 {a+col} else if c==1 {b+off} else {d+off}]};
                     assert(value==self.decoded_byte(dst as int+i));
                     output[dst+i]=value;i=i+1;
                 }

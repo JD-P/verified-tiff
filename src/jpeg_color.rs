@@ -24,7 +24,11 @@ pub(super) fn convert(y:u8,cb:u8,cr:u8,c:usize,limited:bool) -> (r:u8)
     } else {
         if c==0 {base+r*1402000} else if c==1 {base-b*344136-r*714136} else {base+b*1772000}
     };
-    let d=if limited {24528000000i64} else {1000000i64};let n=raw+d/2;
-    if n<=0 {0} else if n>=255*d {255} else {(n/d) as u8}
+    // Separate constant divisors avoid a 64-bit hardware division per byte.
+    if limited {
+        let n=raw+12264000000;if n<=0 {0} else if n>=255*24528000000 {255} else {(n/24528000000) as u8}
+    } else {
+        let n=raw+500000;if n<=0 {0} else if n>=255*1000000 {255} else {(n/1000000) as u8}
+    }
 }
 }
